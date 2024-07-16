@@ -9,7 +9,6 @@ if ($postjson['requisicao'] == 'listar') {
     $id = trim($postjson['id']);
     $id_colaborador = trim($postjson['id_colaborador']);
     $id_empresa = trim($postjson['id_empresa']);
-    $id_local_atividade = trim($postjson['id_local_atividade']);
     $cpf = trim($postjson['cpf']);
 
     $where = "";
@@ -43,26 +42,13 @@ if ($postjson['requisicao'] == 'listar') {
         ";
     }
 
-    // SE TIVER id_local_atividade PARA BUSCA
-    if ($id_local_atividade > 0) {
-        $where .= "
-        AND rl.id_local_atividade = " . $id_local_atividade . "
-        ";
-    }
-
     $sql = "
     SELECT c.*, 
-    rl.id_rl_colaborador_empresa,rl.id_rl_setor_funcao,rl.data_admissao,DATE_FORMAT(rl.data_admissao,'%d/%m/%Y') data_admissao_mask,rl.matricula,rl.status,
-    rl2.funcao,
-    s.setor,
-    lt.id_empresa,lt.id_local_atividade,lt.razao_social local_atividade,
-    e.tipo_inscricao, e.nr_inscricao , e.razao_social
+    rl.id_rl_colaborador_empresa,rl.data_admissao,DATE_FORMAT(rl.data_admissao,'%d/%m/%Y') data_admissao_mask,rl.matricula,rl.status,
+    e.id_empresa, e.tipo_inscricao, e.nr_inscricao , e.razao_social
     FROM colaboradores c
     JOIN rl_colaboradores_empresas rl ON (rl.id_colaborador = c.id_colaborador AND rl.ativo = '1')
-    JOIN rl_setores_funcoes rl2 ON (rl.id_rl_setor_funcao = rl2.id_rl_setor_funcao)
-    JOIN setores s ON (rl2.id_setor = s.id_setor)
-    JOIN locais_atividade lt ON (s.id_local_atividade = lt.id_local_atividade)
-    JOIN empresas e ON (lt.id_empresa = e.id_empresa)
+    JOIN empresas e ON (rl.id_empresa = e.id_empresa)
     WHERE c.ativo = 1
     $where
     ORDER BY rl.status DESC , c.nome
@@ -73,9 +59,6 @@ if ($postjson['requisicao'] == 'listar') {
 
     if (mysqli_num_rows($query) > 0) {
         while ($row = mysqli_fetch_object($query)) {
-
-            $row->razao_social_local_atividade = $row->razao_social . " | " . $row->local_atividade;
-            $row->setor_funcao = $row->setor . " | " . $row->funcao;
 
             $row->celular_mask = '(' . substr($row->celular, 0, 2) . ') ' . substr($row->celular, 2, 1) . ' ' . substr($row->celular, 3, 4) . '-' . substr($row->celular, 7, 4);
             $row->cpf_mask = substr($row->cpf, 0, 3) . '.' . substr($row->cpf, 3, 3) . '.' . substr($row->cpf, 6, 3) . '-' . substr($row->cpf, 9, 2);

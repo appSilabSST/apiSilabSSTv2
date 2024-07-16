@@ -9,6 +9,7 @@ if ($postjson['requisicao'] == 'listar') {
     $id = $postjson['id'];
     $id_empresa = $postjson['id_empresa'];
     $id_setor = $postjson['id_setor'];
+    $id_pcmso = $postjson['id_pcmso'];
     $id_local_atividade = $postjson['id_local_atividade'];
     $id_rl_colaborador_empresa = $postjson['id_rl_colaborador_empresa'];
 
@@ -23,6 +24,17 @@ if ($postjson['requisicao'] == 'listar') {
     if ($id_setor > 0) {
         $where .= "
         AND r.id_setor = $id_setor
+        ";
+    }
+
+    // SE TIVER ID_SETOR PARA BUSCA
+    if ($id_pcmso > 0) {
+        $where .= "
+        AND s.id_local_atividade = (
+            SELECT id_local_atividade
+            FROM pcmso
+            WHERE id_pcmso = $id_pcmso
+        )
         ";
     }
 

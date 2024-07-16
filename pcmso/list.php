@@ -8,6 +8,7 @@ $postjson = json_decode(file_get_contents('php://input'), true);
 if ($postjson['requisicao'] == 'listar') {
     $id = $postjson['id'];
     $id_empresa = $postjson['id_empresa'];
+    $id_rl_colaborador_empresa = $postjson['id_rl_colaborador_empresa'];
 
     // SE TIVER ID PARA BUSCA
     if ($id > 0) {
@@ -15,11 +16,20 @@ if ($postjson['requisicao'] == 'listar') {
         AND p.id_pcmso = $id
         ";
     }
-
     // SE TIVER ID_EMPRESA PARA BUSCA
     if ($id_empresa > 0) {
         $where = "
         AND p.id_empresa = $id_empresa
+        ";
+    }
+    // SE TIVER id_rl_colaborador_empresa PARA BUSCA
+    if ($id_rl_colaborador_empresa > 0) {
+        $where = "
+        AND p.id_empresa = (
+            SELECT id_empresa
+            FROM rl_colaboradores_empresas
+            WHERE id_rl_colaborador_empresa = $id_rl_colaborador_empresa
+        )
         ";
     }
 
@@ -36,7 +46,7 @@ if ($postjson['requisicao'] == 'listar') {
     LEFT JOIN profissionais pro ON (p.id_profissional = pro.id_profissional)
     WHERE p.ativo = 1
     $where
-    ORDER BY p.nr_pcmso
+    ORDER BY p.nr_pcmso DESC
     ";
 
     // echo $sql;exit;

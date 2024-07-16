@@ -60,7 +60,7 @@ if ($postjson['requisicao'] == 'listar') {
 
     $sql = "
     SELECT rl.*,
-    e.procedimento , e.cod , e.procedimento , CONCAT_WS(' | eSocial: ', e.procedimento , e.cod) procedimento_format,
+    e.procedimento , e.cod , CONCAT_WS(' | eSocial: ', e.procedimento , e.cod) procedimento_format,
     s.id_setor,s.setor
     FROM rl_setores_exames AS rl
     JOIN exames e ON (rl.id_exame = e.id_exame)

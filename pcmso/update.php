@@ -55,7 +55,7 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
 
         $row->controle_revisoes = '
             
-            <table style="border-collapse: collapse; width: 100%; border-width: 1px;" border="1">
+            <table style="border-collapse: collapse; width: 100%; border-width: 1px; font-size: 8pt;" border="1">
                 <thead>
                     <tr>
                         <th><p style="text-align:center;"><strong>Nº REV</strong></p></th>
@@ -112,9 +112,9 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
 
             while ($row1 = mysqli_fetch_object($query1)) {
                 $row->levantamento_riscos .= '                
-                    <table style="border-collapse: collapse; width: 100%; border-width: 1px;" border="1">
+                    <table style="border-collapse: collapse; width: 100%; border-width: 1px; font-size: 8pt;" border="1">
                         <caption>
-                            <span style="font-size: 8pt"><strong>10.1 - TABELAS DE POSSÍVEIS AGRAVOS À SAÚDE RELACIONADOS AOS RISCOS OCUPACIONAIS IDENTIFICADOS E CLASSIFICADOS NO PGR, CONFORME ALÍNEA a) DO ÍTEM 7.5.4.</strong></span>
+                            <span style="font-size: 6pt"><strong>10.1 - TABELAS DE POSSÍVEIS AGRAVOS À SAÚDE RELACIONADOS AOS RISCOS OCUPACIONAIS IDENTIFICADOS E CLASSIFICADOS NO PGR, CONFORME ALÍNEA a) DO ÍTEM 7.5.4.</strong></span>
                         </caption>
                         <thead>
                             <tr>
@@ -129,16 +129,16 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
 
                 $row->levantamento_riscos .= '
                 
-                    <table style="border-collapse: collapse; width: 100%; border-width: 1px;" border="1">
+                    <table style="border-collapse: collapse; width: 100%; border-width: 1px; font-size: 8pt;" border="1">
                         <tbody>
                             <tr>
                                 <td>
-                                    <span style="font-size: 8pt"><strong>GHE - DEPARTAMENTO (STATUS)</strong></span><br>
-                                    <span style="font-size: 9pt">' . $row1->setor . ' (' . $row1->status_format . ')</span>
+                                    <span style="font-size: 7pt"><strong>GHE - DEPARTAMENTO (STATUS)</strong></span><br>
+                                    <span style="font-size: 8pt">' . $row1->setor . ' (' . $row1->status_format . ')</span>
                                 </td>
                                 <td>
-                                    <span style="font-size: 8pt"><strong>DESCRIÇÃO</strong></span><br>
-                                    <span style="font-size: 9pt">' . $row1->descricao . '</span>
+                                    <span style="font-size: 7pt"><strong>DESCRIÇÃO</strong></span><br>
+                                    <span style="font-size: 8pt">' . $row1->descricao . '</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -159,15 +159,15 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
                 if (mysqli_num_rows($query2) > 0) {
                     $row->levantamento_riscos .= '
                     
-                    <table style="border-collapse: collapse; width: 100%; border-width: 1px;" border="1">
+                    <table style="border-collapse: collapse; width: 100%; border-width: 1px; font-size: 8pt;" border="1">
                         <tbody>
                     ';
                     while ($row2 = mysqli_fetch_object($query2)) {
                         $row->levantamento_riscos .= '
                         <tr>
                             <td>
-                                <span style="font-size: 8pt"><strong>FUNÇÕES</strong></span><br>
-                                <span style="font-size: 9pt">' . $row2->lista_funcoes . '</span>
+                                <span style="font-size: 7pt"><strong>FUNÇÕES</strong></span><br>
+                                <span style="font-size: 8pt">' . $row2->lista_funcoes . '</span>
                             </td>
                         </tr>
                         ';
@@ -195,7 +195,7 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
                 if (mysqli_num_rows($query3) > 0) {
                     $row->levantamento_riscos .= '
                     
-                    <table style="border-collapse: collapse; width: 100%; border-width: 1px;" border="1">
+                    <table style="border-collapse: collapse; width: 100%; border-width: 1px; font-size: 8pt;" border="1">
                         <thead>
                             <tr>
                                 <th><p style="text-align:center;"><strong>TIPO RISCO</strong></p></th>
@@ -235,9 +235,9 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
 
                     if (mysqli_num_rows($query4) > 0) {
                         $row->levantamento_riscos .= '
-                        <table style="border-collapse: collapse; width: 100%; border-width: 1px;" border="1">
+                        <table style="border-collapse: collapse; width: 100%; border-width: 1px; font-size: 8pt;" border="1">
                             <caption>
-                                <span style="font-size: 8pt"><strong>10.2 - TABELAS DE PLANEJAMENTO DE EXAMES OCUPACIONAIS CLÍNICOS E COMPLEMENTARES RELACIONADOS AOS RISCOS OCUPACIONAIS IDENTIFICADOS E CLASSIFICADOS NO PGR, POR LOCAL E/OU FUNÇÃO E/OU GHE, CONFORME ALÍNEA b) DO ÍTEM 7.5.4.</strong></span>
+                                <span style="font-size: 6pt"><strong>10.2 - TABELAS DE PLANEJAMENTO DE EXAMES OCUPACIONAIS CLÍNICOS E COMPLEMENTARES RELACIONADOS AOS RISCOS OCUPACIONAIS IDENTIFICADOS E CLASSIFICADOS NO PGR, POR LOCAL E/OU FUNÇÃO E/OU GHE, CONFORME ALÍNEA b) DO ÍTEM 7.5.4.</strong></span>
                             </caption>
                             <thead>
                                 <tr>
@@ -320,11 +320,7 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
             $row->data
         );
 
-        $corpo_documento = "
-        <span style='font-size: 9pt'>
-        " . str_replace($search, $replace, $modelo_documento) . "
-        </span>
-        ";
+        $corpo_documento = str_replace($search, $replace, $modelo_documento);
 
         $sql = "
         UPDATE pcmso SET

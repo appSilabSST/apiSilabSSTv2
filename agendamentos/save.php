@@ -141,11 +141,41 @@ if ($postjson['requisicao'] == 'salvar' && !empty($form)) {
 
     $sql = "
     UPDATE agendamentos SET
-    cancelado = 1
+    cancelado = CASE WHEN cancelado = 1 THEN 0 ELSE 1 END
     WHERE id_agendamento = " . $id;
 
     // echo $sql;exit;
     $query  = mysqli_query($conecta, $sql);
+
+    $sql = "
+    SELECT id_regra_agendamento, data, horario, (qtde_horarios - qtde_disponivel) result FROM (
+        SELECT id_regra_agendamento, data, horario, COUNT(id_agendamento) qtde_disponivel,
+        (
+            SELECT qtde
+            FROM regras_agendamento
+            WHERE id_regra_agendamento = agendamentos.id_regra_agendamento
+        ) qtde_horarios
+        FROM agendamentos
+        WHERE DATA = (SELECT DATA FROM agendamentos WHERE id_agendamento = $id) 
+        AND horario = (SELECT horario FROM agendamentos WHERE id_agendamento = $id)
+        AND cancelado = 0
+    ) as r
+    ";
+
+    // echo $sql;exit;
+    $query = mysqli_query($conecta, $sql);
+    $row = mysqli_fetch_object($query);
+    if($row->result > 0) {
+        $sql = "
+        INSERT INTO agendamentos (data, horario, id_regra_agendamento, extra) VALUES
+        ";
+        for ($i=0; $i < $row->result; $i++) { 
+            $sql.= "('$row->data','$row->horario','$row->id_regra_agendamento',1),";
+        }
+        $sql = substr($sql, 0, -1);
+
+        $query = mysqli_query($conecta, $sql);
+    }
 
     if ($query) {
 

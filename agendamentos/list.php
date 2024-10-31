@@ -33,12 +33,12 @@ if ($postjson['requisicao'] == 'listar') {
         LEFT JOIN colaboradores c ON (rl_ce.id_colaborador = c.id_colaborador)
         LEFT JOIN empresas e ON (rl_ce.id_empresa = e.id_empresa)
         LEFT JOIN tipos_atendimento ta ON (a.id_tipo_atendimento = ta.id_tipo_atendimento)
-        LEFT JOIN rl_setores_funcoes rl_sf ON (rl_ce.id_rl_setor_funcao = rl_sf.id_rl_setor_funcao)
+        LEFT JOIN rl_setores_funcoes rl_sf ON (a.id_rl_setor_funcao = rl_sf.id_rl_setor_funcao)
         WHERE a.ativo = '1' 
         $where
         ORDER BY a.data,
         a.horario
-        ";
+    ";
 
     // echo $sql;exit;
     $query = mysqli_query($conecta, $sql);

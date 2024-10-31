@@ -16,13 +16,14 @@ if ($postjson['requisicao'] == 'listar') {
     }
 
     $sql = "
-    SELECT e.id_exame, e.procedimento, e.valor_custo, e.valor_cobrar, e.cod , e.validade, e.padronizar,
+    SELECT e.id_exame, e.procedimento, e.procedimento , e.cod_esocial , CONCAT_WS(' | eSocial: ', e.procedimento , e.cod_esocial) procedimento_format, e.valor_custo, e.valor_cobrar, e.cod_esocial , e.validade, e.padronizar,
     f.razao_social as nome_fornecedor, f.id_fornecedor
     FROM exames e 
     LEFT JOIN fornecedores f on f.id_fornecedor = e.id_fornecedor             
     WHERE e.ativo = 1
     $where
-    ORDER BY procedimento";
+    ORDER BY procedimento
+    ";
 
     $query  = mysqli_query($conecta, $sql);
     while ($row = mysqli_fetch_object($query)) {

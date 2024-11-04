@@ -1,0 +1,89 @@
+<?php
+// VALIDA SE FOI LIBERADO O ACESSO
+if ($authorization) {
+    try {
+        if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
+            $id_revisao = trim($_GET["id"]);
+            $sql = "
+            SELECT * , DATE_FORMAT(r.data_inicio, '%d/%m/%Y') data_inicio_format, DATE_FORMAT(r.data_fim, '%d/%m/%Y') data_fim_format
+            FROM revisoes AS r
+            WHERE r.ativo = 1
+            AND r.id_revisao = :id_revisao
+            ";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id_revisao', $id_revisao);
+        } elseif (isset($_GET["id_pcmso"]) && is_numeric($_GET["id_pcmso"])) {
+            $id_pcmso = trim($_GET["id_pcmso"]);
+            $sql = "
+            SELECT * , DATE_FORMAT(r.data_inicio, '%d/%m/%Y') data_inicio_format, DATE_FORMAT(r.data_fim, '%d/%m/%Y') data_fim_format
+            FROM revisoes AS r
+            WHERE r.ativo = 1
+            AND r.id_pcmso = :id_pcmso
+            ORDER BY r.data_inicio
+            ";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id_pcmso', $id_pcmso);
+        } elseif (isset($_GET["id_pgr"]) && is_numeric($_GET["id_pgr"])) {
+            $id_pgr = trim($_GET["id_pgr"]);
+            $sql = "
+            SELECT * , DATE_FORMAT(r.data_inicio, '%d/%m/%Y') data_inicio_format, DATE_FORMAT(r.data_fim, '%d/%m/%Y') data_fim_format
+            FROM revisoes AS r
+            WHERE r.ativo = 1
+            AND r.id_pgr = :id_pgr
+            ORDER BY r.data_inicio
+            ";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id_pgr', $id_pgr);
+        } elseif (isset($_GET["id_ltcat"]) && is_numeric($_GET["id_ltcat"])) {
+            $id_ltcat = trim($_GET["id_ltcat"]);
+            $sql = "
+            SELECT * , DATE_FORMAT(r.data_inicio, '%d/%m/%Y') data_inicio_format, DATE_FORMAT(r.data_fim, '%d/%m/%Y') data_fim_format
+            FROM revisoes AS r
+            WHERE r.ativo = 1
+            AND r.id_ltcat = :id_ltcat
+            ORDER BY r.data_inicio
+            ";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id_ltcat', $id_ltcat);
+        } else {
+            $sql = "
+            SELECT * , DATE_FORMAT(r.data_inicio, '%d/%m/%Y') data_inicio_format, DATE_FORMAT(r.data_fim, '%d/%m/%Y') data_fim_format
+            FROM revisoes AS r
+            WHERE r.ativo = 1
+            ORDER BY r.data_inicio
+            ";
+            $stmt = $conn->prepare($sql);
+        }
+
+        // EXECUTAR SINTAXE SQL
+        $stmt->execute();
+
+        if ($stmt->rowCount() < 1) {
+            $result = array(
+                'status' => 'fail',
+                'result' => 'Nenhuma revisão foi encontrada'
+            );
+        } elseif ($stmt->rowCount() == 1 && isset($_GET["id"]) && is_numeric($_GET["id"])) {
+            $dados = $stmt->fetch(PDO::FETCH_OBJ);
+            $result = array(
+                'status' => 'success',
+                'result' => $dados
+            );
+        } else {
+            $dados = $stmt->fetchAll(PDO::FETCH_OBJ);
+            $result = array(
+                'status' => 'success',
+                'result' => $dados
+            );
+        }
+    } catch (\Throwable $th) {
+        http_response_code(500);
+        $result = array(
+            'status' => 'fail',
+            'result' => $th->getMessage()
+        );
+    } finally {
+        $conn = null;
+        echo json_encode($result);
+    }
+}

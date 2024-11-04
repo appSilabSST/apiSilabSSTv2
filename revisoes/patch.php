@@ -5,15 +5,17 @@ if ($authorization) {
         if (isset($json['id']) && is_numeric($json['id'])) {
 
             $sql = "
-            UPDATE afastamentos SET
+            UPDATE revisoes SET
             ";
             foreach ($json as $key => $value) {
                 if ($key != 'id') {
                     $sql .= "$key = :$key,";
                 }
             }
-            $sql = substr($sql, 0, -1) . "
-            WHERE id_afastamento = :id_afastamento
+            $sql = substr($sql, 0, -1) . ",
+            data_fim = IF(status = 1, CURDATE(), data_fim)
+            WHERE id_revisao = :id_revisao
+            AND status = 0
             ";
 
             $stmt = $conn->prepare($sql);
@@ -21,7 +23,7 @@ if ($authorization) {
                 if ($key != 'id') {
                     $stmt->bindParam(":$key", trim($value), trim($value) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
                 } else {
-                    $stmt->bindValue(":id_afastamento", $value);
+                    $stmt->bindValue(":id_revisao", $value);
                 }
             }
             $stmt->execute();
@@ -29,7 +31,7 @@ if ($authorization) {
             http_response_code(200);
             $result = array(
                 'status' => 'success',
-                'result' => 'Afastamento atualizado com sucesso!'
+                'result' => 'Revisão atualizada com sucesso!'
             );
         } else {
             http_response_code(400);

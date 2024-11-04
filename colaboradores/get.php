@@ -49,7 +49,7 @@ if ($authorization) {
                 'status' => 'fail',
                 'result' => 'Nenhum colaborador foi encontrado'
             );
-        } elseif ($stmt->rowCount() == 1) {
+        } elseif ($stmt->rowCount() == 1 && isset($_GET["id"]) && is_numeric($_GET["id"])) {
             $dados = $stmt->fetch(PDO::FETCH_OBJ);
             $result = array(
                 'status' => 'success',

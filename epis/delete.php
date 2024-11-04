@@ -4,17 +4,17 @@ if ($authorization) {
     try {
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $sql = "
-            DELETE FROM revisoes
-            WHERE id_setor = :id_setor
+            DELETE FROM epis
+            WHERE id_epi = :id_epi
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_revisao', trim($_GET['id']));
+            $stmt->bindParam(':id_epi', trim($_GET['id']));
             $stmt->execute();
 
             http_response_code(200);
             $result = array(
                 'status' => 'success',
-                'result' => 'Setor removido com sucesso!'
+                'result' => 'EPI removido com sucesso!'
             );
         } else {
             http_response_code(400);
@@ -29,7 +29,7 @@ if ($authorization) {
         if ($th->getCode() == 23000) {
             $result = array(
                 'status' => 'fail',
-                'result' => 'Não é possível remover o setor, pois há vínculos em outras tabelas'
+                'result' => 'Não é possível remover o EPI, pois há vínculos em outras tabelas'
             );
         } else {
             $result = array(

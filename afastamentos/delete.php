@@ -1,13 +1,13 @@
 <?php
 try {
     if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
-        $id_formulario = trim($_GET["id"]);
+        $id_afastamento = trim($_GET["id"]);
         $sql = "
-        DELETE FROM formularios
-        WHERE id_formulario = :id_formulario
+        DELETE FROM afastamentos
+        WHERE id_afastamento = :id_afastamento
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':id_formulario', $id_formulario);
+        $stmt->bindParam(':id_afastamento', $id_afastamento);
         $stmt->execute();
 
         if ($stmt->rowCount() == 0) {

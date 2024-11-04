@@ -15,6 +15,19 @@ if ($authorization) {
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_afastamento', $id_afastamento);
         }
+        // SELECIONAR AFASTAMENTOS DE UM COLABORADOR EM UMA EMPRESA ESPECÍFICA
+        elseif (isset($_GET["id_rl_colaborador_empresa"]) && is_numeric($_GET["id_rl_colaborador_empresa"])) {
+            $id_rl_colaborador_empresa = trim($_GET["id_rl_colaborador_empresa"]);
+            $sql = "
+            SELECT a.id_afastamento, a.id_rl_colaborador_empresa, a.data_entrega, DATE_FORMAT(a.data_entrega, '%d/%m/%Y') data_entrega_format, a.data_afastamento, DATE_FORMAT(a.data_afastamento, '%d/%m/%Y') data_afastamento_format, a.data_retorno, DATE_FORMAT(a.data_retorno, '%d/%m/%Y') data_retorno_format, a.num_dias, a.cid, a.observacao
+            FROM afastamentos a
+            JOIN rl_colaboradores_empresas rl ON (a.id_rl_colaborador_empresa = rl.id_rl_colaborador_empresa)
+            WHERE a.ativo = 1
+            AND rl.id_rl_colaborador_empresa = :id_rl_colaborador_empresa
+            ";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id_rl_colaborador_empresa', $id_rl_colaborador_empresa);
+        }
         // SELECIONAR AFASTAMENTOS DE UMA EMPRESA ESPECÍFICA
         elseif (isset($_GET["id_empresa"]) && is_numeric($_GET["id_empresa"])) {
             $id_empresa = trim($_GET["id_empresa"]);

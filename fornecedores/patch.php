@@ -3,9 +3,8 @@
 if ($authorization) {
     try {
         if (isset($json['id']) && is_numeric($json['id'])) {
-
             $sql = "
-            UPDATE afastamentos SET
+            UPDATE epis SET
             ";
             foreach ($json as $key => $value) {
                 if ($key != 'id') {
@@ -13,7 +12,7 @@ if ($authorization) {
                 }
             }
             $sql = substr($sql, 0, -1) . "
-            WHERE id_afastamento = :id_afastamento
+            WHERE id_epi = :id_epi
             ";
 
             $stmt = $conn->prepare($sql);
@@ -21,7 +20,7 @@ if ($authorization) {
                 if ($key != 'id') {
                     $stmt->bindParam(":$key", trim($value), trim($value) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
                 } else {
-                    $stmt->bindValue(":id_afastamento", $value);
+                    $stmt->bindValue(":id_epi", $value);
                 }
             }
             $stmt->execute();
@@ -29,7 +28,7 @@ if ($authorization) {
             http_response_code(200);
             $result = array(
                 'status' => 'success',
-                'result' => 'Afastamento atualizado com sucesso!'
+                'result' => 'EPI atualizado com sucesso!'
             );
         } else {
             http_response_code(400);
@@ -40,6 +39,7 @@ if ($authorization) {
         }
     } catch (\Throwable $th) {
         http_response_code(500);
+        // DADOS ÚNICOS JÁ UTILIZADOS
         $result = array(
             'status' => 'fail',
             'result' => $th->getMessage()

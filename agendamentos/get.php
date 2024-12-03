@@ -6,7 +6,7 @@ if ($authorization) {
         if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
             $id_agendamento = trim($_GET["id"]);
             $sql = "
-            SELECT a.id_agendamento, a.id_rl_colaborador_empresa, a.id_rl_setor_funcao, a.nr_agendamento, a.id_pcmso, a.data, DATE_FORMAT(a.data, '%d/%m/%Y') data_format, a.horario, DATE_FORMAT(a.horario, '%H:%i') horario_format, a.cancelado,a.encaixe,a.justificativa_remarcacao,a.observacao,
+            SELECT a.id_agendamento, a.id_rl_colaborador_empresa, a.id_rl_setor_funcao, a.nr_agendamento, a.id_pcmso, a.data, DATE_FORMAT(a.data, '%d/%m/%Y') data_format, a.horario, DATE_FORMAT(a.horario, '%H:%i') horario_format,a.encaixe,a.justificativa_remarcacao,a.observacao,
             c.id_colaborador, c.tipo_doc, c.nr_doc, c.nome nome_colaborador, c.nome_social,
             e.id_empresa, e.razao_social, 
             ta.id_tipo_atendimento, ta.tipo_atendimento,
@@ -36,7 +36,7 @@ if ($authorization) {
             }
 
             $sql = "
-            SELECT a.id_agendamento, a.id_rl_colaborador_empresa, a.id_rl_setor_funcao, a.nr_agendamento, a.id_pcmso, a.data, DATE_FORMAT(a.data, '%d/%m/%Y') data_format, a.horario, DATE_FORMAT(a.horario, '%H:%i') horario_format, a.cancelado,a.encaixe,a.justificativa_remarcacao,a.observacao,
+            SELECT a.id_agendamento, a.id_rl_colaborador_empresa, a.id_rl_setor_funcao, a.nr_agendamento, a.id_pcmso, a.data, DATE_FORMAT(a.data, '%d/%m/%Y') data_format, a.horario, DATE_FORMAT(a.horario, '%H:%i') horario_format,a.encaixe,a.justificativa_remarcacao,a.observacao,
             c.id_colaborador, c.tipo_doc, c.nr_doc, c.nome nome_colaborador, c.nome_social,
             e.id_empresa, e.razao_social, 
             ta.id_tipo_atendimento, ta.tipo_atendimento,
@@ -69,25 +69,9 @@ if ($authorization) {
         // EXECUTAR SINTAXE SQL
         $stmt->execute();
 
-        if ($stmt->rowCount() < 1) {
-            $result = array(
-                'status' => 'fail',
-                'result' => 'Nenhum agendamento foi encontrado'
-            );
-        } elseif ($stmt->rowCount() == 1 && isset($_GET["id"]) && is_numeric($_GET["id"])) {
-            $dados = $stmt->fetch(PDO::FETCH_OBJ);
-            $result = array(
-                'status' => 'success',
-                'result' => $dados
-            );
-        } else {
-            $dados = $stmt->fetchAll(PDO::FETCH_OBJ);
-            $result = array(
-                'status' => 'success',
-                'result' => $dados
-            );
-        }
+        $result = getResult($stmt);
     } catch (\Throwable $th) {
+        http_response_code(502);
         $result = array(
             'status' => 'fail',
             'result' => $th->getMessage()
@@ -97,7 +81,7 @@ if ($authorization) {
         echo json_encode($result);
     }
 } else {
-    http_response_code(403);
+    http_response_code(401);
     echo json_encode(
         array(
             'status' => 'fail',

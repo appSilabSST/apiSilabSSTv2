@@ -7,33 +7,28 @@ if ($authorization) {
             $id_rl_agendamento_exame = trim($_GET["id"]);
 
             $sql = "
-            SELECT rl.id_agendamento, rl.id_exame, rl.id_rl_agendamento_exame, rl.data, DATE_FORMAT(rl.data, '%d/%m/%Y') data_format, rl.pago, rl.id_resultado_exame, rl.id_reaproveitado,
-            e.procedimento, e.cod, IF(e.cod IS NOT NULL, CONCAT(e.procedimento, ' | eSocial: ' , e.cod), e.procedimento) procedimento_format,
+            SELECT rl.id_agendamento, rl.id_exame, rl.data, rl.id_rl_agendamento_exame, rl.cobrar, rl.id_resultado_exame, rl.reaproveitado,
+            e.procedimento, e.cod_esocial, IF(e.cod_esocial IS NOT NULL, CONCAT(e.procedimento, ' | eSocial: ' , e.cod_esocial), e.procedimento) procedimento_format,
             (
-                SELECT IF(COUNT(id_rl_agendamento_exame) > 0, TRUE, FALSE)
-                FROM rl_agendamento_exames
-                WHERE id_exame = rl.id_exame
-                AND id_agendamento <> rl.id_agendamento
-                AND realizado = 1
-                AND id_agendamento IN (
-                    SELECT id_agendamento
-                    FROM agendamentos
-                    WHERE id_rl_colaborador_empresa = (
-                        SELECT id_rl_colaborador_empresa
-                        FROM agendamentos
-                        WHERE id_agendamento = rl.id_agendamento
-                    )
-                )
-                AND rl.data <= (
-                    SELECT DATE_ADD(rl_agendamento_exames.data, INTERVAL validade MONTH)
-                    FROM exames
-                    WHERE id_exame = rl.id_exame
-                )
-            ) reaproveitado
+                SELECT JSON_OBJECT('realizado',r1.data, 'validade',IF(r2.validade > 0, DATE_ADD(r1.data, INTERVAL r2.validade MONTH), 'INDETERMINADO'))
+                FROM rl_agendamento_exames r1
+                JOIN exames r2 ON r1.id_exame = r2.id_exame
+                JOIN agendamentos r3 ON r1.id_agendamento = r3.id_agendamento
+                WHERE r1.id_agendamento <> rl.id_agendamento
+                AND r3.id_rl_colaborador_empresa = a.id_rl_colaborador_empresa
+                AND r1.id_exame = rl.id_exame
+                AND r1.reaproveitado = 0
+                AND r1.realizado = 1
+                AND DATE_ADD(r1.data, INTERVAL r2.validade MONTH) <= rl.data
+                ORDER BY r1.data DESC
+                LIMIT 1
+            ) data_reaproveitado
             FROM rl_agendamento_exames rl
+            JOIN agendamentos a ON rl.id_agendamento = a.id_agendamento
             LEFT JOIN exames e ON e.id_exame = rl.id_exame
-            WHERE rl.ativo = '1' 
+            WHERE rl.ativo = '1'
             AND rl.id_rl_agendamento_exame = :id_rl_agendamento_exame
+            ORDER BY e.procedimento
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_rl_agendamento_exame', $id_rl_agendamento_exame);
@@ -43,30 +38,24 @@ if ($authorization) {
             $id_agendamento = trim($_GET["id_agendamento"]);
 
             $sql = "
-            SELECT rl.id_agendamento, rl.id_exame, rl.id_rl_agendamento_exame, rl.data, DATE_FORMAT(rl.data, '%d/%m/%Y') data_format, rl.pago, rl.id_resultado_exame, rl.id_reaproveitado,
-            e.procedimento, e.cod, IF(e.cod IS NOT NULL, CONCAT(e.procedimento, ' | eSocial: ' , e.cod), e.procedimento) procedimento_format,
+            SELECT rl.id_agendamento, rl.id_exame, rl.data, rl.id_rl_agendamento_exame, rl.cobrar, rl.id_resultado_exame, rl.reaproveitado,
+            e.procedimento, e.cod_esocial, IF(e.cod_esocial IS NOT NULL, CONCAT(e.procedimento, ' | eSocial: ' , e.cod_esocial), e.procedimento) procedimento_format,
             (
-                SELECT IF(COUNT(id_rl_agendamento_exame) > 0, TRUE, FALSE)
-                FROM rl_agendamento_exames
-                WHERE id_exame = rl.id_exame
-                AND id_agendamento <> rl.id_agendamento
-                AND realizado = 1
-                AND id_agendamento IN (
-                    SELECT id_agendamento
-                    FROM agendamentos
-                    WHERE id_rl_colaborador_empresa = (
-                        SELECT id_rl_colaborador_empresa
-                        FROM agendamentos
-                        WHERE id_agendamento = rl.id_agendamento
-                    )
-                )
-                AND rl.data <= (
-                    SELECT DATE_ADD(rl_agendamento_exames.data, INTERVAL validade MONTH)
-                    FROM exames
-                    WHERE id_exame = rl.id_exame
-                )
-            ) reaproveitado
+                SELECT JSON_OBJECT('realizado',r1.data, 'validade',IF(r2.validade > 0, DATE_ADD(r1.data, INTERVAL r2.validade MONTH), 'INDETERMINADO'))
+                FROM rl_agendamento_exames r1
+                JOIN exames r2 ON r1.id_exame = r2.id_exame
+                JOIN agendamentos r3 ON r1.id_agendamento = r3.id_agendamento
+                WHERE r1.id_agendamento <> rl.id_agendamento
+                AND r3.id_rl_colaborador_empresa = a.id_rl_colaborador_empresa
+                AND r1.id_exame = rl.id_exame
+                AND r1.reaproveitado = 0
+                AND r1.realizado = 1
+                AND DATE_ADD(r1.data, INTERVAL r2.validade MONTH) <= rl.data
+                ORDER BY r1.data DESC
+                LIMIT 1
+            ) data_reaproveitado
             FROM rl_agendamento_exames rl
+            JOIN agendamentos a ON rl.id_agendamento = a.id_agendamento
             LEFT JOIN exames e ON e.id_exame = rl.id_exame
             WHERE rl.ativo = '1'
             AND rl.id_agendamento = :id_agendamento
@@ -88,24 +77,7 @@ if ($authorization) {
         // EXECUTAR SINTAXE SQL
         $stmt->execute();
 
-        if ($stmt->rowCount() < 1) {
-            $result = array(
-                'status' => 'fail',
-                'result' => 'Nenhum exame foi encontrado'
-            );
-        } elseif ($stmt->rowCount() == 1 && isset($_GET["id"]) && is_numeric($_GET["id"])) {
-            $dados = $stmt->fetch(PDO::FETCH_OBJ);
-            $result = array(
-                'status' => 'success',
-                'result' => $dados
-            );
-        } else {
-            $dados = $stmt->fetchAll(PDO::FETCH_OBJ);
-            $result = array(
-                'status' => 'success',
-                'result' => $dados
-            );
-        }
+        $result = getResult($stmt);
     } catch (\Throwable $th) {
         $result = array(
             'status' => 'fail',

@@ -93,32 +93,7 @@ if ($authorization) {
         // EXECUTAR SINTAXE SQL
         $stmt->execute();
 
-        if ($stmt->rowCount() < 1) {
-            $result = array(
-                'status' => 'fail',
-                'result' => 'Nenhum setor foi encontrado'
-            );
-        } elseif ($stmt->rowCount() == 1 && isset($_GET["id"]) && is_numeric($_GET["id"])) {
-            $dados = $stmt->fetch(PDO::FETCH_OBJ);
-            $dados->exames = explode('||', $dados->exames);
-            $dados->funcoes = explode('||', $dados->funcoes);
-            $dados->riscos = explode('||', $dados->riscos);
-            $result = array(
-                'status' => 'success',
-                'result' => $dados
-            );
-        } else {
-            $dados = $stmt->fetchAll(PDO::FETCH_OBJ);
-            foreach ($dados as $key => $value) {
-                $dados[$key]->exames = explode('||', $dados[$key]->exames);
-                $dados[$key]->funcoes = explode('||', $dados[$key]->funcoes);
-                $dados[$key]->riscos = explode('||', $dados[$key]->riscos);
-            }
-            $result = array(
-                'status' => 'success',
-                'result' => $dados
-            );
-        }
+        $result = getResult($stmt);
     } catch (\Throwable $th) {
         http_response_code(500);
         $result = array(

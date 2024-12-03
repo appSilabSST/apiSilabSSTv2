@@ -71,26 +71,42 @@ if ($authorization) {
                 'status' => 'success',
                 'result' => 'Exames atualizados com sucesso!'
             );
+        } elseif (isset($json['id_agendamento']) && is_numeric($json['id_agendamento'])) {
+            $sql = "
+            UPDATE rl_agendamento_exames SET
+            ";
+            foreach ($json as $key => $value) {
+                if ($key != 'id_agendamento') {
+                    $sql .= "$key = :$key,";
+                }
+            }
+            $sql = substr($sql, 0, -1) . "
+            WHERE id_agendamento = :id_agendamento
+            ";
+            // echo $sql;exit;
+            $stmt = $conn->prepare($sql);
+            foreach ($json as $key => $value) {
+                if ($key != 'id_agendamento') {
+                    $stmt->bindParam(":$key", trim($value), trim($value) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+                } else {
+                    $stmt->bindValue(":id_agendamento", $value);
+                }
+            }
+            $stmt->execute();
+
+            http_response_code(200);
+            $result = 'Exames atualizados com sucesso!';
         } else {
             http_response_code(400);
-            $result = array(
-                'status' => 'fail',
-                'result' => 'Dados incompletos!'
-            );
+            $result = 'Dados incompletos!';
         }
     } catch (\Throwable $th) {
         http_response_code(500);
         // DADOS ÚNICOS JÁ UTILIZADOS
         if ($th->getCode() == 23000) {
-            $result = array(
-                'status' => 'fail',
-                'result' => 'Exame já existente neste agendamento!'
-            );
+            $result = 'Exame já existente neste agendamento!';
         } else {
-            $result = array(
-                'status' => 'fail',
-                'result' => $th->getMessage()
-            );
+            $result = $th->getMessage();
         }
     } finally {
         $conn = null;
@@ -99,10 +115,7 @@ if ($authorization) {
 } else {
     http_response_code(403);
     echo json_encode(
-        array(
-            'status' => 'fail',
-            'result' => 'Sem autorização para acessar este conteúdo!'
-        )
+        'Sem autorização para acessar este conteúdo!'
     );
 }
 exit;

@@ -24,7 +24,7 @@ if ($postjson['requisicao'] == 'listar') {
 
     $sql = "
         SELECT a.id_agendamento, a.id_rl_colaborador_empresa, a.id_rl_setor_funcao, a.nr_agendamento, a.id_pcmso, a.data, DATE_FORMAT(a.data, '%d/%m/%Y') data_format, a.horario, DATE_FORMAT(a.horario, '%H:%i') horario_format, a.cancelado,
-        c.id_colaborador, c.cpf, c.nome nome_colaborador, 
+        c.id_colaborador, c.nr_doc, c.nome nome_colaborador, 
         e.razao_social, 
         ta.id_tipo_atendimento, ta.tipo_atendimento,
         rl_sf.funcao

@@ -69,24 +69,7 @@ if ($authorization) {
         // EXECUTAR SINTAXE SQL
         $stmt->execute();
 
-        if ($stmt->rowCount() < 1) {
-            $result = array(
-                'status' => 'fail',
-                'result' => 'Nenhum afastamento foi encontrado'
-            );
-        } elseif ($stmt->rowCount() == 1) {
-            $dados = $stmt->fetch(PDO::FETCH_OBJ);
-            $result = array(
-                'status' => 'success',
-                'result' => $dados
-            );
-        } else {
-            $dados = $stmt->fetchAll(PDO::FETCH_OBJ);
-            $result = array(
-                'status' => 'success',
-                'result' => $dados
-            );
-        }
+        $result = getResult($stmt);
     } catch (\Throwable $th) {
         $result = array(
             'status' => 'fail',

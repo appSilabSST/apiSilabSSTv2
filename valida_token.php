@@ -1,4 +1,7 @@
 <?php
+
+include_once("functions.php");
+
 $allowedOrigins = array(
     'http://localhost:4200',
     'https://silabsst.com.br/appSilabSST'

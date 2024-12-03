@@ -4,7 +4,7 @@ if ($authorization) {
     try {
         if (isset($json['id']) && is_numeric($json['id'])) {
             $sql = "
-            UPDATE epis SET
+            UPDATE fornecedores SET
             ";
             foreach ($json as $key => $value) {
                 if ($key != 'id') {
@@ -12,7 +12,7 @@ if ($authorization) {
                 }
             }
             $sql = substr($sql, 0, -1) . "
-            WHERE id_epi = :id_epi
+            WHERE id_fornecedor = :id_fornecedor
             ";
 
             $stmt = $conn->prepare($sql);
@@ -20,7 +20,7 @@ if ($authorization) {
                 if ($key != 'id') {
                     $stmt->bindParam(":$key", trim($value), trim($value) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
                 } else {
-                    $stmt->bindValue(":id_epi", $value);
+                    $stmt->bindValue(":id_fornecedor", $value);
                 }
             }
             $stmt->execute();
@@ -28,7 +28,7 @@ if ($authorization) {
             http_response_code(200);
             $result = array(
                 'status' => 'success',
-                'result' => 'EPI atualizado com sucesso!'
+                'result' => 'Fornecedor atualizado com sucesso!'
             );
         } else {
             http_response_code(400);
@@ -40,10 +40,17 @@ if ($authorization) {
     } catch (\Throwable $th) {
         http_response_code(500);
         // DADOS ÚNICOS JÁ UTILIZADOS
-        $result = array(
-            'status' => 'fail',
-            'result' => $th->getMessage()
-        );
+        if ($th->getCode() == 23000) {
+            $result = array(
+                'status' => 'fail',
+                'result' => 'Fornecedor já existente!'
+            );
+        } else {
+            $result = array(
+                'status' => 'fail',
+                'result' => $th->getMessage()
+            );
+        }
     } finally {
         $conn = null;
         echo json_encode($result);

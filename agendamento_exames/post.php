@@ -8,11 +8,7 @@ if ($authorization) {
             INSERT INTO rl_agendamento_exames (id_agendamento,id_exame,data) VALUES
             ";
             foreach ($json['exames'] as $key => $value) {
-                $sql .= "(" . trim($json['id_agendamento']) . ", :id_exame_$key, (
-                        SELECT data
-                        FROM agendamentos
-                        WHERE id_agendamento = '" . trim($json['id_agendamento']) . "'
-                    )
+                $sql .= "(" . trim($json['id_agendamento']) . ", :id_exame_$key, :data_exame_$key
                 ),";
             }
             $sql = substr($sql, 0, -1);
@@ -20,6 +16,7 @@ if ($authorization) {
 
             foreach ($json['exames'] as $key => $value) {
                 $stmt->bindParam(":id_exame_$key", trim($value['id_exame']));
+                $stmt->bindParam(":data_exame_$key", trim($value['data']));
             }
             $stmt->execute();
 

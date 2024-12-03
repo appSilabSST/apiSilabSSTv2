@@ -4,7 +4,7 @@ if ($authorization) {
     try {
         if (isset($json['id']) && is_numeric($json['id'])) {
             $sql = "
-            UPDATE rl_agendamento_exames SET
+            UPDATE rl_agendamento_riscos SET
             ";
             foreach ($json as $key => $value) {
                 if ($key != 'id') {
@@ -12,14 +12,14 @@ if ($authorization) {
                 }
             }
             $sql = substr($sql, 0, -1) . "
-            WHERE id_rl_agendamento_exame = :id_rl_agendamento_exame
+            WHERE id_rl_agendamento_risco = :id_rl_agendamento_risco
             ";
             $stmt = $conn->prepare($sql);
             foreach ($json as $key => $value) {
                 if ($key != 'id') {
-                    $stmt->bindParam(':key', trim($value), trim($value) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+                    $stmt->bindParam(":$key", trim($value), trim($value) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
                 } else {
-                    $stmt->bindValue(":id_rl_agendamento_exame", $value);
+                    $stmt->bindValue(":id_rl_agendamento_risco", $value);
                 }
             }
             $stmt->execute();
@@ -28,7 +28,7 @@ if ($authorization) {
                 http_response_code(200);
                 $result = array(
                     'status' => 'success',
-                    'result' => 'Exames atualizados com sucesso!'
+                    'result' => 'Riscos atualizados com sucesso!'
                 );
             } else {
                 http_response_code(500);
@@ -50,7 +50,7 @@ if ($authorization) {
         if ($th->getCode() == 23000) {
             $result = array(
                 'status' => 'fail',
-                'result' => 'Exame já existente neste agendamento!'
+                'result' => 'Risco já existente neste agendamento!'
             );
         } else {
             $result = array(

@@ -23,7 +23,6 @@ if ($authorization) {
             id_profissional = :id_profissional,
             encaixe = :encaixe,
             disponivel = 0,
-            cancelado = 0
             WHERE id_agendamento = :id_agendamento
             ";
             $stmt = $conn->prepare($sql);

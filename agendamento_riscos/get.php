@@ -6,7 +6,7 @@ if ($authorization) {
         if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
             $id_rl_agendamento_risco = trim($_GET["id"]);
             $sql = "
-            SELECT r.cod, IF(r.cod IS NOT NULL, CONCAT(r.descricao, ' | eSocial: ' , r.cod), descricao) agente_nocivo, r.descricao, r.grupo, r.cor, r.danos_saude
+            SELECT rl.id_risco, r.cod_esocial, IF(r.cod_esocial IS NOT NULL, CONCAT(r.descricao, ' | eSocial: ' , r.cod_esocial), descricao) agente_nocivo, r.descricao, r.grupo, r.cor, r.danos_saude
             FROM rl_agendamento_riscos rl
             JOIN riscos r ON rl.id_risco = r.id_risco
             WHERE rl.ativo = 1
@@ -19,7 +19,7 @@ if ($authorization) {
         elseif (isset($_GET["id_agendamento"]) && is_numeric($_GET["id_agendamento"])) {
             $id_agendamento = trim($_GET["id_agendamento"]);
             $sql = "
-            SELECT r.cod, IF(r.cod IS NOT NULL, CONCAT(r.descricao, ' | eSocial: ' , r.cod), descricao) agente_nocivo, r.descricao, r.grupo, r.cor, r.danos_saude
+            SELECT rl.id_risco, r.cod_esocial, IF(r.cod_esocial IS NOT NULL, CONCAT(r.descricao, ' | eSocial: ' , r.cod_esocial), descricao) agente_nocivo, r.descricao, r.grupo, r.cor, r.danos_saude
             FROM rl_agendamento_riscos rl
             JOIN riscos r ON rl.id_risco = r.id_risco
             WHERE rl.ativo = 1
@@ -40,24 +40,7 @@ if ($authorization) {
         // EXECUTAR SINTAXE SQL
         $stmt->execute();
 
-        if ($stmt->rowCount() < 1) {
-            $result = array(
-                'status' => 'fail',
-                'result' => 'Nenhum risco foi encontrado'
-            );
-        } elseif ($stmt->rowCount() == 1 && isset($_GET["id"]) && is_numeric($_GET["id"])) {
-            $dados = $stmt->fetch(PDO::FETCH_OBJ);
-            $result = array(
-                'status' => 'success',
-                'result' => $dados
-            );
-        } else {
-            $dados = $stmt->fetchAll(PDO::FETCH_OBJ);
-            $result = array(
-                'status' => 'success',
-                'result' => $dados
-            );
-        }
+        $result = getResult($stmt);
     } catch (\Throwable $th) {
         $result = array(
             'status' => 'fail',

@@ -9,8 +9,8 @@ if ($authorization) {
             id_exame = :id_exame,
             data = :data,
             realizado = :realizado,
-            id_reaproveitado = :id_reaproveitado,
-            pago = :pago,
+            reaproveitado = :reaproveitado,
+            cobrar = :cobrar,
             id_resultado_exame = :id_resultado_exame,
             ativo = :ativo
             WHERE id_rl_agendamento_exame = :id_rl_agendamento_exame
@@ -20,8 +20,8 @@ if ($authorization) {
             $stmt->bindParam(':id_exame', trim($json['id_exame']), PDO::PARAM_INT);
             $stmt->bindParam(':data', trim($json['data']));
             $stmt->bindParam(':realizado', trim($json['realizado']), PDO::PARAM_INT);
-            $stmt->bindParam(':id_reaproveitado', trim($json['id_reaproveitado']), PDO::PARAM_INT);
-            $stmt->bindParam(':pago', trim($json['pago']), PDO::PARAM_INT);
+            $stmt->bindParam(':reaproveitado', trim($json['reaproveitado']), PDO::PARAM_INT);
+            $stmt->bindParam(':cobrar', trim($json['cobrar']), PDO::PARAM_INT);
             $stmt->bindParam(':id_resultado_exame', trim($json['id_resultado_exame']), trim($json['id_resultado_exame']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
             $stmt->bindParam(':ativo', trim($json['ativo']), PDO::PARAM_INT);
             $stmt->bindParam(':id_rl_agendamento_exame', trim($json['id_rl_agendamento_exame']), PDO::PARAM_INT);

@@ -3,21 +3,21 @@
 if ($authorization) {
     try {
         if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
-            $id_epi = trim($_GET["id"]);
+            $id_fornecedor = trim($_GET["id"]);
             $sql = "
             SELECT *
-            FROM epis e
+            FROM fornecedores
             WHERE ativo = 1
-            AND e.id_epi = :id_epi
+            AND id_fornecedor = :id_fornecedor
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_epi', $id_epi);
+            $stmt->bindParam(':id_fornecedor', $id_fornecedor);
         } else {
             $sql = "
             SELECT *
-            FROM epis e
-            WHERE e.ativo = 1
-            ORDER BY e.grupo , e.epi
+            FROM fornecedores
+            WHERE ativo = 1
+            ORDER BY razao_social
             ";
             $stmt = $conn->prepare($sql);
         }
@@ -25,24 +25,7 @@ if ($authorization) {
         // EXECUTAR SINTAXE SQL
         $stmt->execute();
 
-        if ($stmt->rowCount() < 1) {
-            $result = array(
-                'status' => 'fail',
-                'result' => 'Nenhum EPI foi encontrado'
-            );
-        } elseif ($stmt->rowCount() == 1 && isset($_GET["id"]) && is_numeric($_GET["id"])) {
-            $dados = $stmt->fetch(PDO::FETCH_OBJ);
-            $result = array(
-                'status' => 'success',
-                'result' => $dados
-            );
-        } else {
-            $dados = $stmt->fetchAll(PDO::FETCH_OBJ);
-            $result = array(
-                'status' => 'success',
-                'result' => $dados
-            );
-        }
+        $result = getResult($stmt);
     } catch (\Throwable $th) {
         http_response_code(500);
         $result = array(

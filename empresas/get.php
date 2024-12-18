@@ -24,6 +24,17 @@ if ($authorization) {
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':status', $status);
+        } elseif (isset($_GET["nr_inscricao"]) && is_numeric($_GET["nr_inscricao"])) {
+            $nr_inscricao = trim($_GET["nr_inscricao"]);
+            $sql = "
+            SELECT *
+            FROM empresas
+            WHERE ativo = '1'
+            AND stanr_inscricaotus = :nr_inscricao
+            ORDER BY status, razao_social
+            ";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':stanr_inscricaous', $nr_inscricao);
         } else {
             $sql = "
             SELECT *

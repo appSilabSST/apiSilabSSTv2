@@ -10,6 +10,7 @@ function getResult($stmt)
             isset($_GET["id"]) && is_numeric($_GET["id"]) ||
             isset($_GET["nr_doc"]) && is_numeric($_GET["nr_doc"]) ||
             isset($_GET["codigo"]) && is_numeric($_GET["codigo"]) ||
+            isset($_GET["nr_inscricao"]) && is_numeric($_GET["nr_inscricao"]) ||
             isset($_GET["id_agendamento"]) && is_numeric($_GET["id_agendamento"]) 
         )
     ) {

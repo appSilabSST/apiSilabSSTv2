@@ -7,40 +7,37 @@ if ($authorization) {
             $sql = "
             SELECT *
             FROM empresas
-            WHERE ativo = '1'
-            AND id_empresa = :id_empresa
-            ORDER BY status, razao_social
+            WHERE id_empresa = :id_empresa
+            ORDER BY empresas.ativo, razao_social
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_empresa', $id_empresa);
-        } elseif (isset($_GET["status"]) && is_numeric($_GET["status"])) {
-            $status = trim($_GET["status"]);
+        } elseif (isset($_GET["ativo"]) && is_numeric($_GET["ativo"])) {
+            $ativo = trim($_GET["ativo"]);
             $sql = "
             SELECT *
             FROM empresas
-            WHERE ativo = '1'
-            AND status = :status
-            ORDER BY status, razao_social
+            WHERE empresas.ativo = :ativo
+            ORDER BY empresas.ativo, razao_social
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':status', $status);
-        } elseif (isset($_GET["nr_inscricao"]) && is_numeric($_GET["nr_inscricao"])) {
-            $nr_inscricao = trim($_GET["nr_inscricao"]);
+            $stmt->bindParam(':ativo', $ativo);
+        } elseif (isset($_GET["nr_doc"]) && is_numeric($_GET["nr_doc"])) {
+            $nr_doc = trim($_GET["nr_doc"]);
             $sql = "
             SELECT *
             FROM empresas
-            WHERE ativo = '1'
-            AND stanr_inscricaotus = :nr_inscricao
-            ORDER BY status, razao_social
+            WHERE nr_doc = :nr_doc
+            ORDER BY empresas.ativo, razao_social
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':stanr_inscricaous', $nr_inscricao);
+            $stmt->bindParam(':nr_doc', $nr_doc);
         } else {
             $sql = "
-            SELECT *
+            SELECT *,empresas.ativo 
             FROM empresas
-            WHERE ativo = '1'
-            ORDER BY status, razao_social
+            LEFT JOIN cnae ON (empresas.id_cnae = cnae.id_cnae)
+            ORDER BY empresas.ativo, empresas.razao_social
             ";
             $stmt = $conn->prepare($sql);
         }

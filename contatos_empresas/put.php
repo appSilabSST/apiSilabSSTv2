@@ -13,14 +13,16 @@ if ($authorization) {
             nome = :nome,
             funcao = :funcao,
             telefone = :telefone,
+            telefone2 = :telefone2,
             email = :email
             WHERE id_contato_empresa = :id_contato_empresa
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_empresa', trim($json['id_empresa']));
+            $stmt->bindParam(':id_empresa', trim($json['id_empresa']), PDO::PARAM_INT);
             $stmt->bindParam(':nome', trim($json['nome']));
             $stmt->bindParam(':funcao', trim($json['funcao']), trim($json['funcao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':telefone', trim($json['telefone']), trim($json['telefone']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':telefone2', trim($json['telefone2']), trim($json['telefone2']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':email', trim($json['email']), trim($json['email']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':id_contato_empresa', trim($json['id']));
             $stmt->execute();

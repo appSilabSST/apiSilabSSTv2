@@ -8,36 +8,40 @@ if ($authorization) {
             SELECT *
             FROM empresas
             WHERE id_empresa = :id_empresa
-            ORDER BY empresas.ativo, razao_social
+            AND empresas.ativo = '1'
+            ORDER BY empresas.status, razao_social
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_empresa', $id_empresa);
-        } elseif (isset($_GET["ativo"]) && is_numeric($_GET["ativo"])) {
-            $ativo = trim($_GET["ativo"]);
+        } elseif (isset($_GET["status"]) && is_numeric($_GET["status"])) {
+            $status = trim($_GET["status"]);
             $sql = "
             SELECT *
             FROM empresas
-            WHERE empresas.ativo = :ativo
-            ORDER BY empresas.ativo, razao_social
+            WHERE empresas.status = :status
+            AND empresas.ativo = '1'
+            ORDER BY empresas.status, razao_social
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':ativo', $ativo);
+            $stmt->bindParam(':status', $status);
         } elseif (isset($_GET["nr_doc"]) && is_numeric($_GET["nr_doc"])) {
             $nr_doc = trim($_GET["nr_doc"]);
             $sql = "
             SELECT *
             FROM empresas
             WHERE nr_doc = :nr_doc
-            ORDER BY empresas.ativo, razao_social
+            AND empresas.ativo = '1'
+            ORDER BY empresas., razao_social
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':nr_doc', $nr_doc);
         } else {
             $sql = "
-            SELECT *,empresas.ativo 
+            SELECT *,empresas.status 
             FROM empresas
             LEFT JOIN cnae ON (empresas.id_cnae = cnae.id_cnae)
-            ORDER BY empresas.ativo, empresas.razao_social
+            WHERE empresas.ativo = '1'
+            ORDER BY empresas.status, empresas.razao_social
             ";
             $stmt = $conn->prepare($sql);
         }

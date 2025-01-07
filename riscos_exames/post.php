@@ -7,21 +7,26 @@ if ($authorization) {
             isset($json['id_exame']) && is_numeric($json['id_exame'])
         ) {
 
+            // $sql = "
+            // INSERT INTO rl_riscos_exames (id_risco, id_exame, padronizar, periodicidade, admissional, periodico, monitoracao_pontual, mudanca_risco, retorno_trabalho, demissional) VALUES
+            // (:id_risco, :id_exame, :padronizar, :periodicidade, :admissional, :periodico, :monitoracao_pontual, :mudanca_risco, :retorno_trabalho, :demissional)
+            // ";
             $sql = "
-            INSERT INTO rl_riscos_exames (id_risco, id_exame, padronizar, periodicidade, admissional, periodico, monitoracao_pontual, mudanca_risco, retorno_trabalho, demissional) VALUES
-            (:id_risco, :id_exame, :padronizar, :periodicidade, :admissional, :periodico, :monitoracao_pontual, :mudanca_risco, :retorno_trabalho, :demissional)
+            INSERT INTO rl_riscos_exames (id_risco, id_exame, padronizar, periodicidade,ids_tipos_atendimento) VALUES
+            (:id_risco, :id_exame, :padronizar, :periodicidade, :ids_tipos_atendimento)
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_risco', trim($json['id_risco']));
             $stmt->bindParam(':id_exame', trim($json['id_exame']));
             $stmt->bindParam(':padronizar', trim($json['padronizar']), PDO::PARAM_INT);
             $stmt->bindParam(':periodicidade', trim($json['periodicidade']), PDO::PARAM_INT);
-            $stmt->bindParam(':admissional', trim($json['admissional']), PDO::PARAM_INT);
-            $stmt->bindParam(':periodico', trim($json['periodico']), PDO::PARAM_INT);
-            $stmt->bindParam(':monitoracao_pontual', trim($json['monitoracao_pontual']), PDO::PARAM_INT);
-            $stmt->bindParam(':mudanca_risco', trim($json['mudanca_risco']), PDO::PARAM_INT);
-            $stmt->bindParam(':retorno_trabalho', trim($json['retorno_trabalho']), PDO::PARAM_INT);
-            $stmt->bindParam(':demissional', trim($json['demissional']), PDO::PARAM_INT);
+            $stmt->bindParam(':ids_tipos_atendimento', json_encode($json['ids_tipos_atendimento']));
+            // $stmt->bindParam(':admissional', trim($json['admissional']), PDO::PARAM_INT);
+            // $stmt->bindParam(':periodico', trim($json['periodico']), PDO::PARAM_INT);
+            // $stmt->bindParam(':monitoracao_pontual', trim($json['monitoracao_pontual']), PDO::PARAM_INT);
+            // $stmt->bindParam(':mudanca_risco', trim($json['mudanca_risco']), PDO::PARAM_INT);
+            // $stmt->bindParam(':retorno_trabalho', trim($json['retorno_trabalho']), PDO::PARAM_INT);
+            // $stmt->bindParam(':demissional', trim($json['demissional']), PDO::PARAM_INT);
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {

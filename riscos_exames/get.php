@@ -39,15 +39,16 @@ if ($authorization) {
                     END AS padronizar_mask,
 
                     -- Lógica para tipos_avaliacao
-                    CONCAT(
+                    CONCAT( 
                         CASE WHEN rl.admissional = 1 THEN 'Admissional, ' ELSE '' END,
                         CASE WHEN rl.periodico = 1 THEN 'Periódico, ' ELSE '' END,
                         CASE WHEN rl.mudanca_risco = 1 THEN 'Mudança de Risco, ' ELSE '' END,
                         CASE WHEN rl.retorno_trabalho = 1 THEN 'Retorno ao Trabalho, ' ELSE '' END,
+                        CASE WHEN rl.monitoracao_pontual = 1 THEN 'Monitoramento Pontual, ' ELSE '' END,
                         CASE WHEN rl.demissional = 1 THEN 'Demissional, ' ELSE '' END
-                    ) AS tipos_avaliacao,
+                     ) AS tipos_avaliacao, rl.ids_tipos_atendimento,
 
-                    -- Lógica para periodicidade_format
+                   	-- Lógica para periodicidade_format
                     CASE
                         WHEN rl.periodicidade = 0 THEN '<div class=\"text-center\"> - </div>'
                         WHEN rl.periodicidade = 1 THEN '<div class=\"text-center\"> 1 mês </div>'

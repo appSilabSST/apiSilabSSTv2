@@ -4,8 +4,8 @@ if ($authorization) {
     try {
         if (isset($json['razao_social']) && isset($json['tipo_inscricao']) && isset($json['nr_inscricao'])) {
             $sql = "
-            INSERT INTO locais_atividade (id_empresa, id_tipo_ambiente, razao_social, tipo_inscricao, nr_inscricao, logradouro, numero, complemento, bairro, cidade, uf, cep, cnae, atividade, grau_risco, atividade_principal) VALUES 
-            (:id_empresa, :id_tipo_ambiente, :razao_social, :tipo_inscricao, :nr_inscricao, :logradouro, :numero, :complemento, :bairro, :cidade, :uf, :cep, :cnae, :atividade, :grau_risco, :atividade_principal)
+            INSERT INTO locais_atividade (id_empresa, id_tipo_ambiente, razao_social, tipo_inscricao, nr_inscricao, logradouro, numero, complemento, bairro, cidade, uf, cep, id_cnae, atividade_principal) VALUES 
+            (:id_empresa, :id_tipo_ambiente, :razao_social, :tipo_inscricao, :nr_inscricao, :logradouro, :numero, :complemento, :bairro, :cidade, :uf, :cep, :id_cnae, :atividade_principal)
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_empresa', trim($json['id_empresa']));
@@ -20,9 +20,7 @@ if ($authorization) {
             $stmt->bindParam(':cidade', trim($json['cidade']), isset($json['cidade']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
             $stmt->bindParam(':uf', trim($json['uf']), isset($json['uf']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
             $stmt->bindParam(':cep', trim($json['cep']), isset($json['cep']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
-            $stmt->bindParam(':cnae', trim($json['cnae']), isset($json['cnae']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
-            $stmt->bindParam(':atividade', trim($json['atividade']), isset($json['atividade']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
-            $stmt->bindParam(':grau_risco', trim($json['grau_risco']), isset($json['grau_risco']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
+            $stmt->bindParam(':id_cnae', trim($json['id_cnae']), isset($json['id_cnae']) ? PDO::PARAM_INT : PDO::PARAM_NULL);
             $stmt->bindParam(':atividade_principal', trim($json['atividade_principal']), isset($json['atividade_principal']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
             $stmt->execute();
 

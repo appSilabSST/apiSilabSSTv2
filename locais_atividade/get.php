@@ -34,9 +34,9 @@ if ($authorization) {
             $sql = "
             SELECT l.*, 
             t.tipo_ambiente,
-            e.grau_risco AS grau_risco_empresa,e.razao_social AS empresa
+            e.razao_social AS empresa
             FROM locais_atividade l
-            LEFT JOIN tipo_ambiente t ON (t.id_tipo_ambiente = l.id_tipo_ambiente)
+            LEFT JOIN tipos_ambiente t ON (t.id_tipo_ambiente = l.id_tipo_ambiente)
             LEFT JOIN empresas e ON (l.id_empresa = e.id_empresa)
             WHERE l.ativo = '1'
             ORDER BY e.razao_social , l.razao_social

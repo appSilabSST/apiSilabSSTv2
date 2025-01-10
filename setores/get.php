@@ -34,7 +34,7 @@ if ($authorization) {
         } elseif (isset($_GET["id_local_atividade"]) && is_numeric($_GET["id_local_atividade"])) {
             $id_local_atividade = trim($_GET["id_local_atividade"]);
             $sql = "
-            SELECT s.id_setor, s.id_local_atividade, s.setor, s.descricao, s.conclusao, s.status,
+            SELECT s.id_setor, s.id_local_atividade, s.setor, s.descricao, s.conclusao, s.status,s.data_edit,
             la.razao_social,
             (
                 SELECT GROUP_CONCAT(IF(LENGTH(r.cod_esocial) > 0, CONCAT_WS(' | eSocial: ' , r.procedimento , r.cod_esocial), r.procedimento) ORDER BY r.procedimento SEPARATOR '||')
@@ -57,7 +57,7 @@ if ($authorization) {
             LEFT JOIN locais_atividade la ON (s.id_local_atividade = la.id_local_atividade)
             WHERE s.ativo = 1
             AND s.id_local_atividade = :id_local_atividade
-            ORDER BY s.setor
+            ORDER BY s.status DESC, s.setor
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_local_atividade', $id_local_atividade);
@@ -85,7 +85,7 @@ if ($authorization) {
             FROM setores s
             LEFT JOIN locais_atividade la ON (s.id_local_atividade = la.id_local_atividade)
             WHERE s.ativo = 1
-            ORDER BY s.setor
+            ORDER BY s.status DESC, s.setor
             ";
             $stmt = $conn->prepare($sql);
         }

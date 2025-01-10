@@ -32,14 +32,18 @@ if ($authorization) {
             $stmt->bindParam(':id_empresa', $id_empresa);
         } else {
             $sql = "
-            SELECT l.*, 
-            t.tipo_ambiente,
-            e.razao_social AS empresa
+            SELECT l.id_local_atividade,l.id_empresa,l.id_tipo_ambiente,l.id_empresa_local_atividade,l.atividade_principal,l.ativo,
+            COALESCE(e2.razao_social, e1.razao_social) AS razao_social_local,
+            COALESCE(e2.nr_doc, e1.nr_doc) AS nr_doc_local,
+            COALESCE(e2.id_tipo_orgao, e1.id_tipo_orgao) AS id_tipo_orgao_local,
+            e1.razao_social AS razao_social_empresa,
+            e1.nr_doc AS nr_doc_empresa,
+            e1.id_tipo_orgao AS id_tipo_orgao_empresa
             FROM locais_atividade l
-            LEFT JOIN tipos_ambiente t ON (t.id_tipo_ambiente = l.id_tipo_ambiente)
-            LEFT JOIN empresas e ON (l.id_empresa = e.id_empresa)
+            LEFT JOIN empresas e1 ON e1.id_empresa = l.id_empresa
+            LEFT JOIN empresas e2 ON e2.id_empresa = l.id_empresa_local_atividade
             WHERE l.ativo = '1'
-            ORDER BY e.razao_social , l.razao_social
+            ORDER BY e1.razao_social,l.razao_social
             ";
             $stmt = $conn->prepare($sql);
         }

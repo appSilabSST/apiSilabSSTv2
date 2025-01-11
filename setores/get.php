@@ -5,7 +5,7 @@ if ($authorization) {
         if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
             $id_setor = trim($_GET["id"]);
             $sql = "
-            SELECT s.id_setor, s.id_local_atividade, s.setor, s.descricao, s.conclusao, s.status,
+            SELECT s.id_setor, s.id_local_atividade, s.setor, s.descricao, s.conclusao, s.status,ausencia_risco,
             la.razao_social,
             (
                 SELECT GROUP_CONCAT(IF(LENGTH(r.cod_esocial) > 0, CONCAT_WS(' | eSocial: ' , r.procedimento , r.cod_esocial), r.procedimento) ORDER BY r.procedimento SEPARATOR '||')
@@ -34,7 +34,7 @@ if ($authorization) {
         } elseif (isset($_GET["id_local_atividade"]) && is_numeric($_GET["id_local_atividade"])) {
             $id_local_atividade = trim($_GET["id_local_atividade"]);
             $sql = "
-            SELECT s.id_setor, s.id_local_atividade, s.setor, s.descricao, s.conclusao, s.status,s.data_edit,
+            SELECT s.id_setor, s.id_local_atividade, s.setor, s.descricao, s.conclusao, s.status,s.data_edit,ausencia_risco,
             la.razao_social,
             (
                 SELECT GROUP_CONCAT(IF(LENGTH(r.cod_esocial) > 0, CONCAT_WS(' | eSocial: ' , r.procedimento , r.cod_esocial), r.procedimento) ORDER BY r.procedimento SEPARATOR '||')
@@ -63,7 +63,7 @@ if ($authorization) {
             $stmt->bindParam(':id_local_atividade', $id_local_atividade);
         } else {
             $sql = "
-            SELECT s.id_setor, s.id_local_atividade, s.setor, s.descricao, s.conclusao, s.status,
+            SELECT s.id_setor, s.id_local_atividade, s.setor, s.descricao, s.conclusao, s.status,ausencia_risco,
             la.razao_social,
             (
                 SELECT GROUP_CONCAT(IF(LENGTH(r.cod_esocial) > 0, CONCAT_WS(' | eSocial: ' , r.procedimento , r.cod_esocial), r.procedimento) ORDER BY r.procedimento SEPARATOR '||')

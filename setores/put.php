@@ -9,6 +9,7 @@ if ($authorization) {
             setor = :setor, 
             descricao = :descricao, 
             conclusao = :conclusao, 
+            ausencia_risco = :ausencia_risco, 
             status = :status, 
             data_edit = NOW()
             WHERE id_setor = :id_setor
@@ -17,17 +18,17 @@ if ($authorization) {
             $stmt->bindParam(':id_local_atividade', trim($json['id_local_atividade']));
             $stmt->bindParam(':setor', trim($json['setor']));
             $stmt->bindParam(':descricao', trim($json['descricao']));
+            $stmt->bindParam(':ausencia_risco', trim($json['ausencia_risco']));
             $stmt->bindParam(':conclusao', trim($json['conclusao']));
             $stmt->bindParam(':status', trim($json['status']));
             $stmt->bindParam(':id_setor', trim($json['id']));
             $stmt->execute();
-            
+
             http_response_code(200);
             $result = array(
                 'status' => 'success',
                 'result' => 'Setor atualizado com sucesso!'
             );
-            
         } else {
             http_response_code(400);
             $result = array(

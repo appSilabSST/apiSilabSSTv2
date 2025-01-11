@@ -9,12 +9,13 @@ if ($authorization) {
 
             $sql = "
             INSERT INTO setores (id_local_atividade, setor, descricao, status) VALUES
-            (:id_local_atividade, :setor, :descricao, :status)
+            (:id_local_atividade, :setor, :descricao, :ausencia_risco, :status)
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_local_atividade', trim($json['id_local_atividade']));
             $stmt->bindParam(':setor', trim($json['setor']));
             $stmt->bindParam(':descricao', trim($json['descricao']));
+            $stmt->bindParam(':ausencia_risco', trim($json['ausencia_risco']));
             $stmt->bindParam(':status', trim($json['status']));
             $stmt->execute();
 

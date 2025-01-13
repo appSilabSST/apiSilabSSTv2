@@ -34,7 +34,7 @@ if ($authorization) {
                 'result' => 'Dados incompletos!'
             );
         }
-    } catch (\Throwable $th) {
+    } catch (\Throwable $th) { 
         http_response_code(500);
         // DADOS ÚNICOS JÁ UTILIZADOS
         if ($th->getCode() == 23000) {

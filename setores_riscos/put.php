@@ -16,7 +16,10 @@ if ($authorization) {
             intensidade = :intensidade, 
             limite_tolerancia = :limite_tolerancia, 
             id_unidade_medida = :id_unidade_medida, 
-            id_tipo_exposicao = :id_tipo_exposicao, 
+            exposicao = :exposicao, 
+            controle = :controle, 
+            gravidade = :gravidade, 
+            pessoa_exposta = :pessoa_exposta, 
             fonte_geradora = :fonte_geradora, 
             tecnica_medicao = :tecnica_medicao, 
             id_meio_propagacao = :id_meio_propagacao, 
@@ -28,12 +31,12 @@ if ($authorization) {
             epc_eficaz = :epc_eficaz, 
             epi_utiliza = :epi_utiliza, 
             epi_eficaz = :epi_eficaz, 
-            epi_medProtecao = :epi_medProtecao, 
-            epi_condFuncto = :epi_condFuncto, 
-            epi_usoInint = :epi_usoInint, 
-            epi_przValid = :epi_przValid, 
-            epi_periodicTroca = :epi_periodicTroca, 
-            epi_higienizacao = :epi_higienizacao, 
+            condicoes_funcionamento = :condicoes_funcionamento, 
+            condicoes_funcionamento = :condicoes_funcionamento, 
+            uso_initerrupto = :uso_initerrupto, 
+            prazo_validade = :prazo_validade, 
+            periodicidade_troca = :periodicidade_troca, 
+            higienizacao = :higienizacao, 
             codigo_gfip = :codigo_gfip, 
             insalubridade = :insalubridade, 
             periculosidade = :periculosidade,
@@ -50,6 +53,10 @@ if ($authorization) {
             $stmt->bindParam(':limite_tolerancia', trim($json['limite_tolerancia']), trim($json['limite_tolerancia']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':id_unidade_medida', trim($json['id_unidade_medida']), trim($json['id_unidade_medida']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':id_tipo_exposicao', trim($json['id_tipo_exposicao']), trim($json['id_tipo_exposicao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':exposicao', trim($json['exposicao']), trim($json['exposicao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':controle', trim($json['controle']), trim($json['controle']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':gravidade', trim($json['gravidade']), trim($json['gravidade']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':pessoa_exposta', trim($json['pessoa_exposta']), trim($json['pessoa_exposta']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':fonte_geradora', trim($json['fonte_geradora']), trim($json['fonte_geradora']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':tecnica_medicao', trim($json['tecnica_medicao']), trim($json['tecnica_medicao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':id_meio_propagacao', trim($json['id_meio_propagacao']), trim($json['id_meio_propagacao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
@@ -61,24 +68,23 @@ if ($authorization) {
             $stmt->bindParam(':epc_eficaz', trim($json['epc_eficaz']), trim($json['epc_eficaz']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':epi_utiliza', trim($json['epi_utiliza']), trim($json['epi_utiliza']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':epi_eficaz', trim($json['epi_eficaz']), trim($json['epi_eficaz']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':epi_medProtecao', trim($json['epi_medProtecao']), trim($json['epi_medProtecao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':epi_condFuncto', trim($json['epi_condFuncto']), trim($json['epi_condFuncto']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':epi_usoInint', trim($json['epi_usoInint']), trim($json['epi_usoInint']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':epi_przValid', trim($json['epi_przValid']), trim($json['epi_przValid']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':epi_periodicTroca', trim($json['epi_periodicTroca']), trim($json['epi_periodicTroca']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':epi_higienizacao', trim($json['epi_higienizacao']), trim($json['epi_higienizacao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':medidas_protecao', trim($json['medidas_protecao']), trim($json['medidas_protecao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':condicoes_funcionamento', trim($json['condicoes_funcionamento']), trim($json['condicoes_funcionamento']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':uso_initerrupto', trim($json['uso_initerrupto']), trim($json['uso_initerrupto']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':prazo_validade', trim($json['prazo_validade']), trim($json['prazo_validade']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':periodicidade_troca', trim($json['periodicidade_troca']), trim($json['periodicidade_troca']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':higienizacao', trim($json['higienizacao']), trim($json['higienizacao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':codigo_gfip', trim($json['codigo_gfip']), trim($json['codigo_gfip']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':insalubridade', trim($json['insalubridade']), trim($json['insalubridade']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':periculosidade', trim($json['periculosidade']), trim($json['periculosidade']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':id_rl_setor_risco', trim($json['id']));
             $stmt->execute();
-            
+
             http_response_code(200);
             $result = array(
                 'status' => 'success',
                 'result' => 'Risco atualizado com sucesso!'
             );
-            
         } else {
             http_response_code(400);
             $result = array(

@@ -8,7 +8,7 @@ if ($authorization) {
         ) {
 
             $sql = "
-            INSERT INTO setores (id_local_atividade, setor, descricao, status) VALUES
+            INSERT INTO setores (id_local_atividade, setor, descricao, status,ausencia_risco) VALUES
             (:id_local_atividade, :setor, :descricao, :ausencia_risco, :status)
             ";
             $stmt = $conn->prepare($sql);

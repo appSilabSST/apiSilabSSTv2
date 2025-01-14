@@ -3,21 +3,21 @@
 if ($authorization) {
     try {
         if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
-            $id_unidade_medida = trim($_GET["id"]);
+            $id_grupo_epi = trim($_GET["id"]);
             $sql = "
             SELECT *
-            FROM unidades_medida
+            FROM grupos_epi
             WHERE ativo = '1'
-            AND id_unidade_medida = :id_unidade_medida
+            AND id_grupo_epi = :id_grupo_epi
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_unidade_medida', $id_unidade_medida);
+            $stmt->bindParam(':id_grupo_epi', $id_grupo_epi);
         } else {
             $sql = "
             SELECT *
-            FROM unidades_medida
+            FROM grupos_epi
             WHERE ativo = '1'
-            ORDER BY id_unidade_medida
+            ORDER BY grupo
             ";
             $stmt = $conn->prepare($sql);
         }

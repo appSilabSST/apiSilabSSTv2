@@ -3,7 +3,6 @@
 if ($authorization) {
     try {
         if (
-            isset($json['id_pgr']) && is_numeric($json['id_pgr']) &&
             isset($json['id_rl_setor_risco']) && is_numeric($json['id_rl_setor_risco']) &&
             isset($json['plano_acao']) && isset($json['descricao'])
         ) {
@@ -13,7 +12,7 @@ if ($authorization) {
             (:id_pgr, :id_rl_setor_risco, :plano_acao, :descricao, :medida_suficiente, :data_avaliacao, :indicacao_medida)
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_pgr', trim($json['id_pgr']), PDO::PARAM_INT);
+            $stmt->bindParam(':id_pgr', trim($json['id_pgr']), isset($json['id_pgr']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':id_rl_setor_risco', trim($json['id_rl_setor_risco']), PDO::PARAM_INT);
             $stmt->bindParam(':plano_acao', trim($json['plano_acao']), PDO::PARAM_STR);
             $stmt->bindParam(':descricao', trim($json['descricao']), isset($json['descricao']) ? PDO::PARAM_STR : PDO::PARAM_NULL);

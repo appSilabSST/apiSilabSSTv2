@@ -3,33 +3,29 @@
 if ($authorization) {
     try {
         if (
-            isset($json['id_grupo_epi']) &&
-            isset($json['id_local_atividade'])  &&
-            isset($json['epi']) &&
-            isset($json['ca'])
+            isset($json['id_rl_setor_risco']) &&
+            isset($json['id_epis_local_atividades'])
         ) {
             $sql = "
-            INSERT INTO epis_local_atividades (id_local_atividade, id_grupo_epi,epi, ca) VALUES 
-            (:id_local_atividade, :id_grupo_epi, :epi, :ca)
+            INSERT INTO rl_risco_setor_epis (id_rl_setor_risco, id_epis_local_atividades) VALUES 
+            (:id_rl_setor_risco, :id_epis_local_atividades)
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_local_atividade', trim($json['id_local_atividade']));
-            $stmt->bindParam(':id_grupo_epi', trim($json['id_grupo_epi']));
-            $stmt->bindParam(':epi', trim($json['epi']));
-            $stmt->bindParam(':ca', trim($json['ca']));
+            $stmt->bindParam(':id_rl_setor_risco', trim($json['id_rl_setor_risco']));
+            $stmt->bindParam(':id_epis_local_atividades', trim($json['id_epis_local_atividades']));
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {
                 http_response_code(200);
                 $result = array(
                     'status' => 'success',
-                    'result' => 'Epi criado com sucesso!'
+                    'result' => 'Vinculo EPI e Setor criado com sucesso!'
                 );
             } else {
                 http_response_code(500);
                 $result = array(
                     'status' => 'fail',
-                    'result' => 'Falha ao criar o Epis Local de atividade!'
+                    'result' => 'Falha ao criar Vinculo EPI e Setor!'
                 );
             }
         } else {
@@ -45,7 +41,7 @@ if ($authorization) {
         if ($th->getCode() == 23000) {
             $result = array(
                 'status' => 'fail',
-                'result' => 'C.A do epis Local de atividade já existente!'
+                'result' => 'Vinculo EPI e Setor já existente!'
             );
         } else {
             $result = array(

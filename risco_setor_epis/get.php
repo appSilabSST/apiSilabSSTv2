@@ -3,35 +3,28 @@
 if ($authorization) {
     try {
         if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
-            $id_epis_local_atividades = trim($_GET["id"]);
+            $id_rl_risco_setor_epis = trim($_GET["id"]);
             $sql = "
-            SELECT ela.*
-            FROM epis_local_atividades ela
-            JOIN locais_atividade l ON (l.id_local_atividade = ela.id_local_atividade)
-            JOIN grupos_epi ge ON (ge.id_grupo_epi = ela.id_grupo_epi)
-            WHERE ela.ativo = '1'
-            AND ela.id_epis_local_atividades = :id_epis_local_atividades
+            SELECT rse.*
+            FROM rl_risco_setor_epis rse
+            WHERE rse.id_rl_risco_setor_epis = :id_rl_risco_setor_epis
+            ";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id_rl_risco_setor_epis', $id_rl_risco_setor_epis);
+        } elseif (isset($_GET["id_epis_local_atividades"]) && is_numeric($_GET["id_epis_local_atividades"])) {
+            $id_epis_local_atividades = trim($_GET["id_epis_local_atividades"]);
+            $sql = "
+            SELECT rse.*
+            FROM rl_risco_setor_epis rse
+            JOIN rl_setores_riscos sr ON (sr.id_rl_setor_risco = rse.id_rl_setor_risco)
+            WHERE rse.id_epis_local_atividades = :id_epis_local_atividades
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_epis_local_atividades', $id_epis_local_atividades);
-        } elseif (isset($_GET["id_local_atividade"]) && is_numeric($_GET["id_local_atividade"])) {
-            $id_local_atividade = trim($_GET["id_local_atividade"]);
-            $sql = "
-            SELECT ela.*,ge.grupo
-            FROM epis_local_atividades ela
-            JOIN grupos_epi ge ON (ge.id_grupo_epi = ela.id_grupo_epi)
-            WHERE ela.ativo = '1'
-            AND ela.id_local_atividade = :id_local_atividade
-            ";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_local_atividade', $id_local_atividade);
         } else {
             $sql = "
-            SELECT ela.*
-            FROM epis_local_atividades ela
-            JOIN locais_atividade l ON (l.id_local_atividade = ela.id_local_atividade)
-            JOIN grupos_epi ge ON (ge.id_grupo_epi = ela.id_grupo_epi)
-            WHERE ela.ativo = '1'
+                SELECT rse.*
+                FROM rl_risco_setor_epis rse
             ";
             $stmt = $conn->prepare($sql);
         }

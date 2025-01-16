@@ -7,7 +7,7 @@ if ($authorization) {
             isset($json['data_inicio']) &&
             isset($json['horario_inicio']) && isset($json['horario_fim']) &&
             isset($json['intervalo']) && is_numeric($json['intervalo']) &&
-            isset($json['qtde']) && is_numeric($json['qtde'])
+            isset($json['qtde_intervalo']) && is_numeric($json['qtde_intervalo'])
         ) {
 
             // VERIFICA SE DATA INICIO ESTÁ NO FORMATO CORRETO
@@ -24,8 +24,8 @@ if ($authorization) {
             }
 
             $sql = "
-            INSERT INTO regras_agendamento (id_dia_semana, data_inicio, data_fim, horario_inicio, horario_fim, intervalo, qtde) VALUES
-            (:id_dia_semana, :data_inicio, :data_fim, :horario_inicio, :horario_fim, :intervalo, :qtde)
+            INSERT INTO regras_agendamento (id_dia_semana, data_inicio, data_fim, horario_inicio, horario_fim, intervalo, qtde_intervalo) VALUES
+            (:id_dia_semana, :data_inicio, :data_fim, :horario_inicio, :horario_fim, :intervalo, :qtde_intervalo)
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_dia_semana', trim($json['id_dia_semana']), PDO::PARAM_INT);
@@ -34,10 +34,11 @@ if ($authorization) {
             $stmt->bindParam(':horario_inicio', trim($json['horario_inicio']), PDO::PARAM_STR);
             $stmt->bindParam(':horario_fim', trim($json['horario_fim']), PDO::PARAM_STR);
             $stmt->bindParam(':intervalo', trim($json['intervalo']), PDO::PARAM_INT);
-            $stmt->bindParam(':qtde', trim($json['qtde']), PDO::PARAM_INT);
+            $stmt->bindParam(':qtde_intervalo', trim($json['qtde_intervalo']), PDO::PARAM_INT);
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {
+
                 http_response_code(200);
 
                 $id = $conn->lastInsertId();
@@ -58,11 +59,11 @@ if ($authorization) {
 
                     while (strtotime($novo_horario) <= strtotime(trim($json['horario_fim']))) {
                         // CRIA HORÁRIOS DE AGENDA VIRTUALMENTE
-                        for ($i = 0; $i < $json['qtde']; $i++) {
+                        for ($i = 0; $i < $json['qtde_intervalo']; $i++) {
                             $insert .= "('$nova_data','$novo_horario','$id'),";
                         }
 
-                        $novo_horario = date('H:i', strtotime("+ $intervalo minutes", strtotime($novo_horario)));
+                        $novo_horario = date('H:i', strtotime("+{$json['intervalo']} minutes", strtotime($novo_horario)));
                     }
 
                     $nova_data = date('Y-m-d', strtotime("+ 1 week", strtotime($nova_data)));

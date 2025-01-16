@@ -8,7 +8,7 @@ if ($authorization) {
             isset($json['data_inicio']) &&
             isset($json['horario_inicio']) && isset($json['horario_fim']) &&
             isset($json['intervalo']) && is_numeric($json['intervalo']) &&
-            isset($json['qtde']) && is_numeric($json['qtde'])
+            isset($json['qtde_intervalo']) && is_numeric($json['qtde_intervalo'])
         ) {
             $sql = "
             UPDATE regras_agendamento SET
@@ -18,7 +18,7 @@ if ($authorization) {
             horario_inicio = :horario_inicio, 
             horario_fim = :horario_fim, 
             intervalo = :intervalo, 
-            qtde = :qtde
+            qtde_intervalo = :qtde_intervalo
             WHERE id_regra_agendamento = :id_regra_agendamento
             ";
             $stmt = $conn->prepare($sql);
@@ -28,7 +28,7 @@ if ($authorization) {
             $stmt->bindParam(':horario_inicio', trim($json['horario_inicio']), PDO::PARAM_STR);
             $stmt->bindParam(':horario_fim', trim($json['horario_fim']), PDO::PARAM_STR);
             $stmt->bindParam(':intervalo', trim($json['intervalo']), PDO::PARAM_INT);
-            $stmt->bindParam(':qtde', trim($json['qtde']), PDO::PARAM_INT);
+            $stmt->bindParam(':qtde_intervalo', trim($json['qtde_intervalo']), PDO::PARAM_INT);
             $stmt->bindParam(':id_regra_agendamento', trim($json['id']), PDO::PARAM_INT);;
             $stmt->execute();
 

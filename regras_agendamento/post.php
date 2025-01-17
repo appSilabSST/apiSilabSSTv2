@@ -41,42 +41,15 @@ if ($authorization) {
 
                 http_response_code(200);
 
-                $id = $conn->lastInsertId();
+                $id_regra_agendamento = $conn->lastInsertId();
 
-                $insert = "";
-                $nova_data = trim($json['data_inicio']);
-                $data_fim = isset($json['data_fim']) ? trim($json['data_fim']) : date('Y-m-d', strtotime("+ 6 month", strtotime($nova_data)));
+                $insertAgendamento = setupInsetAgendamento($json, $id_regra_agendamento);
 
-                // VERIFICA SE A DATA INÍCIO É COMPATÍVEL COM O DIA DE SEMANA SELECIONADO
-                while ((date('w', strtotime($nova_data)) + 1) <> $json['id_dia_semana']) {
-                    $nova_data = date('Y-m-d', strtotime("+ 1 day", strtotime($nova_data)));
+                if ($insertAgendamento) {
+                    // Execute o insert ou a ação de agendamento se for necessário
+                    $stmt = $conn->prepare($insertAgendamento);
+                    $stmt->execute();
                 }
-
-                // echo $nova_data;exit;
-                while (strtotime($nova_data) <= strtotime($data_fim)) {
-
-                    $novo_horario = date('H:i', strtotime(trim($json['horario_inicio'])));
-
-                    while (strtotime($novo_horario) <= strtotime(trim($json['horario_fim']))) {
-                        // CRIA HORÁRIOS DE AGENDA VIRTUALMENTE
-                        for ($i = 0; $i < $json['qtde_intervalo']; $i++) {
-                            $insert .= "('$nova_data','$novo_horario','$id'),";
-                        }
-
-                        $novo_horario = date('H:i', strtotime("+{$json['intervalo']} minutes", strtotime($novo_horario)));
-                    }
-
-                    $nova_data = date('Y-m-d', strtotime("+ 1 week", strtotime($nova_data)));
-                }
-
-                $sql = "
-                INSERT INTO agendamentos (data, horario, id_regra_agendamento) VALUES
-                " . substr($insert, 0, -1) . "
-                ";
-
-                // echo $sql;exit;
-                $stmt = $conn->prepare($sql);
-                $stmt->execute();
 
                 $result = 'Regra de agendamento cadastrada com sucesso!';
             } else {

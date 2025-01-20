@@ -29,7 +29,7 @@ if ($authorization) {
         elseif (isset($_GET["data"])) {
             $data = trim($_GET["data"]);
 
-            if (isset($_GET["externo"])) {
+            if ($_GET["tipo"] == "externo") {
                 $where = 'and a.id_local_atendimento > 1';
             } else {
                 $where = 'and (a.id_local_atendimento = 1 OR a.id_local_atendimento = 0)';

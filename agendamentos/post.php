@@ -9,7 +9,6 @@ if ($authorization) {
             isset($json['riscos']) && count($json['riscos']) > 0 &&
             isset($json['id_rl_colaborador_empresa']) &&
             isset($json['id_tipo_atendimento']) &&
-            isset($json['id_profissional']) &&
             isset($json['encaixe'])
         ) {
             // $conn->beginTransaction();

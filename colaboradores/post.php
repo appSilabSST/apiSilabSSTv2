@@ -4,15 +4,15 @@ if ($authorization) {
     try {
         if (isset($json['nome']) && isset($json['sexo']) && isset($json['data_nascimento']) && isset($json['tipo_doc']) && isset($json['nr_doc'])) {
             $sql = "
-            INSERT INTO colaboradores (nome,nome_social,celular,email,tipo_doc,nr_doc,rg,deficiente,data_nascimento,sexo) VALUES 
-            (:nome,:nome_social,:celular,:email,:tipo_doc,:nr_doc,:rg,:deficiente,:data_nascimento,:sexo)
+            INSERT INTO colaboradores (nome,nome_social,celular,email,id_tipo_orgao,nr_doc,rg,deficiente,data_nascimento,sexo) VALUES 
+            (:nome,:nome_social,:celular,:email,:id_tipo_orgao,:nr_doc,:rg,:deficiente,:data_nascimento,:sexo)
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':nome', trim($json['nome']));
             $stmt->bindParam(':nome_social', trim($json['nome_social']));
             $stmt->bindParam(':celular', trim($json['celular']));
             $stmt->bindParam(':email', trim($json['email']));
-            $stmt->bindParam(':tipo_doc', trim($json['tipo_doc']));
+            $stmt->bindParam(':id_tipo_orgao', trim($json['id_tipo_orgao']));
             $stmt->bindParam(':nr_doc', trim($json['nr_doc']));
             $stmt->bindParam(':rg', trim($json['rg']), trim($json['rg']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':deficiente', trim($json['deficiente']));

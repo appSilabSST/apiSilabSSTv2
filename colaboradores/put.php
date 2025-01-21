@@ -9,7 +9,7 @@ if ($authorization) {
             nome_social = :nome_social,
             celular = :celular,
             email = :email,
-            tipo_doc = :tipo_doc,
+            id_tipo_orgao = :id_tipo_orgao,
             nr_doc = :nr_doc,
             rg = :rg,
             deficiente = :deficiente,
@@ -22,7 +22,7 @@ if ($authorization) {
             $stmt->bindParam(':nome_social', trim($json['nome_social']));
             $stmt->bindParam(':celular', trim($json['celular']));
             $stmt->bindParam(':email', trim($json['email']));
-            $stmt->bindParam(':tipo_doc', trim($json['tipo_doc']));
+            $stmt->bindParam(':id_tipo_orgao', trim($json['id_tipo_orgao']));
             $stmt->bindParam(':nr_doc', trim($json['nr_doc']));
             $stmt->bindParam(':rg', trim($json['rg']), trim($json['rg']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':deficiente', trim($json['deficiente']));

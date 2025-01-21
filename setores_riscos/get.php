@@ -28,13 +28,13 @@ if ($authorization) {
             $id_setor = trim($_GET["id_setor"]);
             $sql = "
             SELECT rl.*,
-            r.descricao as agente_nocivo, r.cod_esocial , r.grupo , r.cor ,
+            r.descricao, r.cod_esocial , r.grupo , r.cor ,
             s.id_setor,s.setor,
             lt.id_local_atividade,lt.razao_social,
             te.id_tipo_exposicao,te.tipo_exposicao,
             cr.id_classificacao_risco,cr.classificacao_risco,
             mp.id_meio_propagacao,mp.meio_propagacao,
-            rlpa.id_rl_setor_risco_plano_acao,rlpa.plano_acao,rlpa.descricao,rlpa.medida_suficiente,rlpa.data_avaliacao,rlpa.indicacao_medida
+            rlpa.id_rl_setor_risco_plano_acao,rlpa.plano_acao,rlpa.descricao as descricao_plano,rlpa.medida_suficiente,rlpa.data_avaliacao,rlpa.indicacao_medida
             FROM rl_setores_riscos AS rl
             JOIN riscos r ON (rl.id_risco = r.id_risco)
             JOIN setores AS s ON (rl.id_setor = s.id_setor)

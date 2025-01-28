@@ -13,31 +13,33 @@ if ($authorization) {
         ) {
             // $conn->beginTransaction();
             $sql = "
-            INSERT INTO agendamentos (nr_agendamento,data,horario,id_pcmso,id_tipo_atendimento,id_rl_colaborador_empresa,id_rl_setor_funcao,funcao,id_profissional,id_regra_agendamento,encaixe)
-            SELECT 
-                IF(((SELECT IFNULL(MAX(nr_agendamento), 0) FROM agendamentos) - ((DATE_FORMAT(CURDATE(), '%y') * 100000))) >= 0,
-                    (SELECT MAX(nr_agendamento) + 1 FROM agendamentos),
-                    (DATE_FORMAT(CURDATE(), '%y') * 100000 + 1)
-                ),
-            :data,:horario,:id_pcmso,:id_tipo_atendimento,:id_rl_colaborador_empresa,:id_rl_setor_funcao,:funcao,:id_profissional,:id_regra_agendamento,:encaixe
+                INSERT INTO agendamentos (nr_agendamento, data, horario, id_pcmso, id_empresa_reservado, id_tipo_atendimento, id_rl_colaborador_empresa, id_rl_setor_funcao, funcao, id_profissional, encaixe,id_setor_funcao_ausente)
+                    SELECT 
+                        IF(((SELECT IFNULL(MAX(nr_agendamento), 0) FROM agendamentos) - ((DATE_FORMAT(CURDATE(), '%y') * 100000))) >= 0,
+                            (SELECT MAX(nr_agendamento) + 1 FROM agendamentos),
+                            (DATE_FORMAT(CURDATE(), '%y') * 100000 + 1)
+                        ),
+                    :data, :horario, :id_pcmso, :id_empresa_reservado, :id_tipo_atendimento, :id_rl_colaborador_empresa, :id_rl_setor_funcao, :funcao, :id_profissional, :encaixe,id_setor_funcao_ausente
             ";
+
             // echo $sql;exit;
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':data', trim($json['data']));
-            $stmt->bindParam(':horario', trim($json['horario']));
-            $stmt->bindParam(':id_pcmso', trim($json['id_pcmso']), trim($json['id_pcmso']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-            $stmt->bindParam(':id_tipo_atendimento', trim($json['id_tipo_atendimento']), PDO::PARAM_INT);
-            $stmt->bindParam(':id_rl_colaborador_empresa', trim($json['id_rl_colaborador_empresa']), PDO::PARAM_INT);
-            $stmt->bindParam(':id_rl_setor_funcao', trim($json['id_rl_setor_funcao']), trim($json['id_rl_setor_funcao']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-            $stmt->bindParam(':funcao', trim($json['funcao']), trim($json['funcao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':id_profissional', trim($json['id_profissional']), PDO::PARAM_INT);
-            $stmt->bindParam(':id_regra_agendamento', trim($json['id_regra_agendamento']), trim($json['id_regra_agendamento']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-            $stmt->bindParam(':encaixe', trim($json['encaixe']), PDO::PARAM_INT);
+            $stmt->bindParam(':data', $json['data']);
+            $stmt->bindParam(':horario', $json['horario']);
+            $stmt->bindParam(':id_pcmso', $json['id_pcmso'], $json['id_pcmso'] === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+            $stmt->bindParam(':id_empresa_reservado', $json['id_empresa_reservado'], $json['id_empresa_reservado'] === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+            $stmt->bindParam(':id_tipo_atendimento', $json['id_tipo_atendimento'], PDO::PARAM_INT);
+            $stmt->bindParam(':id_rl_colaborador_empresa', $json['id_rl_colaborador_empresa'], PDO::PARAM_INT);
+            $stmt->bindParam(':id_rl_setor_funcao', $json['id_rl_setor_funcao'], $json['id_rl_setor_funcao'] === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+            $stmt->bindParam(':funcao', $json['funcao'], $json['funcao'] === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':id_profissional', $json['id_profissional'], PDO::PARAM_INT);
+            $stmt->bindParam(':encaixe', $json['encaixe'], PDO::PARAM_INT);
+            $stmt->bindParam(':id_setor_funcao_ausente', $json['id_setor_funcao_ausente'], PDO::PARAM_INT);
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {
                 $id_agendamento = $conn->lastInsertId();
-                
+
                 // Create both cURL resources
                 $ch1 = curl_init();
                 $ch2 = curl_init();

@@ -2,7 +2,7 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($json['nome']) && isset($json['sexo']) && isset($json['data_nascimento']) && isset($json['tipo_doc']) && isset($json['nr_doc'])) {
+        if (isset($json['nome']) && isset($json['sexo']) && isset($json['data_nascimento']) && isset($json['id_tipo_orgao']) && isset($json['nr_doc'])) {
             $sql = "
             INSERT INTO colaboradores (nome,nome_social,celular,email,id_tipo_orgao,nr_doc,rg,deficiente,data_nascimento,sexo) VALUES 
             (:nome,:nome_social,:celular,:email,:id_tipo_orgao,:nr_doc,:rg,:deficiente,:data_nascimento,:sexo)

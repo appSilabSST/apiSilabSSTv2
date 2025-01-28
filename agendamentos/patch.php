@@ -2,13 +2,35 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($json['id']) && is_numeric($json['id'])) {
+        if (
+            isset($json['id_empresa_reservado']) && is_numeric($json['id_empresa_reservado']) &&
+            isset($json['ids_agendamentos']) && count($json['ids_agendamentos']) > 0
+        ) {
+            $update = "UPDATE agendamentos SET id_empresa_reservado = :id_empresa_reservado WHERE id_agendamento = :id_agendamento";
+            $stmt = $conn->prepare($update);
+
+            // Bind dos parâmetros
+            $stmt->bindParam(':id_empresa_reservado', trim($json['id_empresa_reservado']));
+
+            // Loop pelos agendamentos e executa os updates
+            foreach ($json['ids_agendamentos'] as $value) {
+                $stmt->bindParam(':id_agendamento', $value);
+                $stmt->execute();
+            }
+            $stmt->execute();
+
+            http_response_code(200);
+            $result = array(
+                'status' => 'success',
+                'result' => 'Agendamento Reservada com sucesso!'
+            );
+        } else if (isset($json['id_agendamento']) && is_numeric($json['id_agendamento'])) {
             $sql = "
             UPDATE agendamentos SET
             ";
             foreach ($json as $key => $value) {
                 // REMOVE O CAMPO ID E LISTA DE EXAMES E RISCOS
-                if ($key != 'id' && !is_array($value)) {
+                if ($key != 'id_agendamento' && !is_array($value)) {
                     $sql .= "$key = :$key,";
                 }
             }
@@ -17,88 +39,89 @@ if ($authorization) {
             $stmt = $conn->prepare($sql);
             foreach ($json as $key => $value) {
                 // REMOVE O CAMPO ID E LISTA DE EXAMES E RISCOS
-                if ($key != 'id' && !is_array($value)) {
+                if ($key != 'id_agendamento' && !is_array($value)) {
                     $stmt->bindValue(":$key", trim($value));
-                } elseif ($key == 'id') {
+                } elseif ($key == 'id_agendamento') {
                     $id_agendamento = $value;
                     $stmt->bindValue(":id_agendamento", $value);
                 } else {
                     // IGNORA OS ARRAYS DE EXAMES E RISCOS
                 }
             }
+
             $stmt->execute();
 
-            // Create both cURL resources
-            $ch1 = curl_init();
-            $ch2 = curl_init();
+            // // Create both cURL resources
+            // $ch1 = curl_init();
+            // $ch2 = curl_init();
 
-            // CHAMA A API PARA CADASTRAR OS EXAMES AO AGENDAMENTO CRIADO
-            $postfields = array(
-                'id_agendamento' => $id_agendamento,
-                'exames' => $json['exames']
-            );
-            curl_setopt_array($ch1, array(
-                CURLOPT_URL => "https://silabsst.com.br/_backend/agendamento_exames/",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => json_encode($postfields),
-                CURLOPT_HTTPHEADER => array(
-                    "Authorization: $token",
-                    "Content-Type: application/json"
-                ),
-            ));
+            // // CHAMA A API PARA CADASTRAR OS EXAMES AO AGENDAMENTO CRIADO
+            // $postfields = array(
+            //     'id_agendamento' => $id_agendamento,
+            //     'exames' => $json['exames']
+            // );
+            // curl_setopt_array($ch1, array(
+            //     CURLOPT_URL => "https://silabsst.com.br/_backend/agendamento_exames/",
+            //     CURLOPT_RETURNTRANSFER => true,
+            //     CURLOPT_ENCODING => '',
+            //     CURLOPT_MAXREDIRS => 10,
+            //     CURLOPT_TIMEOUT => 0,
+            //     CURLOPT_FOLLOWLOCATION => true,
+            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            //     CURLOPT_CUSTOMREQUEST => 'POST',
+            //     CURLOPT_POSTFIELDS => json_encode($postfields),
+            //     CURLOPT_HTTPHEADER => array(
+            //         "Authorization: $token",
+            //         "Content-Type: application/json"
+            //     ),
+            // ));
 
-            // CHAMA A API PARA CADASTRAR OS RISCOS AO AGENDAMENTO CRIADO
-            $postfields = array(
-                'id_agendamento' => $id_agendamento,
-                'riscos' => $json['riscos']
-            );
-            curl_setopt_array($ch2, array(
-                CURLOPT_URL => "https://silabsst.com.br/_backend/agendamento_riscos/",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => json_encode($postfields),
-                CURLOPT_HTTPHEADER => array(
-                    "Authorization: $token",
-                    "Content-Type: application/json"
-                ),
-            ));
+            // // CHAMA A API PARA CADASTRAR OS RISCOS AO AGENDAMENTO CRIADO
+            // $postfields = array(
+            //     'id_agendamento' => $id_agendamento,
+            //     'riscos' => $json['riscos']
+            // );
+            // curl_setopt_array($ch2, array(
+            //     CURLOPT_URL => "https://silabsst.com.br/_backend/agendamento_riscos/",
+            //     CURLOPT_RETURNTRANSFER => true,
+            //     CURLOPT_ENCODING => '',
+            //     CURLOPT_MAXREDIRS => 10,
+            //     CURLOPT_TIMEOUT => 0,
+            //     CURLOPT_FOLLOWLOCATION => true,
+            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            //     CURLOPT_CUSTOMREQUEST => 'POST',
+            //     CURLOPT_POSTFIELDS => json_encode($postfields),
+            //     CURLOPT_HTTPHEADER => array(
+            //         "Authorization: $token",
+            //         "Content-Type: application/json"
+            //     ),
+            // ));
 
-            // Create the multiple cURL handle
-            $mh = curl_multi_init();
+            // // Create the multiple cURL handle
+            // $mh = curl_multi_init();
 
-            // Add the two handles
-            curl_multi_add_handle($mh, $ch1);
-            curl_multi_add_handle($mh, $ch2);
+            // // Add the two handles
+            // curl_multi_add_handle($mh, $ch1);
+            // curl_multi_add_handle($mh, $ch2);
 
-            // Execute the multi handle
-            do {
-                $status = curl_multi_exec($mh, $active);
-                if ($active) {
-                    curl_multi_select($mh);
-                }
-            } while ($active && $status == CURLM_OK);
+            // // Execute the multi handle
+            // do {
+            //     $status = curl_multi_exec($mh, $active);
+            //     if ($active) {
+            //         curl_multi_select($mh);
+            //     }
+            // } while ($active && $status == CURLM_OK);
 
-            // Optionally capture the response
-            $response1 = curl_multi_getcontent($ch1);
-            $response2 = curl_multi_getcontent($ch2);
+            // // Optionally capture the response
+            // $response1 = curl_multi_getcontent($ch1);
+            // $response2 = curl_multi_getcontent($ch2);
 
-            // Close the handles
-            curl_multi_remove_handle($mh, $ch1);
-            curl_close($ch1);
-            curl_multi_remove_handle($mh, $ch2);
-            curl_close($ch2);
-            curl_multi_close($mh);
+            // // Close the handles
+            // curl_multi_remove_handle($mh, $ch1);
+            // curl_close($ch1);
+            // curl_multi_remove_handle($mh, $ch2);
+            // curl_close($ch2);
+            // curl_multi_close($mh);
 
             // Print the responses (if captured)
             // echo "Response1: " . $response1 . PHP_EOL;

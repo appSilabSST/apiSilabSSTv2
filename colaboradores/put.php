@@ -2,7 +2,7 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($json['id']) && is_numeric($json['id'])) {
+        if (isset($json['id_colaborador']) && is_numeric($json['id_colaborador'])) {
             $sql = "
             UPDATE colaboradores SET
             nome = :nome,
@@ -28,7 +28,7 @@ if ($authorization) {
             $stmt->bindParam(':deficiente', trim($json['deficiente']));
             $stmt->bindParam(':data_nascimento', trim($json['data_nascimento']));
             $stmt->bindParam(':sexo', trim($json['sexo']));
-            $stmt->bindParam(':id_colaborador', trim($json['id']));
+            $stmt->bindParam(':id_colaborador', trim($json['id_colaborador']));
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {

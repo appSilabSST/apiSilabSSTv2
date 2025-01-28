@@ -3,40 +3,62 @@
 if ($authorization) {
     try {
         if (
-            isset($json['id']) && is_numeric($json['id']) &&
+            isset($json['id_agendamento']) && is_numeric($json['id_agendamento']) &&
+            isset($json['id_rl_colaborador_empresa']) && is_numeric($json['id_rl_colaborador_empresa']) &&
             isset($json['exames']) && count($json['exames']) > 0 &&
             isset($json['riscos']) && count($json['riscos']) > 0 &&
-            isset($json['id_rl_colaborador_empresa']) &&
-            isset($json['id_profissional']) &&
-            isset($json['id_tipo_atendimento']) &&
-            isset($json['encaixe'])
-            ) {
-            $id_agendamento = trim($json['id']);
+            isset($json['id_tipo_atendimento'])
+        ) {
+            $id_agendamento = trim($json['id_agendamento']);
+
+            if (!isset($json['nr_agendamento']) || $json['nr_agendamento'] === null) {
+                $sql = "
+                    SELECT 
+                    IF(((SELECT IFNULL(MAX(nr_agendamento), 0) FROM agendamentos) - ((DATE_FORMAT(CURDATE(), '%y') * 100000))) >= 0,
+                        (SELECT MAX(nr_agendamento) + 1 FROM agendamentos),
+                        (DATE_FORMAT(CURDATE(), '%y') * 100000 + 1)
+                    ) AS next_nr_agendamento
+                ";
+
+                $stmt = $conn->prepare($sql); // Use $sql here
+                $stmt->execute();
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                $nr_agendamento = $result['next_nr_agendamento'];
+            } else {
+                $nr_agendamento = trim($json['nr_agendamento']);
+            }
 
             $sql = "
             UPDATE agendamentos SET
             id_pcmso = :id_pcmso,
             id_tipo_atendimento = :id_tipo_atendimento,
+            nr_agendamento = :nr_agendamento,
             id_rl_colaborador_empresa = :id_rl_colaborador_empresa,
+            id_empresa_reservado = :id_empresa_reservado,
             id_rl_setor_funcao = :id_rl_setor_funcao,
             funcao = :funcao,
             id_profissional = :id_profissional,
             encaixe = :encaixe,
-            disponivel = 0,
+            id_setor_funcao_ausente:id_setor_funcao_ausente,
+            disponivel = 0
             WHERE id_agendamento = :id_agendamento
             ";
+
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_pcmso', trim($json['id_pcmso']), trim($json['id_pcmso']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
             $stmt->bindParam(':id_tipo_atendimento', trim($json['id_tipo_atendimento']), PDO::PARAM_INT);
-            $stmt->bindParam(':id_rl_colaborador_empresa', trim($json['id_rl_colaborador_empresa']), PDO::PARAM_INT);
             $stmt->bindParam(':id_rl_setor_funcao', trim($json['id_rl_setor_funcao']), trim($json['id_rl_setor_funcao']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
             $stmt->bindParam(':funcao', trim($json['funcao']), trim($json['funcao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':id_empresa_reservado', trim($json['id_empresa_reservado']), trim($json['id_empresa_reservado']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
             $stmt->bindParam(':id_profissional', trim($json['id_profissional']), PDO::PARAM_INT);
+            $stmt->bindParam(':id_rl_colaborador_empresa', trim($json['id_rl_colaborador_empresa']), PDO::PARAM_INT);
             $stmt->bindParam(':encaixe', trim($json['encaixe']), PDO::PARAM_INT);
+            $stmt->bindParam(':id_setor_funcao_ausente', trim($json['id_setor_funcao_ausente']), PDO::PARAM_INT);
+            $stmt->bindParam(':nr_agendamento', $nr_agendamento, PDO::PARAM_INT);
             $stmt->bindParam(':id_agendamento', $id_agendamento);
             $stmt->execute();
 
-            // Create both cURL resources
+            // Create both cURL resources for exames and riscos
             $ch1 = curl_init();
             $ch2 = curl_init();
 
@@ -82,14 +104,11 @@ if ($authorization) {
                 ),
             ));
 
-            // Create the multiple cURL handle
+            // Execute the multi handle for cURL requests
             $mh = curl_multi_init();
-
-            // Add the two handles
             curl_multi_add_handle($mh, $ch1);
             curl_multi_add_handle($mh, $ch2);
 
-            // Execute the multi handle
             do {
                 $status = curl_multi_exec($mh, $active);
                 if ($active) {
@@ -108,16 +127,11 @@ if ($authorization) {
             curl_close($ch2);
             curl_multi_close($mh);
 
-            // Print the responses (if captured)
-            // echo "Response1: " . $response1 . PHP_EOL;
-            // echo "Response2: " . $response2 . PHP_EOL;
-            // echo "Response3: " . $response3 . PHP_EOL;
-            // echo "Response4: " . $response4 . PHP_EOL;
-
             http_response_code(200);
             $result = array(
                 'status' => 'success',
-                'result' => 'Agendamento atualizado com sucesso!'
+                'result' => 'Agendamento atualizado com sucesso!',
+                'nr_agendamento' => $nr_agendamento
             );
         } else {
             http_response_code(400);
@@ -153,4 +167,6 @@ if ($authorization) {
         )
     );
 }
+exit;
+
 exit;

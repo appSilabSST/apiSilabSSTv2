@@ -1,0 +1,71 @@
+[23-Oct-2024 08:59:30 America/Sao_Paulo] PHP Warning:  Undefined variable $formData in /home4/silabs69/public_html/_backend/salas_atendimentos/get.php on line 22
+[23-Oct-2024 11:53:11 America/Sao_Paulo] PHP Warning:  require(post.php): Failed to open stream: No such file or directory in /home4/silabs69/public_html/_backend/salas_atendimentos/index.php on line 8
+[23-Oct-2024 11:53:11 America/Sao_Paulo] PHP Fatal error:  Uncaught Error: Failed opening required 'post.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home4/silabs69/public_html/_backend/salas_atendimentos/index.php:8
+Stack trace:
+#0 {main}
+  thrown in /home4/silabs69/public_html/_backend/salas_atendimentos/index.php on line 8
+[23-Oct-2024 11:53:11 America/Sao_Paulo] PHP Warning:  require(post.php): Failed to open stream: No such file or directory in /home4/silabs69/public_html/_backend/salas_atendimentos/index.php on line 8
+[23-Oct-2024 11:53:11 America/Sao_Paulo] PHP Fatal error:  Uncaught Error: Failed opening required 'post.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home4/silabs69/public_html/_backend/salas_atendimentos/index.php:8
+Stack trace:
+#0 {main}
+  thrown in /home4/silabs69/public_html/_backend/salas_atendimentos/index.php on line 8
+[23-Oct-2024 11:58:24 America/Sao_Paulo] PHP Warning:  Undefined variable $th in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 11:58:24 America/Sao_Paulo] PHP Fatal error:  Uncaught Error: Call to a member function getMessage() on null in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php:38
+Stack trace:
+#0 /home4/silabs69/public_html/_backend/salas_atendimentos/index.php(8): require()
+#1 {main}
+  thrown in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 11:58:24 America/Sao_Paulo] PHP Warning:  Undefined variable $th in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 11:58:24 America/Sao_Paulo] PHP Fatal error:  Uncaught Error: Call to a member function getMessage() on null in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php:38
+Stack trace:
+#0 /home4/silabs69/public_html/_backend/salas_atendimentos/index.php(8): require()
+#1 {main}
+  thrown in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 12:00:19 America/Sao_Paulo] PHP Warning:  Undefined variable $th in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 12:00:19 America/Sao_Paulo] PHP Fatal error:  Uncaught Error: Call to a member function getMessage() on null in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php:38
+Stack trace:
+#0 /home4/silabs69/public_html/_backend/salas_atendimentos/index.php(8): require()
+#1 {main}
+  thrown in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 12:00:19 America/Sao_Paulo] PHP Warning:  Undefined variable $th in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 12:00:19 America/Sao_Paulo] PHP Fatal error:  Uncaught Error: Call to a member function getMessage() on null in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php:38
+Stack trace:
+#0 /home4/silabs69/public_html/_backend/salas_atendimentos/index.php(8): require()
+#1 {main}
+  thrown in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 14:21:26 America/Sao_Paulo] PHP Warning:  Undefined variable $th in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 14:21:26 America/Sao_Paulo] PHP Fatal error:  Uncaught Error: Call to a member function getMessage() on null in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php:38
+Stack trace:
+#0 /home4/silabs69/public_html/_backend/salas_atendimentos/index.php(8): require()
+#1 {main}
+  thrown in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 14:21:26 America/Sao_Paulo] PHP Warning:  Undefined variable $th in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 14:21:26 America/Sao_Paulo] PHP Fatal error:  Uncaught Error: Call to a member function getMessage() on null in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php:38
+Stack trace:
+#0 /home4/silabs69/public_html/_backend/salas_atendimentos/index.php(8): require()
+#1 {main}
+  thrown in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 14:21:39 America/Sao_Paulo] PHP Warning:  Undefined variable $th in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 14:21:39 America/Sao_Paulo] PHP Fatal error:  Uncaught Error: Call to a member function getMessage() on null in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php:38
+Stack trace:
+#0 /home4/silabs69/public_html/_backend/salas_atendimentos/index.php(8): require()
+#1 {main}
+  thrown in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 14:21:40 America/Sao_Paulo] PHP Warning:  Undefined variable $th in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 14:21:40 America/Sao_Paulo] PHP Fatal error:  Uncaught Error: Call to a member function getMessage() on null in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php:38
+Stack trace:
+#0 /home4/silabs69/public_html/_backend/salas_atendimentos/index.php(8): require()
+#1 {main}
+  thrown in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 14:22:32 America/Sao_Paulo] PHP Warning:  Undefined variable $th in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 14:22:32 America/Sao_Paulo] PHP Fatal error:  Uncaught Error: Call to a member function getMessage() on null in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php:38
+Stack trace:
+#0 /home4/silabs69/public_html/_backend/salas_atendimentos/index.php(8): require()
+#1 {main}
+  thrown in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 14:22:32 America/Sao_Paulo] PHP Warning:  Undefined variable $th in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38
+[23-Oct-2024 14:22:32 America/Sao_Paulo] PHP Fatal error:  Uncaught Error: Call to a member function getMessage() on null in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php:38
+Stack trace:
+#0 /home4/silabs69/public_html/_backend/salas_atendimentos/index.php(8): require()
+#1 {main}
+  thrown in /home4/silabs69/public_html/_backend/salas_atendimentos/post.php on line 38

@@ -13,13 +13,13 @@ if ($authorization) {
         ) {
             // $conn->beginTransaction();
             $sql = "
-                INSERT INTO agendamentos (nr_agendamento, data, horario, id_pcmso, id_empresa_reservado, id_tipo_atendimento, id_rl_colaborador_empresa, id_rl_setor_funcao, funcao, id_profissional, encaixe,id_setor_funcao_ausente)
+                INSERT INTO agendamentos (nr_agendamento, data, horario, id_pcmso, id_empresa_reservado, id_tipo_atendimento, id_rl_colaborador_empresa, id_rl_setor_funcao, funcao, id_profissional, encaixe)
                     SELECT 
                         IF(((SELECT IFNULL(MAX(nr_agendamento), 0) FROM agendamentos) - ((DATE_FORMAT(CURDATE(), '%y') * 100000))) >= 0,
                             (SELECT MAX(nr_agendamento) + 1 FROM agendamentos),
                             (DATE_FORMAT(CURDATE(), '%y') * 100000 + 1)
                         ),
-                    :data, :horario, :id_pcmso, :id_empresa_reservado, :id_tipo_atendimento, :id_rl_colaborador_empresa, :id_rl_setor_funcao, :funcao, :id_profissional, :encaixe,id_setor_funcao_ausente
+                    :data, :horario, :id_pcmso, :id_empresa_reservado, :id_tipo_atendimento, :id_rl_colaborador_empresa, :id_rl_setor_funcao, :funcao, :id_profissional, :encaixe
             ";
 
             // echo $sql;exit;
@@ -34,7 +34,6 @@ if ($authorization) {
             $stmt->bindParam(':funcao', $json['funcao'], $json['funcao'] === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':id_profissional', $json['id_profissional'], PDO::PARAM_INT);
             $stmt->bindParam(':encaixe', $json['encaixe'], PDO::PARAM_INT);
-            $stmt->bindParam(':id_setor_funcao_ausente', $json['id_setor_funcao_ausente'], PDO::PARAM_INT);
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {

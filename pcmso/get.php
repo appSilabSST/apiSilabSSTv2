@@ -37,7 +37,7 @@ if ($authorization) {
             e.id_empresa, e.razao_social,
             l.id_local_atividade, l.razao_social nome_local_atividade,
             s.id_status_documento, s.status_documento,
-            pro.nome nome_profissional
+            pro.nome nome_profissional,pro.orgao_classe,pro.orgao_nr,pro.orgao_uf,pro.nit,pro.cpf
             FROM pcmso p
             LEFT JOIN empresas e ON (p.id_empresa = e.id_empresa)
             LEFT JOIN locais_atividade l ON (p.id_local_atividade = l.id_local_atividade)

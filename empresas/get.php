@@ -9,7 +9,7 @@ if ($authorization) {
             FROM empresas
             WHERE id_empresa = :id_empresa
             AND empresas.ativo = '1'
-            ORDER BY empresas.status, razao_social
+            ORDER BY empresas.status, empresas.razao_social
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_empresa', $id_empresa);
@@ -20,7 +20,7 @@ if ($authorization) {
             FROM empresas
             WHERE empresas.status = :status
             AND empresas.ativo = '1'
-            ORDER BY empresas.status, razao_social
+            ORDER BY empresas.status, empresas.razao_social
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':status', $status);
@@ -31,7 +31,7 @@ if ($authorization) {
             FROM empresas
             WHERE nr_doc = :nr_doc
             AND empresas.ativo = '1'
-            ORDER BY empresas., razao_social
+            ORDER BY empresas.status, empresas.razao_social
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':nr_doc', $nr_doc);

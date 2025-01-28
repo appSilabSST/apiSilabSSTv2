@@ -29,7 +29,7 @@ if ($authorization) {
         http_response_code(500);
         // DADOS ÚNICOS JÁ UTILIZADOS
         if ($th->getCode() == 23000) {
-            $result = 'Serviço já existente!';
+            $result = 'Plano de ação já existente!';
         } else {
             $result = $th->getMessage();
         }

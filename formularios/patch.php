@@ -2,29 +2,36 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($json['id_empresa']) && is_numeric($json['id_empresa']) && isset($json['id_tipo_ambiente']) && is_numeric($json['id_tipo_ambiente'])) {
-            $sql = "
-            INSERT INTO locais_atividade (id_empresa, id_tipo_ambiente,id_empresa_local_atividade, atividade_principal) VALUES 
-            (:id_empresa, :id_tipo_ambiente, :id_empresa_local_atividade, :atividade_principal)
-            ";
+        if (isset($json['id']) && is_numeric($json['id'])) {
+            $sql = "UPDATE formularios SET ";
+            $params = [];
+
+            // Monta a consulta SQL dinamicamente
+            foreach ($json as $key => $value) {
+                if ($key != 'id') {
+                    $sql .= "$key = :$key, ";
+                    $params[":$key"] = trim($value);
+                }
+            }
+
+            $sql = rtrim($sql, ', ') . " WHERE id_formulario = :id_formulario";
+            $params[':id_formulario'] = $json['id'];
+
+            // Prepara e executa a instrução
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_empresa', trim($json['id_empresa']));
-            $stmt->bindParam(':id_tipo_ambiente', trim($json['id_tipo_ambiente']));
-            $stmt->bindParam(':id_empresa_local_atividade', trim($json['id_empresa_local_atividade']), isset($json['id_empresa_local_atividade']) ? PDO::PARAM_INT : PDO::PARAM_NULL);
-            $stmt->bindParam(':atividade_principal', trim($json['atividade_principal']));
-            $stmt->execute();
+            $stmt->execute($params);
 
             if ($stmt->rowCount() > 0) {
                 http_response_code(200);
                 $result = array(
                     'status' => 'success',
-                    'result' => 'Local de atividade criado com sucesso!'
+                    'result' => 'Exames atualizados com sucesso!'
                 );
             } else {
                 http_response_code(500);
                 $result = array(
                     'status' => 'fail',
-                    'result' => 'Falha ao criar o local de atividade!'
+                    'result' => 'Falha ao editar o exame!'
                 );
             }
         } else {
@@ -40,7 +47,7 @@ if ($authorization) {
         if ($th->getCode() == 23000) {
             $result = array(
                 'status' => 'fail',
-                'result' => 'Local de atividade já existente!'
+                'result' => 'Exame já existente neste agendamento!'
             );
         } else {
             $result = array(
@@ -52,4 +59,13 @@ if ($authorization) {
         $conn = null;
         echo json_encode($result);
     }
+} else {
+    http_response_code(403);
+    echo json_encode(
+        array(
+            'status' => 'fail',
+            'result' => 'Sem autorização para acessar este conteúdo!'
+        )
+    );
 }
+exit;

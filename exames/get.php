@@ -6,7 +6,7 @@ if ($authorization) {
             $id_exame = trim($_GET["id"]);
             $sql = "
             SELECT e.id_exame, e.procedimento, e.valor_custo, e.valor_cobrar, e.cod_esocial , e.validade, e.padronizar,
-            f.razao_social as nome_fornecedor, f.id_fornecedor
+            f.razao_social, f.id_fornecedor
             FROM exames e 
             LEFT JOIN fornecedores f on f.id_fornecedor = e.id_fornecedor             
             WHERE e.ativo = 1
@@ -17,7 +17,7 @@ if ($authorization) {
         } else {
             $sql = "
             SELECT e.id_exame, e.procedimento, e.valor_custo, e.valor_cobrar, e.cod_esocial , e.validade, e.padronizar,
-            f.razao_social as nome_fornecedor, f.id_fornecedor
+            f.razao_social, f.id_fornecedor,f.nr_inscricao
             FROM exames e 
             LEFT JOIN fornecedores f on f.id_fornecedor = e.id_fornecedor             
             WHERE e.ativo = 1

@@ -39,7 +39,6 @@ if ($authorization) {
             funcao = :funcao,
             id_profissional = :id_profissional,
             encaixe = :encaixe,
-            id_setor_funcao_ausente:id_setor_funcao_ausente,
             disponivel = 0
             WHERE id_agendamento = :id_agendamento
             ";
@@ -53,7 +52,6 @@ if ($authorization) {
             $stmt->bindParam(':id_profissional', trim($json['id_profissional']), PDO::PARAM_INT);
             $stmt->bindParam(':id_rl_colaborador_empresa', trim($json['id_rl_colaborador_empresa']), PDO::PARAM_INT);
             $stmt->bindParam(':encaixe', trim($json['encaixe']), PDO::PARAM_INT);
-            $stmt->bindParam(':id_setor_funcao_ausente', trim($json['id_setor_funcao_ausente']), PDO::PARAM_INT);
             $stmt->bindParam(':nr_agendamento', $nr_agendamento, PDO::PARAM_INT);
             $stmt->bindParam(':id_agendamento', $id_agendamento);
             $stmt->execute();

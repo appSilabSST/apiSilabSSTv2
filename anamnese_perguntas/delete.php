@@ -2,20 +2,20 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($_GET["id_sala_atendimento"]) && is_numeric($_GET["id_sala_atendimento"])) {
-            $id_sala_atendimento = trim($_GET["id_sala_atendimento"]);
+        if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
+            $id_anamnese_pergunta = trim($_GET["id"]);
             $sql = "
-            DELETE FROM salas_atendimentos
-            WHERE id_sala_atendimento = :id_sala_atendimento
+            DELETE FROM anamnese_perguntas
+            WHERE id_anamnese_pergunta = :id_anamnese_pergunta
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_sala_atendimento', $id_sala_atendimento);
+            $stmt->bindParam(':id_anamnese_pergunta', $id_anamnese_pergunta);
             $stmt->execute();
 
             http_response_code(200);
             $result = array(
                 'status' => 'success',
-                'result' => 'Sala excluida com sucesso!'
+                'result' => 'Pergunta excluida com sucesso!'
             );
         } else {
             http_response_code(400);

@@ -2,20 +2,26 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($_GET["id_sala_atendimento"]) && is_numeric($_GET["id_sala_atendimento"])) {
-            $id_sala_atendimento = trim($_GET["id_sala_atendimento"]);
+        if (isset($json['id']) && is_numeric($json['id'])) {
             $sql = "
-            DELETE FROM salas_atendimentos
-            WHERE id_sala_atendimento = :id_sala_atendimento
+            UPDATE 
+                anamnese_perguntas 
+            SET
+                pergunta = :pergunta,
+                ordem = :ordem
+            WHERE 
+                id_anamnese_pergunta = :id_anamnese_pergunta
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_sala_atendimento', $id_sala_atendimento);
+            $stmt->bindParam(':pergunta', trim($json['pergunta']));
+            $stmt->bindParam(':ordem', trim($json['ordem']));
+            $stmt->bindParam(':id_anamnese_pergunta', trim($json['id']), PDO::PARAM_INT);
             $stmt->execute();
 
             http_response_code(200);
             $result = array(
                 'status' => 'success',
-                'result' => 'Sala excluida com sucesso!'
+                'result' => 'Atualizados com sucesso!'
             );
         } else {
             http_response_code(400);
@@ -25,10 +31,11 @@ if ($authorization) {
             );
         }
     } catch (\Throwable $th) {
-        http_response_code(200);
+        http_response_code(500);
+        // DADOS ÚNICOS JÁ UTILIZADOS
         $result = array(
-            "status" => "fail",
-            "error" => $th->getMessage()
+            'status' => 'fail',
+            'result' => $th->getMessage()
         );
     } finally {
         $conn = null;

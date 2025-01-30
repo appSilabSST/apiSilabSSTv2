@@ -6,44 +6,36 @@ if ($authorization) {
         if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
             $id_anamnese_pergunta = trim($_GET["id"]);
             $sql = "
-                SELECT * FROM anamnese_perguntas WHERE id_anamnese_pergunta = :id_anamnese_pergunta
+                SELECT * 
+                FROM anamnese_perguntas 
+                WHERE id_anamnese_pergunta = :id_anamnese_pergunta AND ativo = 1
+                ORDER BY  ordem
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_anamnese_pergunta', $id_anamnese_pergunta);
         } else if (isset($_GET["id_anamnese"]) && is_numeric($_GET["id_anamnese"])) {
             $id_anamnese = trim($_GET["id_anamnese"]);
             $sql = "
-                    SELECT * FROM anamnese_perguntas WHERE id_anamnese = :id_anamnese
+                    SELECT * 
+                    FROM anamnese_perguntas 
+                    WHERE id_anamnese = :id_anamnese AND ativo = 1
+                    ORDER BY  ordem
                 ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_anamnese', $id_anamnese);
         } else {
             $sql = "
-                SELECT * FROM anamnese_perguntas
+                SELECT * 
+                FROM anamnese_perguntas 
+                WHERE ativo = 1
+                ORDER BY  ordem
             ";
             $stmt = $conn->prepare($sql);
         }
         // EXECUTAR SINTAXE SQL
         $stmt->execute();
 
-        if ($stmt->rowCount() < 1) {
-            $result = array(
-                'status' => 'fail',
-                'result' => 'Nenhum Pergunta foi encontrado'
-            );
-        } elseif ($stmt->rowCount() == 1 && isset($_GET["id"]) && is_numeric($_GET["id"])) {
-            $dados = $stmt->fetch(PDO::FETCH_OBJ);
-            $result = array(
-                'status' => 'success',
-                'result' => $dados
-            );
-        } else {
-            $dados = $stmt->fetchAll(PDO::FETCH_OBJ);
-            $result = array(
-                'status' => 'success',
-                'result' => $dados
-            );
-        }
+        $result = getResult($stmt);
     } catch (\Throwable $th) {
         $result = array(
             'status' => 'fail',

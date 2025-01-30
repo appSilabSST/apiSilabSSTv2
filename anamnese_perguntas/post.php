@@ -2,46 +2,48 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if ((isset($json["id_anamnese"]) && is_numeric($json["id_anamnese"])) &&  (isset($json["ordem"]) && is_numeric($json["ordem"]))  &&  isset($json["pergunta"])) {
+        if ((isset($json["id_anamnese"]) && is_numeric($json["id_anamnese"])) &&  (isset($json["ordem"]) && is_numeric($json["ordem"]))  &&  isset($json["label"])) {
 
-            $sql = "INSERT INTO anamnese_perguntas (pergunta,ordem,id_anamnese) VALUES (:pergunta,:ordem,:id_anamnese)";
+            $sql = "INSERT INTO anamnese_perguntas (label,ordem,id_anamnese) VALUES (:label,:ordem,:id_anamnese)";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_anamnese', trim($json['id_anamnese']), PDO::PARAM_INT);
             $stmt->bindParam(':ordem', trim($json['ordem']));
-            $stmt->bindParam(':pergunta', trim($json['pergunta']));
+            $stmt->bindParam(':label', trim($json['label']));
+
             $stmt->execute();
 
-            if ($stmt->rowCount() > 0) {
-                http_response_code(200);
-                $result = array(
-                    'status' => 'success',
-                    'result' => 'Criado com sucesso!'
-                );
-            } else {
-                http_response_code(500);
-                $result = array(
-                    'status' => 'fail',
-                    'result' => 'Falha ao criar a pergunta!'
-                );
-            }
+            http_response_code(201);
+            $result = array(
+                'status' => 'success',
+                'result' => 'Criado com sucesso!'
+            );
         } else {
-            http_response_code(400);
+            http_response_code(204);
             $result = array(
                 'status' => 'fail',
                 'result' => 'Dados incompletos!'
+            );
+        }
+    } catch (\Throwable $th) {
+        // DADOS ÚNICOS JÁ UTILIZADOS
+        if ($th->getCode() == 23000) {
+            http_response_code(200);
+            $result = array(
+                'status' => 'fail',
+                'result' => 'Ordem já selecionada por outra pergunta!',
+                'error' => $th->getMessage(),
+                'code' => $th->getCode()
+            );
+        } else {
+            http_response_code(500);
+            $result = array(
+                'status' => 'fail',
+                'result' => $th->getMessage(),
+                'code' => $th->getCode()
             );
         }
     } finally {
         $conn = null;
         echo json_encode($result);
     }
-} else {
-    http_response_code(403);
-    echo json_encode(
-        array(
-            'status' => 'fail',
-            'result' => 'Sem autorização para acessar este conteúdo!'
-        )
-    );
 }
-exit;

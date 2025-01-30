@@ -2,52 +2,53 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($json['id']) && is_numeric($json['id'])) {
+        if (isset($json['id_anamnese_pergunta']) && is_numeric($json['id_anamnese_pergunta'])) {
             $sql = "
             UPDATE 
                 anamnese_perguntas 
             SET
-                pergunta = :pergunta,
+                label = :label,
                 ordem = :ordem
             WHERE 
-                id_anamnese_pergunta = :id_anamnese_pergunta
+                id_anamnese_label = :id_anamnese_pergunta
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':pergunta', trim($json['pergunta']));
+            $stmt->bindParam(':label', trim($json['label']));
             $stmt->bindParam(':ordem', trim($json['ordem']));
-            $stmt->bindParam(':id_anamnese_pergunta', trim($json['id']), PDO::PARAM_INT);
+            $stmt->bindParam(':id_anamnese_pergunta', trim($json['id_anamnese_pergunta']), PDO::PARAM_INT);
             $stmt->execute();
 
-            http_response_code(200);
+            http_response_code(201);
             $result = array(
                 'status' => 'success',
                 'result' => 'Atualizados com sucesso!'
             );
         } else {
-            http_response_code(400);
+            http_response_code(204);
             $result = array(
                 'status' => 'fail',
                 'result' => 'Dados incompletos!'
             );
         }
     } catch (\Throwable $th) {
-        http_response_code(500);
         // DADOS ÚNICOS JÁ UTILIZADOS
-        $result = array(
-            'status' => 'fail',
-            'result' => $th->getMessage()
-        );
+        if ($th->getCode() == 23000) {
+            http_response_code(200);
+            $result = array(
+                'status' => 'fail',
+                'result' => 'Ordem já selecionada por outra pergunta!',
+                'error' => $th->getMessage(),
+                'code' => $th->getCode()
+            );
+        } else {
+            http_response_code(500);
+            $result = array(
+                'status' => 'fail',
+                'result' => $th->getMessage()
+            );
+        }
     } finally {
         $conn = null;
         echo json_encode($result);
     }
-} else {
-    http_response_code(403);
-    echo json_encode(
-        array(
-            'status' => 'fail',
-            'result' => 'Sem autorização para acessar este conteúdo!'
-        )
-    );
 }
-exit;

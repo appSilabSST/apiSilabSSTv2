@@ -5,7 +5,9 @@ if ($authorization) {
         if (
             isset($json['nome']) &&
             isset($json['descricao']) &&
-            isset($json['exames']) && count($json['exames']) > 0 && !in_array(null, $json['exames'])
+            isset($json['perguntas']) &&
+            count($json['perguntas']) > 0 &&
+            !in_array(null, $json['perguntas'])
         ) {
 
             $sql = "INSERT INTO anamneses (nome,descricao) VALUES (:nome,:descricao)";
@@ -14,10 +16,8 @@ if ($authorization) {
             $stmt->bindParam(':descricao', trim($json['descricao']));
             $stmt->execute();
 
-
             if ($stmt->rowCount() > 0) {
                 $id_anamnese = $conn->lastInsertId();
-
 
                 // // Create both cURL resources
                 $ch1 = curl_init();
@@ -25,10 +25,10 @@ if ($authorization) {
                 // // CHAMA A API PARA CADASTRAR OS EXAMES AO AGENDAMENTO CRIADO
                 $postfields = array(
                     'id_anamnese' => $id_anamnese,
-                    'exames' => $json['exames']
+                    'perguntas' => $json['perguntas']
                 );
                 curl_setopt_array($ch1, array(
-                    CURLOPT_URL => "https://silabsst.com.br/_backend/anamneses_exames/",
+                    CURLOPT_URL => "https://silabsst.com.br/_backend/anamnese_perguntas/",
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => '',
                     CURLOPT_MAXREDIRS => 10,

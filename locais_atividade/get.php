@@ -7,10 +7,11 @@ if ($authorization) {
             $sql = "
             SELECT l.*, 
             t.tipo_ambiente,
-            e.grau_risco AS grau_risco_empresa,e.razao_social AS empresa
+            c.grau_risco AS grau_risco_empresa,e.razao_social AS empresa
             FROM locais_atividade l
-            LEFT JOIN tipo_ambiente t ON (t.id_tipo_ambiente = l.id_tipo_ambiente)
+            LEFT JOIN tipos_ambiente t ON (t.id_tipo_ambiente = l.id_tipo_ambiente)
             LEFT JOIN empresas e ON (l.id_empresa = e.id_empresa)
+            LEFT JOIN cnae c ON (c.id_cnae = e.id_cnae)
             WHERE l.ativo = '1'
             AND l.id_local_atividade = :id_local_atividade
             ";
@@ -21,10 +22,11 @@ if ($authorization) {
             $sql = "
             SELECT l.*, 
             t.tipo_ambiente,
-            e.grau_risco AS grau_risco_empresa,e.razao_social AS empresa
+            c.grau_risco AS grau_risco_empresa,e.razao_social AS empresa
             FROM locais_atividade l
-            LEFT JOIN tipo_ambiente t ON (t.id_tipo_ambiente = l.id_tipo_ambiente)
+            LEFT JOIN tipos_ambiente t ON (t.id_tipo_ambiente = l.id_tipo_ambiente)
             LEFT JOIN empresas e ON (l.id_empresa = e.id_empresa)
+            LEFT JOIN cnae c ON (c.id_cnae = e.id_cnae)
             WHERE l.ativo = '1'
             AND l.id_empresa = :id_empresa
             ";
@@ -56,7 +58,7 @@ if ($authorization) {
         http_response_code(500);
         $result = array(
             'status' => 'fail',
-            'result' => $th->getMessage()
+            'result' => $th->getMessage(),
         );
     } finally {
         $conn = null;

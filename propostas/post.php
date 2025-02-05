@@ -4,23 +4,22 @@ if ($authorization) {
     try {
         if (
             isset($json['id_empresa']) && is_numeric($json['id_empresa']) &&
-            isset($json['id_local_atividade']) && is_numeric($json['id_local_atividade']) &&
-            isset($json['id_status_proposta']) && is_numeric($json['id_status_proposta'])
+            isset($json['id_empresa_local_atividade']) && is_numeric($json['id_empresa_local_atividade'])
         ) {
             $sql = "
-            INSERT INTO propostas (nr_proposta, data, renovacao, id_empresa, id_local_atividade, qtde_funcionarios, qtde_funcoes, responsavel, responsavel_cpf, responsavel_email, consideracoes_finais) VALUES
-            (
+            INSERT INTO propostas (nr_proposta, data, renovacao, id_empresa, id_empresa_local_atividade,id_local_atividade, qtde_funcionarios, qtde_funcoes, responsavel, responsavel_cpf, responsavel_email, consideracoes_finais)
             SELECT 
-            IF(((SELECT IFNULL(MAX(nr_ltcat), 0) FROM ltcat) - ((DATE_FORMAT(CURDATE(), '%y') * 100000))) >= 0,
-                (SELECT MAX(nr_ltcat) + 1 FROM ltcat),
-                (DATE_FORMAT(CURDATE(), '%y') * 100000 + 1)
-            ),
-            :data, :renovacao, :id_empresa, :id_local_atividade, :qtde_funcionarios, :qtde_funcoes, :responsavel, :responsavel_cpf, :responsavel_email, :consideracoes_finais)
+                IF(((SELECT IFNULL(MAX(nr_proposta), 0) FROM propostas) - ((DATE_FORMAT(CURDATE(), '%y') * 100000))) >= 0,
+                    (SELECT MAX(nr_proposta) + 1 FROM propostas),
+                    (DATE_FORMAT(CURDATE(), '%y') * 100000 + 1)
+                ),
+            :data, :renovacao, :id_empresa, :id_empresa_local_atividade,:id_local_atividade, :qtde_funcionarios, :qtde_funcoes, :responsavel, :responsavel_cpf, :responsavel_email, :consideracoes_finais
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':data', trim($json['data']));
             $stmt->bindParam(':renovacao', trim($json['renovacao']));
             $stmt->bindParam(':id_empresa', trim($json['id_empresa']));
+            $stmt->bindParam(':id_empresa_local_atividade', trim($json['id_empresa_local_atividade']));
             $stmt->bindParam(':id_local_atividade', trim($json['id_local_atividade']));
             $stmt->bindParam(':qtde_funcionarios', trim($json['qtde_funcionarios']), isset($json['qtde_funcionarios']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
             $stmt->bindParam(':qtde_funcoes', trim($json['qtde_funcoes']), isset($json['qtde_funcoes']) ? PDO::PARAM_STR : PDO::PARAM_NULL);

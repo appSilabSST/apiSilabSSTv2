@@ -2,24 +2,17 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (
-            isset($json['id']) && is_numeric($json['id']) &&
-            isset($json['id_proposta']) && is_numeric($json['id_proposta']) &&
-            isset($json['id_exame']) && is_numeric($json['id_exame']) &&
-            isset($json['valor']) && is_numeric($json['valor'])
-        ) {
+        if (isset($json['id_rl_proposta_exame']) && is_numeric($json['id_rl_proposta_exame'])) {
             $sql = "
             UPDATE rl_propostas_exames SET
-            id_proposta = :id_proposta , 
             id_exame = :id_exame, 
             valor = :valor
             WHERE id_rl_proposta_exame = :id_rl_proposta_exame
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_proposta', trim($json['id_proposta']));
             $stmt->bindParam(':id_exame', trim($json['id_exame']));
             $stmt->bindParam(':valor', trim($json['valor']));
-            $stmt->bindParam(':id_rl_proposta_exame', trim($json['id']));
+            $stmt->bindParam(':id_rl_proposta_exame', trim($json['id_rl_proposta_exame']));
             $stmt->execute();
 
             $result = array(

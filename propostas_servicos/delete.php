@@ -2,13 +2,13 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+        if (isset($_GET['id_rl_proposta_servico']) && is_numeric($_GET['id_rl_proposta_servico'])) {
             $sql = "
             DELETE FROM rl_propostas_servicos
             WHERE id_rl_proposta_servico = :id_rl_proposta_servico
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_rl_proposta_servico', trim($_GET['id']));
+            $stmt->bindParam(':id_rl_proposta_servico', trim($_GET['id_rl_proposta_servico']));
             $stmt->execute();
 
             http_response_code(200);

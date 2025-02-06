@@ -3,16 +3,16 @@
 if ($authorization) {
     try {
         if (
-            isset($json['id']) && is_numeric($json['id']) &&
+            isset($json['id_proposta']) && is_numeric($json['id_proposta']) &&
             isset($json['id_empresa']) && is_numeric($json['id_empresa']) &&
-            isset($json['id_local_atividade']) && is_numeric($json['id_local_atividade']) &&
-            isset($json['id_status_proposta']) && is_numeric($json['id_status_proposta'])
+            isset($json['id_empresa_local_atividade']) && is_numeric($json['id_empresa_local_atividade'])
         ) {
             $sql = "
             UPDATE propostas SET
             data = :data, 
             renovacao = :renovacao, 
             id_empresa = :id_empresa, 
+            id_empresa_local_atividade = :id_empresa_local_atividade,
             id_local_atividade = :id_local_atividade, 
             qtde_funcionarios = :qtde_funcionarios, 
             qtde_funcoes = :qtde_funcoes, 
@@ -23,18 +23,18 @@ if ($authorization) {
             WHERE id_proposta = :id_proposta
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_profissional', trim($json['id_profissional']));
+            $stmt->bindParam(':data', trim($json['data']));
+            $stmt->bindParam(':renovacao', trim($json['renovacao']));
             $stmt->bindParam(':id_empresa', trim($json['id_empresa']));
-            $stmt->bindParam(':id_status_documento', trim($json['id_status_documento']));
+            $stmt->bindParam(':id_empresa_local_atividade', trim($json['id_empresa_local_atividade']));
             $stmt->bindParam(':id_local_atividade', trim($json['id_local_atividade']));
-            $stmt->bindParam(':data_inicio', trim($json['data_inicio']), isset($json['data_inicio']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
-            $stmt->bindParam(':grau_risco_empresa', trim($json['grau_risco_empresa']), isset($json['grau_risco_empresa']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
-            $stmt->bindParam(':grau_risco_local_atividade', trim($json['grau_risco_local_atividade']), isset($json['grau_risco_local_atividade']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
+            $stmt->bindParam(':qtde_funcionarios', trim($json['qtde_funcionarios']), isset($json['qtde_funcionarios']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
+            $stmt->bindParam(':qtde_funcoes', trim($json['qtde_funcoes']), isset($json['qtde_funcoes']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
             $stmt->bindParam(':responsavel', trim($json['responsavel']), isset($json['responsavel']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
             $stmt->bindParam(':responsavel_cpf', trim($json['responsavel_cpf']), isset($json['responsavel_cpf']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
             $stmt->bindParam(':responsavel_email', trim($json['responsavel_email']), isset($json['responsavel_email']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
             $stmt->bindParam(':consideracoes_finais', trim($json['consideracoes_finais']), isset($json['consideracoes_finais']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
-            $stmt->bindParam(':id_proposta', trim($json['id']));
+            $stmt->bindParam(':id_proposta', trim($json['id_proposta']));
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {

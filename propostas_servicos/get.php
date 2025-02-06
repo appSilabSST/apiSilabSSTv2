@@ -10,8 +10,7 @@ if ($authorization) {
             FROM propostas p
             JOIN rl_propostas_servicos rl ON (p.id_proposta = rl.id_proposta)
             JOIN servicos s ON (s.id_servico = rl.id_servico)
-            WHERE p.ativo = '1'
-            AND rl.id_rl_proposta_servico = :id_rl_proposta_servico
+            WHERE rl.id_rl_proposta_servico = :id_rl_proposta_servico
             ORDER BY s.servico
             ";
             $stmt = $conn->prepare($sql);
@@ -24,8 +23,7 @@ if ($authorization) {
             FROM propostas p
             JOIN rl_propostas_servicos rl ON (p.id_proposta = rl.id_proposta)
             JOIN servicos s ON (s.id_servico = rl.id_servico)
-            WHERE p.ativo = '1'
-            AND rl.id_proposta = :id_proposta
+            WHERE rl.id_proposta = :id_proposta
             ORDER BY s.servico
             ";
             $stmt = $conn->prepare($sql);
@@ -37,7 +35,6 @@ if ($authorization) {
             FROM propostas p
             JOIN rl_propostas_servicos rl ON (p.id_proposta = rl.id_proposta)
             JOIN servicos s ON (s.id_servico = rl.id_servico)
-            WHERE p.ativo = '1'
             ORDER BY s.servico
             ";
             $stmt = $conn->prepare($sql);

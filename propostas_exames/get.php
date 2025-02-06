@@ -10,8 +10,7 @@ if ($authorization) {
             FROM propostas p
             JOIN rl_propostas_exames rl_pe ON (p.id_proposta = rl_pe.id_proposta)
             JOIN exames e ON (e.id_exame = rl_pe.id_exame)
-            WHERE p.ativo = '1'
-            AND rl_pe.id_rl_proposta_exame = :id_rl_proposta_exame
+            WHERE rl_pe.id_rl_proposta_exame = :id_rl_proposta_exame
             ORDER BY e.procedimento
             ";
             $stmt = $conn->prepare($sql);
@@ -24,8 +23,7 @@ if ($authorization) {
             FROM propostas p
             JOIN rl_propostas_exames rl_pe ON (p.id_proposta = rl_pe.id_proposta)
             JOIN exames e ON (e.id_exame = rl_pe.id_exame)
-            WHERE p.ativo = '1'
-            AND rl_pe.id_proposta = :id_proposta
+            WHERE rl_pe.id_proposta = :id_proposta
             ORDER BY e.procedimento
             ";
             $stmt = $conn->prepare($sql);
@@ -37,7 +35,6 @@ if ($authorization) {
             FROM propostas p
             JOIN rl_propostas_exames rl_pe ON (p.id_proposta = rl_pe.id_proposta)
             JOIN exames e ON (e.id_exame = rl_pe.id_exame)
-            WHERE p.ativo = '1'
             ORDER BY e.procedimento
             ";
             $stmt = $conn->prepare($sql);

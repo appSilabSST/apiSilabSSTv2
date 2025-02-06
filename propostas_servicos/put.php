@@ -2,33 +2,36 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (
-            isset($json['id']) && is_numeric($json['id']) &&
-            isset($json['id_proposta']) && is_numeric($json['id_proposta']) &&
-            isset($json['id_servico']) && is_numeric($json['id_servico']) &&
-            isset($json['valor']) && is_numeric($json['valor']) &&
-            isset($json['prazo']) && is_numeric($json['prazo'])
-        ) {
+        if (isset($json['id_rl_proposta_servico']) && is_numeric($json['id_rl_proposta_servico'])) {
             $sql = "
             UPDATE rl_propostas_servicos SET
-            id_proposta = :id_proposta , 
             id_servico = :id_servico, 
             valor = :valor,
-            prazo = :prazo
+            prazo = :prazo,
+            observacoes = :observacoes
             WHERE id_rl_proposta_servico = :id_rl_proposta_servico
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_proposta', trim($json['id_proposta']));
             $stmt->bindParam(':id_servico', trim($json['id_servico']));
             $stmt->bindParam(':valor', trim($json['valor']));
             $stmt->bindParam(':prazo', trim($json['prazo']));
-            $stmt->bindParam(':id_rl_proposta_servico', trim($json['id']));
+            $stmt->bindParam(':observacoes', trim($json['observacoes']), isset($json['observacoes']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
+            $stmt->bindParam(':id_rl_proposta_servico', trim($json['id_rl_proposta_servico']));
             $stmt->execute();
 
-            $result = array(
-                'status' => 'success',
-                'result' => 'Serviço atualizado com sucesso!'
-            );
+            if ($stmt->rowCount() > 0) {
+                http_response_code(200);
+                $result = array(
+                    'status' => 'success',
+                    'result' => 'Serviço atualizada com sucesso!'
+                );
+            } else {
+                http_response_code(500);
+                $result = array(
+                    'status' => 'fail',
+                    'result' => 'Falha ao atualizar a Serviço!'
+                );
+            }
         } else {
             http_response_code(400);
             $result = array(

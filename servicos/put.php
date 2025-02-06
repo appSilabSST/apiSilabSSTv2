@@ -3,7 +3,7 @@
 if ($authorization) {
     try {
         if (
-            isset($json['id']) && is_numeric($json['id']) &&
+            isset($json['id_servico']) && is_numeric($json['id_servico']) &&
             isset($json['servico'])
         ) {
             $sql = "
@@ -13,7 +13,7 @@ if ($authorization) {
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':servico', trim($json['servico']), PDO::PARAM_STR);
-            $stmt->bindParam(':id_servico', trim($json['id']), PDO::PARAM_INT);;
+            $stmt->bindParam(':id_servico', trim($json['id_servico']), PDO::PARAM_INT);;
             $stmt->execute();
 
             http_response_code(200);

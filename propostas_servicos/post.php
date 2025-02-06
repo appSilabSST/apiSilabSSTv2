@@ -9,11 +9,12 @@ if ($authorization) {
             isset($json['prazo']) && is_numeric($json['prazo'])
         ) {
             $sql = "
-            INSERT INTO rl_propostas_servicos (id_proposta, id_servico, valor, prazo) VALUES 
-            (:id_proposta, :id_servico, :valor, :prazo)
+            INSERT INTO rl_propostas_servicos (id_proposta, id_servico, valor, prazo,observacoes) VALUES 
+            (:id_proposta, :id_servico, :valor, :prazo,:observacoes)
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_proposta', trim($json['id_proposta']));
+            $stmt->bindParam(':observacoes', trim($json['observacoes']), isset($json['observacoes']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
             $stmt->bindParam(':id_servico', trim($json['id_servico']));
             $stmt->bindParam(':valor', trim($json['valor']));
             $stmt->bindParam(':prazo', trim($json['prazo']));

@@ -22,18 +22,20 @@ if ($authorization) {
             $sql = "
             SELECT l.*,  
             t.tipo_ambiente,
-            c.grau_risco AS grau_risco_empresa,
             COALESCE(e2.razao_social, e1.razao_social) AS razao_social_local,
             COALESCE(e2.nr_doc, e1.nr_doc) AS nr_doc_local,
             COALESCE(e2.id_tipo_orgao, e1.id_tipo_orgao) AS id_tipo_orgao_local,
+            COALESCE(c2.grau_risco, c1.grau_risco) AS grau_risco_empresa_local,
             e1.razao_social AS razao_social_empresa,
             e1.nr_doc AS nr_doc_empresa,
-            e1.id_tipo_orgao AS id_tipo_orgao_empresa
+            e1.id_tipo_orgao AS id_tipo_orgao_empresa,
+            c1.grau_risco AS grau_risco_empresa
             FROM locais_atividade l
             LEFT JOIN tipos_ambiente t ON (t.id_tipo_ambiente = l.id_tipo_ambiente)
-            LEFT JOIN empresas e1 ON e1.id_empresa = l.id_empresa
-            LEFT JOIN empresas e2 ON e2.id_empresa = l.id_empresa_local_atividade
-            LEFT JOIN cnae c ON (c.id_cnae = e1.id_cnae OR c.id_cnae = e2.id_cnae)
+            LEFT JOIN empresas e1 ON (e1.id_empresa = l.id_empresa)
+            LEFT JOIN empresas e2 ON (e2.id_empresa = l.id_empresa_local_atividade)
+            LEFT JOIN cnae c1 ON (c1.id_cnae = e1.id_cnae)
+            LEFT JOIN cnae c2 ON (c2.id_cnae = e2.id_cnae)
             WHERE l.ativo = '1'
             AND l.id_empresa = :id_empresa
             ";

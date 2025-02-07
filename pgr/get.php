@@ -48,13 +48,22 @@ if ($authorization) {
         } else {
             $sql = "
             SELECT p.id_pgr, p.nr_pgr, p.nr_pgr nr_documento, DATE_FORMAT(p.data_inicio, '%Y-%m') data_inicio, DATE_FORMAT(p.data_inicio, '%b/%y') data_inicio_format, DATE_FORMAT(p.data_fim, '%Y-%m') data_fim, DATE_FORMAT(p.data_fim, '%b/%y') data_fim_format, CONCAT(DATE_FORMAT(p.data_inicio, '%b/%y'), ' - ', DATE_FORMAT(p.data_fim, '%b/%y')) vigencia, p.responsavel, p.responsavel_cpf, p.responsavel_email,p.grau_risco_empresa,p.grau_risco_local_atividade,p.id_profissional,p.consideracoes_finais,
-            e.id_empresa, e.razao_social,
-            l.id_local_atividade, l.razao_social nome_local_atividade,
+            COALESCE(e2.razao_social, e1.razao_social) AS razao_social_local,
+            COALESCE(e2.nr_doc, e1.nr_doc) AS nr_doc_local,
+            COALESCE(e2.id_tipo_orgao, e1.id_tipo_orgao) AS id_tipo_orgao_local,        
+            COALESCE(e2.razao_social, e1.razao_social) AS razao_social_local,
+            COALESCE(e2.id_empresa, e1.id_empresa) AS id_empresa_local_atividade,
+            e1.id_empresa,
+            e1.razao_social AS razao_social_empresa,
+            e1.nr_doc AS nr_doc_empresa,
+            e1.id_tipo_orgao AS id_tipo_orgao_empresa,
+            l.id_local_atividade,
             s.id_status_documento, s.status_documento,
-            pro.nome nome_profissional
+            pro.nome,pro.cpf,pro.orgao_classe,pro.orgao_nr,pro.orgao_uf
             FROM pgr p
-            LEFT JOIN empresas e ON (p.id_empresa = e.id_empresa)
             LEFT JOIN locais_atividade l ON (p.id_local_atividade = l.id_local_atividade)
+            LEFT JOIN empresas e1 ON (e1.id_empresa = l.id_empresa)
+            LEFT JOIN empresas e2 ON (e2.id_empresa = l.id_empresa_local_atividade)
             LEFT JOIN status_documentos s ON (s.id_status_documento = p.id_status_documento)
             LEFT JOIN profissionais pro ON (p.id_profissional = pro.id_profissional)
             WHERE p.ativo = 1

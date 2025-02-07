@@ -3,11 +3,7 @@
 if ($authorization) {
     try {
         if (
-            isset($json['id']) && is_numeric($json['id']) &&
-            isset($json['id_empresa']) && is_numeric($json['id_empresa']) &&
-            isset($json['id_local_atividade']) && is_numeric($json['id_local_atividade']) &&
-            isset($json['id_status_documento']) && is_numeric($json['id_status_documento']) &&
-            isset($json['id_profissional']) && is_numeric($json['id_profissional'])
+            isset($json['id_ltcat']) && is_numeric($json['id_ltcat'])
         ) {
             $sql = "
             UPDATE ltcat SET
@@ -28,8 +24,8 @@ if ($authorization) {
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_profissional', trim($json['id_profissional']));
             $stmt->bindParam(':id_empresa', trim($json['id_empresa']));
-            $stmt->bindParam(':id_status_documento', trim($json['id_status_documento']));
             $stmt->bindParam(':id_local_atividade', trim($json['id_local_atividade']));
+            $stmt->bindParam(':id_empresa_local_atividade', trim($json['id_empresa_local_atividade']));
             $stmt->bindParam(':data_inicio', trim($json['data_inicio']), isset($json['data_inicio']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
             $stmt->bindParam(':grau_risco_empresa', trim($json['grau_risco_empresa']), isset($json['grau_risco_empresa']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
             $stmt->bindParam(':grau_risco_local_atividade', trim($json['grau_risco_local_atividade']), isset($json['grau_risco_local_atividade']) ? PDO::PARAM_STR : PDO::PARAM_NULL);

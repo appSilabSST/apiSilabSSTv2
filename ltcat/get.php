@@ -42,13 +42,22 @@ if ($authorization) {
         } else {
             $sql = "
             SELECT l.id_ltcat, l.nr_ltcat, l.nr_ltcat nr_documento, l.data_inicio, DATE_FORMAT(l.data_inicio, '%d/%m/%Y') data_inicio_format, l.responsavel, l.responsavel_cpf, l.responsavel_email,l.grau_risco_empresa,l.grau_risco_local_atividade,l.id_profissional,l.consideracoes_finais,
-            e.id_empresa, e.razao_social,
-            la.id_local_atividade, la.razao_social nome_local_atividade,
+           	COALESCE(e2.razao_social, e1.razao_social) AS razao_social_local,
+            COALESCE(e2.nr_doc, e1.nr_doc) AS nr_doc_local,
+            COALESCE(e2.id_tipo_orgao, e1.id_tipo_orgao) AS id_tipo_orgao_local,        
+            COALESCE(e2.razao_social, e1.razao_social) AS razao_social_local,
+            COALESCE(e2.id_empresa, e1.id_empresa) AS id_empresa_local_atividade,
+            e1.id_empresa,
+            e1.razao_social AS razao_social_empresa,
+            e1.nr_doc AS nr_doc_empresa,
+            e1.id_tipo_orgao AS id_tipo_orgao_empresa,
+            l.id_local_atividade,
             s.id_status_documento, s.status_documento,
-            pro.nome nome_profissional
+            pro.nome,pro.cpf,pro.orgao_classe,pro.orgao_nr,pro.orgao_uf
             FROM ltcat l
-            LEFT JOIN empresas e ON (l.id_empresa = e.id_empresa)
             LEFT JOIN locais_atividade la ON (l.id_local_atividade = la.id_local_atividade)
+           	LEFT JOIN empresas e1 ON (e1.id_empresa = la.id_empresa)
+            LEFT JOIN empresas e2 ON (e2.id_empresa = la.id_empresa_local_atividade)
             LEFT JOIN status_documentos s ON (s.id_status_documento = l.id_status_documento)
             LEFT JOIN profissionais pro ON (l.id_profissional = pro.id_profissional)
             WHERE l.ativo = 1

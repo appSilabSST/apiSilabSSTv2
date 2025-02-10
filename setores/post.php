@@ -8,15 +8,14 @@ if ($authorization) {
         ) {
 
             $sql = "
-            INSERT INTO setores (id_local_atividade, setor, descricao, status,ausencia_risco) VALUES
-            (:id_local_atividade, :setor, :descricao, :ausencia_risco, :status)
+            INSERT INTO setores (id_local_atividade, setor, descricao,ausencia_risco) VALUES
+            (:id_local_atividade, :setor, :descricao, :ausencia_risco)
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_local_atividade', trim($json['id_local_atividade']));
             $stmt->bindParam(':setor', trim($json['setor']));
             $stmt->bindParam(':descricao', trim($json['descricao']));
             $stmt->bindParam(':ausencia_risco', trim($json['ausencia_risco']));
-            $stmt->bindParam(':status', trim($json['status']));
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {

@@ -22,7 +22,7 @@ if ($authorization) {
             $id_setor = trim($_GET["id_setor"]);
             $sql = "
             SELECT rl.*,
-            e.procedimento , e.cod_esocial , CONCAT_WS(' | eSocial: ', e.procedimento , e.cod_esocial) procedimento_format,
+            e.procedimento , e.cod_esocial,
             s.id_setor,s.setor
             FROM rl_setores_exames AS rl
             JOIN exames e ON (rl.id_exame = e.id_exame)

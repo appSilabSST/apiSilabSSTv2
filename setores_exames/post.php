@@ -7,22 +7,17 @@ if ($authorization) {
             isset($json['id_pcmso']) && is_numeric($json['id_pcmso']) &&
             isset($json['id_exame']) && is_numeric($json['id_exame'])
         ) {
-
             $sql = "
-            INSERT INTO rl_setores_exames (id_setor, id_pcmso, id_exame, periodicidade, admissional, periodico, monitoracao_pontual, mudanca_risco, retorno_trabalho, demissional) VALUES
-            (:id_setor, :id_pcmso, :id_exame, :periodicidade, :admissional, :periodico, :monitoracao_pontual, :mudanca_risco, :retorno_trabalho, :demissional)
+            INSERT INTO rl_setores_exames (id_setor, id_pcmso, id_exame, periodicidade, ids_tipos_atendimento) 
+            VALUES (:id_setor, :id_pcmso, :id_exame, :periodicidade, :ids_tipos_atendimento)
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_setor', trim($json['id_setor']));
             $stmt->bindParam(':id_pcmso', trim($json['id_pcmso']));
             $stmt->bindParam(':id_exame', trim($json['id_exame']));
-            $stmt->bindParam(':periodicidade', trim($json['periodicidade']), trim($json['periodicidade']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-            $stmt->bindParam(':admissional', trim($json['admissional']), trim($json['admissional']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-            $stmt->bindParam(':periodico', trim($json['periodico']), trim($json['periodico']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-            $stmt->bindParam(':monitoracao_pontual', trim($json['monitoracao_pontual']), trim($json['monitoracao_pontual']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-            $stmt->bindParam(':mudanca_risco', trim($json['mudanca_risco']), trim($json['mudanca_risco']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-            $stmt->bindParam(':retorno_trabalho', trim($json['retorno_trabalho']), trim($json['retorno_trabalho']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-            $stmt->bindParam(':demissional', trim($json['demissional']), trim($json['demissional']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+            $stmt->bindParam(':periodicidade', trim($json['periodicidade']), PDO::PARAM_INT);
+            $stmt->bindParam(':ids_tipos_atendimento', json_encode($json['ids_tipos_atendimento']));
+            
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {

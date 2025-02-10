@@ -4,12 +4,11 @@ if ($authorization) {
     try {
         if (isset($json['id_risco']) && is_numeric($json['id_risco'])) {
             $sql = "
-            INSERT INTO planos_acao (id_risco, padronizar, plano_acao, descricao) VALUES 
-            (:id_risco, :padronizar, :plano_acao, :descricao)
+            INSERT INTO planos_acao (id_risco, plano_acao, descricao) VALUES 
+            (:id_risco, :plano_acao, :descricao)
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_risco', trim($json['id_risco']));
-            $stmt->bindParam(':padronizar', trim($json['padronizar']));
             $stmt->bindParam(':plano_acao', trim($json['plano_acao']));
             $stmt->bindParam(':descricao', trim($json['descricao']));
             $stmt->execute();

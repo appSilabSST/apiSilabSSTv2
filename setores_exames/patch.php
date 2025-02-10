@@ -2,13 +2,13 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($json['id']) && is_numeric($json['id'])) {
+        if (isset($json['id_rl_setor_funcao']) && is_numeric($json['id_rl_setor_funcao'])) {
 
             $sql = "
             UPDATE rl_setores_exames SET
             ";
             foreach ($json as $key => $value) {
-                if ($key != 'id') {
+                if ($key != 'id_rl_setor_funcao') {
                     $sql .= "$key = :$key,";
                 }
             }
@@ -19,7 +19,7 @@ if ($authorization) {
 
             $stmt = $conn->prepare($sql);
             foreach ($json as $key => $value) {
-                if ($key != 'id') {
+                if ($key != 'id_rl_setor_funcao') {
                     $stmt->bindParam(":$key", trim($value), trim($value) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
                 } else {
                     $stmt->bindValue(":id_rl_setor_exame", $value);

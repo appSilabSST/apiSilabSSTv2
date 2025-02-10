@@ -4,7 +4,6 @@ if ($authorization) {
     try {
         if (
             isset($json['revisao']) &&
-            isset($json['status']) && is_numeric($json['status']) &&
             (
                 (isset($json['id_pcmso']) && is_numeric($json['id_pcmso'])) ||
                 (isset($json['id_pgr']) && is_numeric($json['id_pgr'])) ||
@@ -13,8 +12,8 @@ if ($authorization) {
         ) {
 
             $sql = "
-            INSERT INTO revisoes (id_pcmso, id_pgr, id_ltcat, data_inicio, data_fim, revisao, descricao, corpo_documento, status) VALUES
-            (:id_pcmso, :id_pgr, :id_ltcat, :data_inicio, :data_fim, :revisao, :descricao, :corpo_documento, :status)
+            INSERT INTO revisoes (id_pcmso, id_pgr, id_ltcat, data_inicio, data_fim, revisao, descricao, corpo_documento) VALUES
+            (:id_pcmso, :id_pgr, :id_ltcat, :data_inicio, :data_fim, :revisao, :descricao, :corpo_documento)
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(':id_pcmso', isset($json['id_pcmso']) ? trim($json['id_pcmso']) : null);
@@ -25,7 +24,6 @@ if ($authorization) {
             $stmt->bindValue(':revisao', trim($json['revisao']));
             $stmt->bindValue(':descricao', trim($json['descricao']), trim($json['descricao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindValue(':corpo_documento', trim($json['corpo_documento']), trim($json['corpo_documento']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindValue(':status', trim($json['status']), PDO::PARAM_INT);
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {

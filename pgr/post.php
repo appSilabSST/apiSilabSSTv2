@@ -12,13 +12,13 @@ if ($authorization) {
         ) {
 
             $sql = "
-            INSERT INTO pgr (nr_pgr, id_empresa, grau_risco_empresa, id_local_atividade,id_empresa_local_atividade, grau_risco_local_atividade, id_profissional, data_inicio, data_fim, responsavel, responsavel_cpf, responsavel_email,plano_emergencia) 
+            INSERT INTO pgr (nr_pgr, id_empresa, grau_risco_empresa, id_local_atividade,id_empresa_local_atividade, grau_risco_local_atividade, id_profissional,id_usuario, data_inicio, data_fim, responsavel, responsavel_cpf, responsavel_email,plano_emergencia) 
             SELECT 
             IF(((SELECT IFNULL(MAX(nr_pgr), 0) FROM pgr) - ((DATE_FORMAT(CURDATE(), '%y') * 100000))) >= 0,
                 (SELECT MAX(nr_pgr) + 1 FROM pgr),
                 (DATE_FORMAT(CURDATE(), '%y') * 100000 + 1)
             ),
-            :id_empresa, :grau_risco_empresa, :id_local_atividade, :id_empresa_local_atividade,:grau_risco_local_atividade, :id_profissional, :data_inicio, :data_fim, :responsavel, :responsavel_cpf, :responsavel_email,:plano_emergencia
+            :id_empresa, :grau_risco_empresa, :id_local_atividade, :id_empresa_local_atividade,:grau_risco_local_atividade, :id_profissional,:id_usuario, :data_inicio, :data_fim, :responsavel, :responsavel_cpf, :responsavel_email,:plano_emergencia
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_empresa', trim($json['id_empresa']));
@@ -27,6 +27,7 @@ if ($authorization) {
             $stmt->bindParam(':id_empresa_local_atividade', trim($json['id_empresa_local_atividade']));
             $stmt->bindParam(':grau_risco_local_atividade', trim($json['grau_risco_local_atividade']));
             $stmt->bindParam(':id_profissional', trim($json['id_profissional']));
+            $stmt->bindParam(':id_usuario', trim($json['id_usuario']));
             $stmt->bindParam(':data_inicio', trim($json['data_inicio']));
             $stmt->bindParam(':data_fim', trim($json['data_fim']));
             $stmt->bindParam(':responsavel', trim($json['responsavel']));

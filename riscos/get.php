@@ -15,10 +15,12 @@ if ($authorization) {
             $stmt->bindParam(':id_risco', $id_risco);
         } else {
             $sql = "
-            SELECT id_risco, cod_esocial, descricao, grupo, cor, danos_saude
+            SELECT riscos.id_risco, riscos.cod_esocial, riscos.descricao, riscos.grupo, riscos.cor, riscos.danos_saude,
+			pa.id_plano_acao, pa.padronizar
             FROM riscos
-            WHERE ativo = '1'
-            ORDER BY descricao
+            LEFT JOIN planos_acao pa ON (pa.id_risco = riscos.id_risco)
+            WHERE riscos.ativo = '1'
+            ORDER BY riscos.descricao
             ";
             $stmt = $conn->prepare($sql);
         }

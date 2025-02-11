@@ -5,13 +5,22 @@ if ($authorization) {
         if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
             $id_proposta = trim($_GET["id"]);
             $sql = "
-            SELECT p.*,
-            la.razao_social local_atividade,
-            e.razao_social,
-            sp.status_proposta
+            SELECT p.*,p.nr_proposta nr_documento,p.responsavel, p.responsavel_cpf, p.responsavel_email,
+            sp.status_proposta,
+            COALESCE(e2.razao_social, e1.razao_social) AS razao_social_local,
+            COALESCE(e2.razao_social, e1.razao_social) AS razao_social_local,
+            COALESCE(e2.nr_doc, e1.nr_doc) AS nr_doc_local,
+            COALESCE(e2.id_tipo_orgao, e1.id_tipo_orgao) AS id_tipo_orgao_local,
+            COALESCE(e2.cidade,e1.cidade) AS cidade,
+            COALESCE(e2.uf,e1.uf) AS uf,
+            e1.razao_social AS razao_social_empresa, e1.nr_doc AS nr_doc_empresa,e1.id_tipo_orgao AS id_tipo_orgao_empresa,
+            la.atividade_principal,la.id_local_atividade,
+			CONCAT(LEFT(c.codigo,2), '.', MID(c.codigo,3,2), '-', RIGHT(c.codigo,1)) cnae, c.grau_risco AS grau_risco_local_atividade,c.atividade
             FROM propostas p
-            JOIN locais_atividade la ON (p.id_local_atividade = la.id_local_atividade)
-            JOIN empresas e ON (la.id_empresa = e.id_empresa)
+            LEFT JOIN locais_atividade la ON (p.id_local_atividade = la.id_local_atividade)
+            LEFT JOIN empresas e1 ON e1.id_empresa = p.id_empresa
+            LEFT JOIN empresas e2 ON e2.id_empresa = la.id_empresa_local_atividade
+            LEFT JOIN cnae c ON(c.id_cnae = e2.id_cnae)
             JOIN status_propostas sp ON (sp.id_status_proposta = p.id_status_proposta)
             WHERE p.ativo = '1'
             AND id_proposta = :id_proposta

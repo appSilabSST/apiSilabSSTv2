@@ -37,7 +37,8 @@ if ($authorization) {
         } elseif (isset($_GET["id_ltcat"]) && is_numeric($_GET["id_ltcat"])) {
             $id_ltcat = trim($_GET["id_ltcat"]);
             $sql = "
-            SELECT * , DATE_FORMAT(r.data_inicio, '%d/%m/%Y') data_inicio_format, DATE_FORMAT(r.data_fim, '%d/%m/%Y') data_fim_format
+            SELECT * , DATE_FORMAT(r.data_inicio, '%d/%m/%Y') data_inicio_format, DATE_FORMAT(r.data_fim, '%d/%m/%Y') data_fim_format,
+            IF(status = 0, 'FECHADA', 'ABERTA') status_format
             FROM revisoes AS r
             WHERE r.ativo = 1
             AND r.id_ltcat = :id_ltcat

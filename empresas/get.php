@@ -37,9 +37,10 @@ if ($authorization) {
             $stmt->bindParam(':nr_doc', $nr_doc);
         } else {
             $sql = "
-            SELECT *,empresas.status 
+            SELECT *
             FROM empresas
-            LEFT JOIN cnae ON (empresas.id_cnae = cnae.id_cnae)
+            LEFT JOIN rl_empresa_cnae rl_ec ON rl_ec.id_empresa = empresas.id_empresa AND rl_ec.classe = 1
+            LEFT JOIN cnae c ON (c.id_cnae = rl_ec.id_cnae)
             WHERE empresas.ativo = '1'
             ORDER BY empresas.status, empresas.razao_social
             ";

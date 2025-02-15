@@ -22,6 +22,37 @@ if ($authorization) {
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':codigo', $codigo);
+        } else if (isset($_GET["cnaes"]) && is_numeric($_GET["cnaes"])) {
+
+            $postfields = [];
+
+            // Abre o arquivo txt
+            $file = fopen('../cnae.txt', 'r');
+            // Lê o arquivo linha por linha
+            while (($line = fgets($file)) !== false) {
+                // Remove o caractere de quebra de linha no final da linha
+                $line = trim($line);
+
+                // Separa o código e a descrição
+                list($codigo, $atividade, $dataInicio, $dataFim, $aliquita) = explode('|', $line);
+
+                // Preenche o campo $codigo com zeros à esquerda até que ele tenha 6 caracteres
+                $codigo = str_pad($codigo, 6, '0', STR_PAD_LEFT);
+
+                //no arquivo txt ele tráz os cnae finalizado e atual, para não ter duplicidade if ignorar os cnae com data fim
+                if (!empty($dataFim)) {
+                    // Monta os dados a serem enviados via POST
+                    $postfields[] = array(
+                        'codigo' => $codigo,
+                        'atividade' => $atividade
+                    );
+                }
+            }
+            // Fecha o arquivo
+            fclose($file);
+            $conn = null;
+            echo json_encode($postfields);
+            exit;
         } else {
             $sql = "
             SELECT *

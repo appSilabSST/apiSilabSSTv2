@@ -2,7 +2,7 @@
 
 include 'conn.php';
 // Abre o arquivo txt
-$file = fopen('cbo.txt', 'r');
+$file = fopen('cnae.txt', 'r');
 
 // Cria uma string vazia para armazenar o insert mysql
 $insert = '';
@@ -13,7 +13,9 @@ while (($line = fgets($file)) !== false) {
     $line = trim($line);
 
     // Separa o código e a descrição
-    list($codigo, $descricao) = explode(';', $line);
+    list($codigo, $atividade, $dataInicio, $dataFim, $aliquita) = explode('|', $line);
+
+    print_r($codigo);
 
     // Preenche o campo $codigo com zeros à esquerda até que ele tenha 6 caracteres
     $codigo = str_pad($codigo, 6, '0', STR_PAD_LEFT);
@@ -21,7 +23,7 @@ while (($line = fgets($file)) !== false) {
     $descricao = utf8_encode($descricao);
 
     // Adiciona o insert mysql à string
-    $insert .= "INSERT INTO cbo_cargos (codigo, descricao) VALUES ('$codigo', '$descricao');\n";
+    $insert .= "INSERT INTO cnae (codigo, descricao) VALUES ('$codigo', '$atividade');\n";
 }
 
 // Fecha o arquivo

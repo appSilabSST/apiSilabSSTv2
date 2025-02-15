@@ -13,10 +13,14 @@ if ($authorization) {
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {
+
+                $id_cnae = $conn->lastInsertId();
+
                 http_response_code(200);
                 $result = array(
                     'status' => 'success',
-                    'result' => 'Cnae criado com sucesso!'
+                    'result' => 'Cnae criado com sucesso!',
+                    'id' => $id_cnae
                 );
             } else {
                 http_response_code(500);
@@ -35,10 +39,18 @@ if ($authorization) {
     } catch (\Throwable $th) {
         http_response_code(500);
         // DADOS ÚNICOS JÁ UTILIZADOS
-        $result = array(
-            'status' => 'fail',
-            'result' => $th->getMessage()
-        );
+        if ($th->getCode() == 23000) {
+            $result = array(
+                'status' => 'fail',
+                'result' => 'Cnae já existente!',
+                'error' => $th->getMessage()
+            );
+        } else {
+            $result = array(
+                'status' => 'fail',
+                'result' => $th->getMessage()
+            );
+        }
     } finally {
         $conn = null;
         echo json_encode($result);

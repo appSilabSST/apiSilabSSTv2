@@ -20,22 +20,14 @@ if ($authorization) {
         } elseif (isset($_GET["id_empresa"]) && is_numeric($_GET["id_empresa"])) {
             $id_empresa = trim($_GET["id_empresa"]);
             $sql = "
-            SELECT l.*,  
-            t.tipo_ambiente,
-            COALESCE(e2.razao_social, e1.razao_social) AS razao_social_local,
-            COALESCE(e2.nr_doc, e1.nr_doc) AS nr_doc_local,
-            COALESCE(e2.id_tipo_orgao, e1.id_tipo_orgao) AS id_tipo_orgao_local,
-            COALESCE(c2.grau_risco, c1.grau_risco) AS grau_risco_empresa_local,
-            e1.razao_social AS razao_social_empresa,
-            e1.nr_doc AS nr_doc_empresa,
-            e1.id_tipo_orgao AS id_tipo_orgao_empresa,
-            c1.grau_risco AS grau_risco_empresa
+            SELECT l.*, 
+            e.nome_fantasia,
+            IF(l.id_tipo_orgao = 3, l.razao_social, e2.razao_social) AS nome_local,
+            ta.tipo_ambiente
             FROM locais_atividade l
-            LEFT JOIN tipos_ambiente t ON (t.id_tipo_ambiente = l.id_tipo_ambiente)
-            LEFT JOIN empresas e1 ON (e1.id_empresa = l.id_empresa)
-            LEFT JOIN empresas e2 ON (e2.id_empresa = l.id_empresa_local_atividade)
-            LEFT JOIN cnae c1 ON (c1.id_cnae = e1.id_cnae)
-            LEFT JOIN cnae c2 ON (c2.id_cnae = e2.id_cnae)
+            JOIN empresas e ON e.id_empresa = l.id_empresa
+            LEFT JOIN empresas e2 ON e2.nr_doc = l.nr_inscricao
+            JOIN tipos_ambiente ta ON ta.id_tipo_ambiente = l.id_tipo_ambiente
             WHERE l.ativo = '1'
             AND l.id_empresa = :id_empresa
             ";
@@ -43,18 +35,15 @@ if ($authorization) {
             $stmt->bindParam(':id_empresa', $id_empresa);
         } else {
             $sql = "
-            SELECT l.id_local_atividade,l.id_empresa,l.id_tipo_ambiente,l.id_empresa_local_atividade,l.atividade_principal,l.ativo,
-            COALESCE(e2.razao_social, e1.razao_social) AS razao_social_local,
-            COALESCE(e2.nr_doc, e1.nr_doc) AS nr_doc_local,
-            COALESCE(e2.id_tipo_orgao, e1.id_tipo_orgao) AS id_tipo_orgao_local,
-            e1.razao_social AS razao_social_empresa,
-            e1.nr_doc AS nr_doc_empresa,
-            e1.id_tipo_orgao AS id_tipo_orgao_empresa
+            SELECT l.*,e.*,c.*,
+            IF(l.id_tipo_orgao = 3, l.razao_social, e2.razao_social) AS nome_local,
+            ta.tipo_ambiente
             FROM locais_atividade l
-            LEFT JOIN empresas e1 ON e1.id_empresa = l.id_empresa
-            LEFT JOIN empresas e2 ON e2.id_empresa = l.id_empresa_local_atividade
+            JOIN empresas e ON e.id_empresa = l.id_empresa
+            LEFT JOIN empresas e2 ON e2.nr_doc = l.nr_inscricao
+            LEFT JOIN cnae c ON (c.id_cnae = l.id_cnae)
+            JOIN tipos_ambiente ta ON ta.id_tipo_ambiente = l.id_tipo_ambiente
             WHERE l.ativo = '1'
-            ORDER BY e1.razao_social,l.razao_social
             ";
             $stmt = $conn->prepare($sql);
         }

@@ -2,22 +2,24 @@
 
 include_once('../conexao.php');
 
-$postjson = json_decode(file_get_contents('php://input'), true);
-
-$id = trim($postjson['id']);
+$id = trim($_GET['id']);
 
 // SALVAR OU EDITAR EMPRESA
-if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
+if (!empty($id)) {
+
 
     $sql = "
-    SELECT l.id_ltcat, l.nr_ltcat, DATE_FORMAT(l.data_inicio, '%Y-%m') data_inicio, DATE_FORMAT(l.data_inicio, '%b/%y') data_inicio_format, DATE_FORMAT(l.data_revisao, '%Y-%m') data_revisao, DATE_FORMAT(l.data_revisao, '%b/%y') data_revisao_format, l.responsavel, l.responsavel_cpf, l.responsavel_email, l.grau_risco_empresa, l.grau_risco_local_atividade, l.consideracoes_finais, l.id_profissional, l.corpo_documento,
-    e.id_empresa, e.razao_social, IF(e.tipo_inscricao = 1, 'CNPJ', 'CPF') tipo_inscricao_format, e.nr_inscricao, e.cidade, e.uf,
+    SELECT l.id_ltcat, l.nr_ltcat, DATE_FORMAT(l.data_inicio, '%Y-%m') data_inicio, DATE_FORMAT(l.data_inicio, '%b/%y')
+    data_inicio_format, l.responsavel, l.responsavel_cpf, l.responsavel_email, l.grau_risco, l.consideracoes_finais, 
+    l.id_profissional, l.corpo_documento,
+    e.id_empresa, e.razao_social, IF(e.id_tipo_orgao = 2, 'CNPJ', 'CPF') tipo_inscricao_format, e.cidade,
+    e.uf,
     la.id_local_atividade, la.razao_social nome_local_atividade, la.atividade_principal,
     s.id_status_documento, s.status_documento,
     pro.nome nome_profissional, pro.orgao_classe, pro.orgao_nr, pro.orgao_uf,
     es.nome especialidade,
     DATE_FORMAT(CURDATE(), '%d de %M de %Y') data
-	FROM ltcat l
+    FROM ltcat l
     LEFT JOIN empresas e ON (l.id_empresa = e.id_empresa)
     LEFT JOIN locais_atividade la ON (l.id_local_atividade = la.id_local_atividade)
     LEFT JOIN status_documentos s ON (s.id_status_documento = l.id_status_documento)
@@ -44,11 +46,11 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
 
         // MONTAR TABELA DE CONTROLE DE REVISÕES
         $sql1 = "
-        SELECT DATE_FORMAT(data, '%b/%y') data_format, revisao, descricao, status, IF(status = 0, 'FECHADA', 'ABERTA') status_format
+        SELECT DATE_FORMAT(revisoes.data_inicio, '%b/%y') data_format, revisao, descricao, status, IF(status = 0, 'FECHADA', 'ABERTA') status_format
         FROM revisoes
         WHERE id_ltcat = $id
         AND ativo = 1
-        ORDER BY data DESC
+        ORDER BY revisoes.data_inicio DESC
         ";
 
         $query1 = mysqli_query($conecta, $sql1);
@@ -203,21 +205,22 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
 
                 // LISTAR AGENTES DE RISCOS CADASTRADOS NO GHE
                 $sql3 = "
-                SELECT rl.limite_tolerancia, IF(rl.tipo_avaliacao = 1, 'N/A', CONCAT_WS(' ', rl.intensidade, um.sigla)) intensidade_format, rl.fonte_geradora, rl.medidas_controle, rl.probabilidade, rl.severidade,
-                r.cod , r.descricao, r.grupo, r.danos_saude,
-                te.tipo_exposicao, te.tempo_exposicao,
-                mp.meio_propagacao,
-                cr.classificacao_risco , cr.descricao descricao_classificacao_risco
-                FROM rl_setores_riscos rl
-                JOIN riscos r ON (r.id_risco = rl.id_risco)
-                JOIN tipos_exposicao te ON (te.id_tipo_exposicao = rl.id_tipo_exposicao)
-                JOIN meios_propagacao mp ON (mp.id_meio_propagacao = rl.id_meio_propagacao)
-                JOIN classificacao_riscos cr ON (cr.id_classificacao_risco = rl.id_classificacao_risco)
-                LEFT JOIN unidades_medida um ON (um.id_unidade_medida = rl.id_unidade_medida)
-                WHERE rl.id_setor = $row1->id_setor
-                AND rl.ativo = 1
-                AND r.cod <> ''
-                ORDER BY FIELD(LEFT(r.grupo, 1), 'F', 'Q', 'B'), r.descricao
+                    SELECT rl.limite_tolerancia, IF(rl.id_tipo_avaliacao = 1, 'N/A', CONCAT_WS(' ', rl.intensidade, um.sigla))
+                    intensidade_format, rl.fonte_geradora, rl.medidas_controle, rl.probabilidade, rl.severidade,
+                    r.cod_esocial , r.descricao, r.grupo, r.danos_saude,
+                    te.tipo_exposicao, te.tempo_exposicao,
+                    mp.meio_propagacao,
+                    cr.classificacao_risco , cr.descricao descricao_classificacao_risco
+                    FROM rl_setores_riscos rl
+                    JOIN riscos r ON (r.id_risco = rl.id_risco)
+                    JOIN tipos_exposicao te ON (te.id_tipo_exposicao = rl.id_tipo_exposicao)
+                    JOIN meios_propagacao mp ON (mp.id_meio_propagacao = rl.id_meio_propagacao)
+                    JOIN classificacao_riscos cr ON (cr.id_classificacao_risco = rl.id_classificacao_risco)
+                    LEFT JOIN unidades_medida um ON (um.id_unidade_medida = rl.id_unidade_medida)
+                    WHERE rl.id_setor = $row1->id_setor
+                    AND rl.ativo = 1
+                    AND r.cod_esocial <> ''
+                    ORDER BY FIELD(LEFT(r.grupo, 1), 'F', 'Q', 'B'), r.descricao
                 ";
 
                 $query3 = mysqli_query($conecta, $sql3);
@@ -367,28 +370,28 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
 
         $corpo_documento = str_replace($search, $replace, $modelo_documento);
 
-        $sql = "
-        UPDATE ltcat SET
-        corpo_documento = '" . mysqli_real_escape_string($conecta, $corpo_documento) . "'
-        WHERE id_ltcat = " . mysqli_real_escape_string($conecta, $id) . "
-        ";
+        // $sql = "
+        // UPDATE ltcat SET
+        // corpo_documento = '" . mysqli_real_escape_string($conecta, $corpo_documento) . "'
+        // WHERE id_ltcat = " . mysqli_real_escape_string($conecta, $id) . "
+        // ";
 
-        // echo $sql; exit;
-        $query  = mysqli_query($conecta, $sql);
+        // // echo $sql; exit;
+        // $query  = mysqli_query($conecta, $sql);
 
-        if ($query) {
+        // if ($query) {
 
-            $result = json_encode(array(
-                'success' => true,
-                'result' => $corpo_documento,
-            ));
-        } else {
+        $result = json_encode(array(
+            'success' => true,
+            'corpo_modelo' => $corpo_documento,
+        ));
+        // } else {
 
-            $result = json_encode(array(
-                'success' => false,
-                'result' => 'Falha ao tentar salvar registro.'
-            ));
-        }
+        //     $result = json_encode(array(
+        //         'success' => false,
+        //         'result' => 'Falha ao tentar salvar registro.'
+        //     ));
+        // }
 
         echo $result;
     }

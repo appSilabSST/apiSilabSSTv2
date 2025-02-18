@@ -5,18 +5,23 @@ if ($authorization) {
         if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
             $id_ltcat = trim($_GET["id"]);
             $sql = "
-            SELECT l.id_ltcat, l.nr_ltcat, l.nr_ltcat nr_documento, l.data_inicio, DATE_FORMAT(l.data_inicio, '%d/%m/%Y') data_inicio_format, l.responsavel, l.responsavel_cpf, l.responsavel_email,l.grau_risco_empresa,l.grau_risco_local_atividade,l.id_profissional,l.consideracoes_finais, l.corpo_documento,
-            e.id_empresa, e.razao_social,
-            la.id_local_atividade, la.razao_social nome_local_atividade,
-            s.id_status_documento, s.status_documento,
-            pro.nome nome_profissional
-            FROM ltcat l
-            LEFT JOIN empresas e ON (l.id_empresa = e.id_empresa)
-            LEFT JOIN locais_atividade la ON (l.id_local_atividade = la.id_local_atividade)
-            LEFT JOIN status_documentos s ON (s.id_status_documento = l.id_status_documento)
-            LEFT JOIN profissionais pro ON (l.id_profissional = pro.id_profissional)
-            WHERE l.ativo = 1
-            AND l.id_ltcat = :id_ltcat
+                SELECT l.*, DATE_FORMAT(l.data_inicio, '%d/%m/%Y') data_inicio_format,
+                e.nome_fantasia,e.nr_doc,e.id_tipo_orgao,e.razao_social,
+                la.razao_social AS nome_local,la.nr_inscricao,la.id_tipo_orgao as id_tipo_orgao_local,
+                e2.id_empresa as id_empresa_local,
+                ta.tipo_ambiente,ta.id_tipo_ambiente,
+                COUNT(r.id_revisao) as isRevisoes,
+                pro.nome,pro.cpf,pro.orgao_classe,pro.orgao_nr,pro.orgao_uf
+                FROM ltcat l
+                LEFT JOIN locais_atividade la ON (l.id_local_atividade = la.id_local_atividade)
+                LEFT JOIN empresas e ON (e.id_empresa = l.id_empresa)
+                LEFT JOIN empresas e2 ON (e2.nr_doc = la.nr_inscricao)
+                LEFT JOIN revisoes r ON (r.id_ltcat  = l.id_ltcat)
+                LEFT JOIN tipos_ambiente ta ON (ta.id_tipo_ambiente = la.id_tipo_ambiente)
+                LEFT JOIN profissionais pro ON (l.id_profissional = pro.id_profissional)
+                WHERE l.ativo = 1
+                AND l.id_ltcat = :id_ltcat
+                GROUP BY l.id_ltcat
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_ltcat', $id_ltcat);
@@ -41,26 +46,22 @@ if ($authorization) {
             $stmt->bindParam(':id_empresa', $id_empresa);
         } else {
             $sql = "
-            SELECT l.id_ltcat, l.nr_ltcat, l.nr_ltcat nr_documento, l.data_inicio, DATE_FORMAT(l.data_inicio, '%d/%m/%Y') data_inicio_format, l.responsavel, l.responsavel_cpf, l.responsavel_email,l.grau_risco_empresa,l.grau_risco_local_atividade,l.id_profissional,l.consideracoes_finais,
-           	COALESCE(e2.razao_social, e1.razao_social) AS razao_social_local,
-            COALESCE(e2.nr_doc, e1.nr_doc) AS nr_doc_local,
-            COALESCE(e2.id_tipo_orgao, e1.id_tipo_orgao) AS id_tipo_orgao_local,        
-            COALESCE(e2.razao_social, e1.razao_social) AS razao_social_local,
-            COALESCE(e2.id_empresa, e1.id_empresa) AS id_empresa_local_atividade,
-            e1.id_empresa,
-            e1.razao_social AS razao_social_empresa,
-            e1.nr_doc AS nr_doc_empresa,
-            e1.id_tipo_orgao AS id_tipo_orgao_empresa,
-            l.id_local_atividade,
-            s.id_status_documento, s.status_documento,
+            SELECT l.*, DATE_FORMAT(l.data_inicio, '%d/%m/%Y') data_inicio_format,
+            e.nome_fantasia,e.nr_doc,e.id_tipo_orgao,e.razao_social,
+ 		   	la.razao_social AS nome_local,la.nr_inscricao,la.id_tipo_orgao as id_tipo_orgao_local,
+            e2.id_empresa as id_empresa_local,
+            ta.tipo_ambiente,ta.id_tipo_ambiente,
+            COUNT(r.id_revisao) as isRevisoes,
             pro.nome,pro.cpf,pro.orgao_classe,pro.orgao_nr,pro.orgao_uf
             FROM ltcat l
             LEFT JOIN locais_atividade la ON (l.id_local_atividade = la.id_local_atividade)
-           	LEFT JOIN empresas e1 ON (e1.id_empresa = la.id_empresa)
-            LEFT JOIN empresas e2 ON (e2.id_empresa = la.id_empresa_local_atividade)
-            LEFT JOIN status_documentos s ON (s.id_status_documento = l.id_status_documento)
+            LEFT JOIN empresas e ON (e.id_empresa = l.id_empresa)
+            LEFT JOIN empresas e2 ON (e2.nr_doc = la.nr_inscricao)
+            LEFT JOIN revisoes r ON (r.id_ltcat  = l.id_ltcat)
+            LEFT JOIN tipos_ambiente ta ON (ta.id_tipo_ambiente = la.id_tipo_ambiente)
             LEFT JOIN profissionais pro ON (l.id_profissional = pro.id_profissional)
             WHERE l.ativo = 1
+            GROUP BY l.id_ltcat
             ORDER BY l.nr_ltcat
             ";
             $stmt = $conn->prepare($sql);

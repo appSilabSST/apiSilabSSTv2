@@ -3,13 +3,13 @@
 if ($authorization) {
     try {
         if (
-            isset($json['id']) && is_numeric($json['id']) &&
-            isset($json['revisao']) &&
-            isset($json['status']) && is_numeric($json['status']) &&
+            isset($json['id_revisao']) && is_numeric($json['id_revisao']) &&
+            isset($json['revisao']) && isset($json['descricao']) &&
             (
                 (isset($json['id_pcmso']) && is_numeric($json['id_pcmso'])) ||
                 (isset($json['id_pgr']) && is_numeric($json['id_pgr'])) ||
-                (isset($json['id_ltcat']) && is_numeric($json['id_ltcat']))
+                (isset($json['id_ltcat']) && is_numeric($json['id_ltcat'])) ||
+                (isset($json['id_proposta']) && is_numeric($json['id_proposta']))
             )
         ) {
             $sql = "
@@ -17,11 +17,9 @@ if ($authorization) {
             id_pcmso = :id_pcmso, 
             id_pgr = :id_pgr, 
             id_ltcat = :id_ltcat, 
-            data_fim = :data_fim, 
+            id_proposta = :id_proposta,
             revisao = :revisao, 
-            descricao = :descricao, 
-            corpo_documento = :corpo_documento, 
-            status = :status
+            descricao = :descricao
             WHERE id_revisao = :id_revisao
             AND status = 0
             ";
@@ -29,12 +27,10 @@ if ($authorization) {
             $stmt->bindValue(':id_pcmso', isset($json['id_pcmso']) ? trim($json['id_pcmso']) : null);
             $stmt->bindValue(':id_pgr', isset($json['id_pgr']) ? trim($json['id_pgr']) : null);
             $stmt->bindValue(':id_ltcat', isset($json['id_ltcat']) ? trim($json['id_ltcat']) : null);
-            $stmt->bindValue(':data_fim', trim($json['status']) == 1 ? date("Y-m-d") : null);
+            $stmt->bindValue(':id_proposta', isset($json['id_proposta']) ? trim($json['id_proposta']) : null);
             $stmt->bindValue(':revisao', trim($json['revisao']));
             $stmt->bindValue(':descricao', trim($json['descricao']), trim($json['descricao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindValue(':corpo_documento', trim($json['corpo_documento']), trim($json['corpo_documento']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindValue(':status', trim($json['status']), PDO::PARAM_INT);
-            $stmt->bindParam(':id_revisao', trim($json['id']));
+            $stmt->bindParam(':id_revisao', trim($json['id_revisao']));
             $stmt->execute();
 
             http_response_code(200);

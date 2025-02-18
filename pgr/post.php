@@ -4,30 +4,29 @@ if ($authorization) {
     try {
         if (
             isset($json['id_empresa']) && is_numeric($json['id_empresa']) &&
-            isset($json['id_empresa_local_atividade']) && is_numeric($json['id_empresa_local_atividade']) &&
             isset($json['id_local_atividade']) && is_numeric($json['id_local_atividade']) &&
             isset($json['id_profissional']) && is_numeric($json['id_profissional']) &&
-            isset($json['data_inicio']) && isset($json['data_inicio']) &&
+            isset($json['id_usuario']) && is_numeric($json['id_usuario']) &&
+            isset($json['data_inicio']) && isset($json['grau_risco']) && isset($json['data_fim']) &&
             isset($json['responsavel']) && isset($json['responsavel_cpf']) && isset($json['responsavel_email'])
         ) {
 
             $sql = "
-            INSERT INTO pgr (nr_pgr, id_empresa, grau_risco_empresa, id_local_atividade,id_empresa_local_atividade, grau_risco_local_atividade, id_profissional,id_usuario, data_inicio, data_fim, responsavel, responsavel_cpf, responsavel_email,plano_emergencia) 
+            INSERT INTO pgr (nr_pgr, id_empresa, id_local_atividade, grau_risco, id_profissional, id_usuario, data_inicio, data_fim, responsavel, responsavel_cpf, responsavel_email, plano_emergencia,consideracoes_finais) 
             SELECT 
             IF(((SELECT IFNULL(MAX(nr_pgr), 0) FROM pgr) - ((DATE_FORMAT(CURDATE(), '%y') * 100000))) >= 0,
                 (SELECT MAX(nr_pgr) + 1 FROM pgr),
                 (DATE_FORMAT(CURDATE(), '%y') * 100000 + 1)
             ),
-            :id_empresa, :grau_risco_empresa, :id_local_atividade, :id_empresa_local_atividade,:grau_risco_local_atividade, :id_profissional,:id_usuario, :data_inicio, :data_fim, :responsavel, :responsavel_cpf, :responsavel_email,:plano_emergencia
+            :id_empresa, :id_local_atividade, :grau_risco, :id_profissional, :id_usuario, :data_inicio, :data_fim, :responsavel, :responsavel_cpf, :responsavel_email, :plano_emergencia,:consideracoes_finais
             ";
+
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_empresa', trim($json['id_empresa']));
-            $stmt->bindParam(':grau_risco_empresa', trim($json['grau_risco_empresa']));
-            $stmt->bindParam(':id_local_atividade', trim($json['id_local_atividade']));
-            $stmt->bindParam(':id_empresa_local_atividade', trim($json['id_empresa_local_atividade']));
-            $stmt->bindParam(':grau_risco_local_atividade', trim($json['grau_risco_local_atividade']));
             $stmt->bindParam(':id_profissional', trim($json['id_profissional']));
             $stmt->bindParam(':id_usuario', trim($json['id_usuario']));
+            $stmt->bindParam(':id_empresa', trim($json['id_empresa']));
+            $stmt->bindParam(':id_local_atividade', trim($json['id_local_atividade']));
+            $stmt->bindParam(':grau_risco', trim($json['grau_risco']));
             $stmt->bindParam(':data_inicio', trim($json['data_inicio']));
             $stmt->bindParam(':data_fim', trim($json['data_fim']));
             $stmt->bindParam(':responsavel', trim($json['responsavel']));

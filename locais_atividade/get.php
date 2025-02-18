@@ -35,7 +35,8 @@ if ($authorization) {
             $stmt->bindParam(':id_empresa', $id_empresa);
         } else {
             $sql = "
-            SELECT l.*,e.*,c.*,
+            SELECT e.*,e2.id_empresa as id_empresa_local,l.*,c.*,
+            if(l.id_tipo_orgao = 0,e.id_tipo_orgao,l.id_tipo_orgao) as id_tipo_orgao,
             IF(l.id_tipo_orgao = 3, l.razao_social, e2.razao_social) AS nome_local,
             ta.tipo_ambiente
             FROM locais_atividade l

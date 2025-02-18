@@ -4,30 +4,28 @@ if ($authorization) {
     try {
         if (
             isset($json['id_empresa']) && is_numeric($json['id_empresa']) &&
-            isset($json['id_empresa_local_atividade']) && is_numeric($json['id_empresa_local_atividade']) &&
             isset($json['id_local_atividade']) && is_numeric($json['id_local_atividade']) &&
             isset($json['id_profissional']) && is_numeric($json['id_profissional']) &&
             isset($json['id_usuario']) && is_numeric($json['id_usuario']) &&
-            isset($json['data_inicio']) && isset($json['data_inicio']) &&
+            isset($json['data_inicio']) && isset($json['grau_risco']) &&
             isset($json['responsavel']) && isset($json['responsavel_cpf']) && isset($json['responsavel_email'])
         ) {
+
             $sql = "
-            INSERT INTO ltcat (nr_ltcat, id_profissional,id_usuario, data_inicio, id_empresa, id_local_atividade, id_empresa_local_atividade,grau_risco_empresa, grau_risco_local_atividade, responsavel, responsavel_cpf, responsavel_email, consideracoes_finais) 
+            INSERT INTO ltcat (nr_ltcat, id_profissional,id_usuario, data_inicio, id_empresa, id_local_atividade,grau_risco, responsavel, responsavel_cpf, responsavel_email, consideracoes_finais) 
             SELECT 
             IF(((SELECT IFNULL(MAX(nr_ltcat), 0) FROM ltcat) - ((DATE_FORMAT(CURDATE(), '%y') * 100000))) >= 0,
                 (SELECT MAX(nr_ltcat) + 1 FROM ltcat),
                 (DATE_FORMAT(CURDATE(), '%y') * 100000 + 1)
-            ),:id_profissional,:id_usuario, :data_inicio, :id_empresa, :id_local_atividade, :id_empresa_local_atividade,:grau_risco_empresa, :grau_risco_local_atividade, :responsavel, :responsavel_cpf, :responsavel_email, :consideracoes_finais";
+            ),:id_profissional,:id_usuario, :data_inicio, :id_empresa, :id_local_atividade,:grau_risco, :responsavel, :responsavel_cpf, :responsavel_email, :consideracoes_finais";
 
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_empresa', trim($json['id_empresa']));
-            $stmt->bindParam(':id_local_atividade', trim($json['id_local_atividade']));
-            $stmt->bindParam(':grau_risco_empresa', trim($json['grau_risco_empresa']));
-            $stmt->bindParam(':id_empresa_local_atividade', trim($json['id_empresa_local_atividade']));
-            $stmt->bindParam(':grau_risco_local_atividade', trim($json['grau_risco_local_atividade']));
             $stmt->bindParam(':id_profissional', trim($json['id_profissional']));
             $stmt->bindParam(':id_usuario', trim($json['id_usuario']));
             $stmt->bindParam(':data_inicio', trim($json['data_inicio']));
+            $stmt->bindParam(':id_empresa', trim($json['id_empresa']));
+            $stmt->bindParam(':id_local_atividade', trim($json['id_local_atividade']));
+            $stmt->bindParam(':grau_risco', trim($json['grau_risco']));
             $stmt->bindParam(':responsavel', trim($json['responsavel']));
             $stmt->bindParam(':responsavel_cpf', trim($json['responsavel_cpf']));
             $stmt->bindParam(':responsavel_email', trim($json['responsavel_email']));

@@ -4,16 +4,14 @@ if ($authorization) {
     try {
         if (
             isset($json['id_proposta']) && is_numeric($json['id_proposta']) &&
-            isset($json['id_empresa']) && is_numeric($json['id_empresa']) &&
-            isset($json['id_empresa_local_atividade']) && is_numeric($json['id_empresa_local_atividade'])
+            isset($json['renovacao']) && is_numeric($json['renovacao']) &&
+            isset($json['qtde_funcionarios']) && is_numeric($json['qtde_funcionarios']) &&
+            isset($json['qtde_funcoes']) && is_numeric($json['qtde_funcoes']) &&
+            isset($json['responsavel']) && isset($json['responsavel_cpf']) && isset($json['responsavel_email'])
         ) {
             $sql = "
             UPDATE propostas SET
-            data = :data, 
             renovacao = :renovacao, 
-            id_empresa = :id_empresa, 
-            id_empresa_local_atividade = :id_empresa_local_atividade,
-            id_local_atividade = :id_local_atividade, 
             qtde_funcionarios = :qtde_funcionarios, 
             qtde_funcoes = :qtde_funcoes, 
             responsavel = :responsavel, 
@@ -23,11 +21,7 @@ if ($authorization) {
             WHERE id_proposta = :id_proposta
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':data', trim($json['data']));
             $stmt->bindParam(':renovacao', trim($json['renovacao']));
-            $stmt->bindParam(':id_empresa', trim($json['id_empresa']));
-            $stmt->bindParam(':id_empresa_local_atividade', trim($json['id_empresa_local_atividade']));
-            $stmt->bindParam(':id_local_atividade', trim($json['id_local_atividade']));
             $stmt->bindParam(':qtde_funcionarios', trim($json['qtde_funcionarios']), isset($json['qtde_funcionarios']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
             $stmt->bindParam(':qtde_funcoes', trim($json['qtde_funcoes']), isset($json['qtde_funcoes']) ? PDO::PARAM_STR : PDO::PARAM_NULL);
             $stmt->bindParam(':responsavel', trim($json['responsavel']), isset($json['responsavel']) ? PDO::PARAM_STR : PDO::PARAM_NULL);

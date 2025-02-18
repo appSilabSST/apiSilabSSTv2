@@ -2,25 +2,24 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($json['id']) && is_numeric($json['id'])) {
+        if (isset($json['id_revisao']) && is_numeric($json['id_revisao'])) {
 
             $sql = "
             UPDATE revisoes SET
             ";
             foreach ($json as $key => $value) {
-                if ($key != 'id') {
+                if ($key != 'id_revisao') {
                     $sql .= "$key = :$key,";
                 }
             }
-            $sql = substr($sql, 0, -1) . ",
-            data_fim = IF(status = 1, CURDATE(), data_fim)
+            $sql = substr($sql, 0, -1) . "
             WHERE id_revisao = :id_revisao
-            AND status = 0
             ";
+
 
             $stmt = $conn->prepare($sql);
             foreach ($json as $key => $value) {
-                if ($key != 'id') {
+                if ($key != 'id_revisao') {
                     $stmt->bindParam(":$key", trim($value), trim($value) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
                 } else {
                     $stmt->bindValue(":id_revisao", $value);

@@ -2,16 +2,16 @@
 
 include_once('../conexao.php');
 
-$postjson = json_decode(file_get_contents('php://input'), true);
-
-$id = trim($postjson['id']);
+$id = trim($_GET['id']);
 
 // SALVAR OU EDITAR EMPRESA
-if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
+if (!empty($id)) {
 
     $sql = "
-    SELECT p.id_pgr, p.nr_pgr, DATE_FORMAT(p.data_inicio, '%Y-%m') data_inicio, DATE_FORMAT(p.data_inicio, '%b/%y') data_inicio_format, DATE_FORMAT(p.data_fim, '%Y-%m') data_fim, DATE_FORMAT(p.data_fim, '%b/%y') data_fim_format, p.responsavel, p.responsavel_cpf, p.responsavel_email,p.grau_risco_empresa,p.grau_risco_local_atividade,p.plano_emergencia,p.id_profissional,p.consideracoes_finais,p.corpo_documento,
-    e.id_empresa, e.razao_social, IF(e.tipo_inscricao = 1, 'CNPJ', 'CPF') tipo_inscricao_format, e.nr_inscricao, e.cidade, e.uf,
+    SELECT p.id_pgr, p.nr_pgr, DATE_FORMAT(p.data_inicio, '%Y-%m') data_inicio, DATE_FORMAT(p.data_inicio, '%b/%y') data_inicio_format, DATE_FORMAT(p.data_fim, '%Y-%m') data_fim, 
+    DATE_FORMAT(p.data_fim, '%b/%y') data_fim_format, p.responsavel, p.responsavel_cpf, p.responsavel_email,
+    p.grau_risco,p.plano_emergencia,p.id_profissional,p.consideracoes_finais,p.corpo_documento, e.id_empresa, 
+    e.razao_social, IF(e.id_tipo_orgao = 2, 'CNPJ', 'CPF') tipo_inscricao_format, e.nr_doc as nr_inscricao, e.cidade, e.uf,
     l.id_local_atividade, l.razao_social nome_local_atividade, l.atividade_principal,
     s.id_status_documento, s.status_documento,
     pro.nome nome_profissional, pro.orgao_classe, pro.orgao_nr, pro.orgao_uf,
@@ -29,6 +29,8 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
 
     // echo $sql; exit;
     $query  = mysqli_query($conecta, $sql);
+
+
     if (mysqli_num_rows($query) > 0) {
 
         $row = mysqli_fetch_object($query);
@@ -100,11 +102,11 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
 
         // MONTAR TABELA DE CONTROLE DE REVISÕES
         $sql1 = "
-        SELECT DATE_FORMAT(data, '%b/%y') data_format, revisao, descricao, status, IF(status = 0, 'FECHADA', 'ABERTA') status_format
+        SELECT DATE_FORMAT(revisoes.data_inicio, '%b/%y') data_format, revisao, descricao, status, IF(status = 0, 'FECHADA', 'ABERTA') status_format
         FROM revisoes
         WHERE id_pgr = $id
         AND ativo = 1
-        ORDER BY data DESC
+        ORDER BY revisoes.data_inicio DESC
         ";
 
         $query1 = mysqli_query($conecta, $sql1);
@@ -174,7 +176,7 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
                         <thead>
                             <tr>
                                 <th><p style="text-align:center;"><span class="text-tiny"><strong>PROGRAMA DE GERENCIAMENTO DE RISCOS | INVENTÁRIO DE RISCOS </strong></span></p></th>
-                                <th><p style="text-align:center;"><span class="text-tiny"><strong>'.$row->data_inicio_format.'</strong></span></p></th>
+                                <th><p style="text-align:center;"><span class="text-tiny"><strong>' . $row->data_inicio_format . '</strong></span></p></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -259,7 +261,7 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
 
                 // LISTAR AGENTES DE RISCOS CADASTRADOS NO GHE
                 $sql3 = "
-                SELECT rl.limite_tolerancia, IF(rl.tipo_avaliacao = 1, 'N/A', CONCAT_WS(' ', rl.intensidade, um.sigla)) intensidade_format, rl.fonte_geradora, rl.medidas_controle, rl.probabilidade, rl.severidade,
+                SELECT rl.limite_tolerancia, IF(rl.id_tipo_avaliacao = 1, 'N/A', CONCAT_WS(' ', rl.intensidade, um.sigla)) intensidade_format, rl.fonte_geradora, rl.medidas_controle, rl.probabilidade, rl.severidade,
                 r.descricao, r.grupo, r.danos_saude,
                 te.tipo_exposicao, te.tempo_exposicao,
                 mp.meio_propagacao,
@@ -372,7 +374,7 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
                 </figure>
                 ';
 
-                if($cont++ < mysqli_num_rows($query1)) {
+                if ($cont++ < mysqli_num_rows($query1)) {
                     $row->levantamento_riscos .= '<div style="page-break-after: always;"></div>';
                 }
             }
@@ -412,28 +414,29 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
 
         $corpo_documento = str_replace($search, $replace, $modelo_documento);
 
-        $sql = "
-        UPDATE pgr SET
-        corpo_documento = '" . mysqli_real_escape_string($conecta, $corpo_documento) . "'
-        WHERE id_pgr = " . mysqli_real_escape_string($conecta, $id) . "
-        ";
 
-        // echo $sql; exit;
-        $query  = mysqli_query($conecta, $sql);
+        // $sql = "
+        // UPDATE pgr SET
+        // corpo_documento = '" . mysqli_real_escape_string($conecta, $corpo_documento) . "'
+        // WHERE id_pgr = " . mysqli_real_escape_string($conecta, $id) . "
+        // ";
 
-        if ($query) {
+        // // echo $sql; exit;
+        // $query  = mysqli_query($conecta, $sql);
 
-            $result = json_encode(array(
-                'success' => true,
-                'result' => $corpo_documento,
-            ));
-        } else {
+        // if ($query) {
 
-            $result = json_encode(array(
-                'success' => false,
-                'result' => 'Falha ao tentar salvar registro.'
-            ));
-        }
+        $result = json_encode(array(
+            'success' => true,
+            'corpo_modelo' => $corpo_documento,
+        ));
+        // } else {
+
+        //     $result = json_encode(array(
+        //         'success' => false,
+        //         'result' => 'Falha ao tentar salvar registro.'
+        //     ));
+        // }
 
         echo $result;
     }

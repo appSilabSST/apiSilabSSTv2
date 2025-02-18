@@ -46,6 +46,18 @@ if ($authorization) {
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_ltcat', $id_ltcat);
+        } elseif (isset($_GET["id_proposta"]) && is_numeric($_GET["id_proposta"])) {
+            $id_proposta = trim($_GET["id_proposta"]);
+            $sql = "
+            SELECT * , DATE_FORMAT(r.data_inicio, '%d/%m/%Y') data_inicio_format, DATE_FORMAT(r.data_fim, '%d/%m/%Y') data_fim_format,
+            IF(status = 0, 'FECHADA', 'ABERTA') status_format
+            FROM revisoes AS r
+            WHERE r.ativo = 1
+            AND r.id_proposta = :id_proposta
+            ORDER BY r.data_inicio
+            ";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id_proposta', $id_proposta);
         } else {
             $sql = "
             SELECT * , DATE_FORMAT(r.data_inicio, '%d/%m/%Y') data_inicio_format, DATE_FORMAT(r.data_fim, '%d/%m/%Y') data_fim_format

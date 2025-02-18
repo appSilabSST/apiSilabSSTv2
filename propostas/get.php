@@ -5,22 +5,18 @@ if ($authorization) {
         if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
             $id_proposta = trim($_GET["id"]);
             $sql = "
-            SELECT p.*,p.nr_proposta nr_documento,p.responsavel, p.responsavel_cpf, p.responsavel_email,
+            SELECT p.*,
+ 			e.nome_fantasia,e.nr_doc,e.id_tipo_orgao,e.razao_social,
+ 			la.razao_social AS nome_local,la.nr_inscricao,la.id_tipo_orgao as id_tipo_orgao_local,
+            la.grau_risco as grau_risco_local_atividade,
+            e2.id_empresa as id_empresa_local,
             sp.status_proposta,
-            COALESCE(e2.razao_social, e1.razao_social) AS razao_social_local,
-            COALESCE(e2.razao_social, e1.razao_social) AS razao_social_local,
-            COALESCE(e2.nr_doc, e1.nr_doc) AS nr_doc_local,
-            COALESCE(e2.id_tipo_orgao, e1.id_tipo_orgao) AS id_tipo_orgao_local,
-            COALESCE(e2.cidade,e1.cidade) AS cidade,
-            COALESCE(e2.uf,e1.uf) AS uf,
-            e1.razao_social AS razao_social_empresa, e1.nr_doc AS nr_doc_empresa,e1.id_tipo_orgao AS id_tipo_orgao_empresa,
-            la.atividade_principal,la.id_local_atividade,
-			CONCAT(LEFT(c.codigo,2), '.', MID(c.codigo,3,2), '-', RIGHT(c.codigo,1)) cnae, c.grau_risco AS grau_risco_local_atividade,c.atividade
+            ta.tipo_ambiente,ta.id_tipo_ambiente
             FROM propostas p
             LEFT JOIN locais_atividade la ON (p.id_local_atividade = la.id_local_atividade)
-            LEFT JOIN empresas e1 ON e1.id_empresa = p.id_empresa
-            LEFT JOIN empresas e2 ON e2.id_empresa = la.id_empresa_local_atividade
-            LEFT JOIN cnae c ON(c.id_cnae = e2.id_cnae)
+            LEFT JOIN empresas e ON e.id_empresa = p.id_empresa
+            LEFT JOIN empresas e2 ON e2.nr_doc = la.nr_inscricao
+            JOIN tipos_ambiente ta ON ta.id_tipo_ambiente = la.id_tipo_ambiente
             JOIN status_propostas sp ON (sp.id_status_proposta = p.id_status_proposta)
             WHERE p.ativo = '1'
             AND id_proposta = :id_proposta
@@ -47,20 +43,20 @@ if ($authorization) {
         } else {
             $sql = "
             SELECT p.*,
-            sp.status_proposta,
-            COALESCE(e2.razao_social, e1.razao_social) AS razao_social_local,
-            COALESCE(e2.nr_doc, e1.nr_doc) AS nr_doc_local,
-            COALESCE(e2.id_tipo_orgao, e1.id_tipo_orgao) AS id_tipo_orgao_local,
-            e1.razao_social AS razao_social_empresa,
-            e1.nr_doc AS nr_doc_empresa,
-            e1.id_tipo_orgao AS id_tipo_orgao_empresa
+ 		 	e.nome_fantasia,e.nr_doc,e.id_tipo_orgao,e.razao_social,
+ 			la.razao_social AS nome_local,la.nr_inscricao,la.id_tipo_orgao as id_tipo_orgao_local,
+            e2.id_empresa as id_empresa_local,
+            ta.tipo_ambiente,ta.id_tipo_ambiente,
+            COUNT(r.id_revisao) as isRevisoes
             FROM propostas p
             LEFT JOIN locais_atividade la ON (p.id_local_atividade = la.id_local_atividade)
-            LEFT JOIN empresas e1 ON e1.id_empresa = p.id_empresa
-            LEFT JOIN empresas e2 ON e2.id_empresa = la.id_empresa_local_atividade
-            JOIN status_propostas sp ON (sp.id_status_proposta = p.id_status_proposta)
+            LEFT JOIN empresas e ON (e.id_empresa = p.id_empresa)
+            LEFT JOIN empresas e2 ON (e2.nr_doc = la.nr_inscricao)
+            LEFT JOIN revisoes r on (r.id_proposta  = p.id_proposta)
+            JOIN tipos_ambiente ta ON (ta.id_tipo_ambiente = la.id_tipo_ambiente)
             WHERE p.ativo = '1'
-            ORDER BY FIELD(p.id_status_proposta,2,1,3,4,5),razao_social_empresa,razao_social_local
+            GROUP BY p.id_proposta
+            ORDER BY FIELD(p.id_status_proposta,2,1,3,4,5),p.nr_proposta
             ";
             $stmt = $conn->prepare($sql);
         }

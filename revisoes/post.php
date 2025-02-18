@@ -7,20 +7,22 @@ if ($authorization) {
             (
                 (isset($json['id_pcmso']) && is_numeric($json['id_pcmso'])) ||
                 (isset($json['id_pgr']) && is_numeric($json['id_pgr'])) ||
-                (isset($json['id_ltcat']) && is_numeric($json['id_ltcat']))
+                (isset($json['id_ltcat']) && is_numeric($json['id_ltcat'])) ||
+                (isset($json['id_proposta']) && is_numeric($json['id_proposta']))
             )
         ) {
 
             $sql = "
-            INSERT INTO revisoes (id_pcmso, id_pgr, id_ltcat, data_inicio, data_fim, revisao, descricao, corpo_documento) VALUES
-            (:id_pcmso, :id_pgr, :id_ltcat, :data_inicio, :data_fim, :revisao, :descricao, :corpo_documento)
+            INSERT INTO revisoes (id_pcmso,id_proposta, id_pgr, id_ltcat, data_inicio, data_fim, revisao, descricao, corpo_documento) VALUES
+            (:id_pcmso,:id_proposta, :id_pgr, :id_ltcat, :data_inicio, :data_fim, :revisao, :descricao, :corpo_documento)
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(':id_pcmso', isset($json['id_pcmso']) ? trim($json['id_pcmso']) : null);
             $stmt->bindValue(':id_pgr', isset($json['id_pgr']) ? trim($json['id_pgr']) : null);
             $stmt->bindValue(':id_ltcat', isset($json['id_ltcat']) ? trim($json['id_ltcat']) : null);
-            $stmt->bindValue(':data_inicio', date("Y-m-d"));
-            $stmt->bindValue(':data_fim', trim($json['status']) == 1 ? date("Y-m-d") : null);
+            $stmt->bindValue(':id_proposta', isset($json['id_proposta']) ? trim($json['id_proposta']) : null);
+            $stmt->bindValue(':data_inicio', isset($json['data_inicio']) ? trim($json['data_inicio']) : date("Y-m-d"));
+            $stmt->bindValue(':data_fim', isset($json['data_fim']) ? trim($json['data_fim']) : date("Y-m-d"));
             $stmt->bindValue(':revisao', trim($json['revisao']));
             $stmt->bindValue(':descricao', trim($json['descricao']), trim($json['descricao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindValue(':corpo_documento', trim($json['corpo_documento']), trim($json['corpo_documento']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);

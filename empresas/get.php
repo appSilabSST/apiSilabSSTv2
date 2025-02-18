@@ -37,7 +37,7 @@ if ($authorization) {
             $stmt->bindParam(':nr_doc', $nr_doc);
         } else {
             $sql = "
-            SELECT *
+            SELECT *,empresas.*
             FROM empresas
             LEFT JOIN rl_empresa_cnae rl_ec ON rl_ec.id_empresa = empresas.id_empresa AND rl_ec.classe = 1
             LEFT JOIN cnae c ON (c.id_cnae = rl_ec.id_cnae)

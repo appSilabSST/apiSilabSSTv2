@@ -47,7 +47,7 @@ if ($authorization) {
                 IF(LENGTH(c.nr_doc) = 11, INSERT( INSERT( INSERT( c.nr_doc, 10, 0, '-' ), 7, 0, '.' ), 4, 0, '.' ), null) nr_doc_format,
 			    IF(LENGTH(rg) = 9, INSERT( INSERT( INSERT( rg, 9, 0, '-' ), 6, 0, '.' ), 3, 0, '.' ), 
 			    IF(LENGTH(rg) = 8, INSERT( INSERT( rg, 6, 0, '.' ), 3, 0, '.' ), null)) rg_format,
-            rl.id_rl_colaborador_empresa,rl.data_admissao,DATE_FORMAT(rl.data_admissao,'%d/%m/%Y') data_admissao_mask,rl.matricula,rl.status,
+            rl.id_rl_colaborador_empresa,rl.data_admissao,DATE_FORMAT(rl.data_admissao,'%d/%m/%Y') data_admissao_mask,rl.matricula,rl.status,rl.data_demissao,
             e.id_empresa,  e.nr_doc as nr_doc_empresa,  e.razao_social
             FROM colaboradores c
             JOIN rl_colaboradores_empresas rl ON (rl.id_colaborador = c.id_colaborador AND rl.ativo = '1')
@@ -61,7 +61,7 @@ if ($authorization) {
             $id_empresa = trim($_GET["id_empresa"]);
             $sql = "
             SELECT c.*,c.nr_doc as nr_doc_colaborador,
-            rl.id_rl_colaborador_empresa,rl.data_admissao,rl.matricula,rl.status,
+            rl.id_rl_colaborador_empresa,rl.data_admissao,rl.matricula,rl.status,rl.data_demissao,
             e.id_empresa, e.razao_social,e.nr_doc as nr_doc_empresa
             FROM colaboradores c
             JOIN rl_colaboradores_empresas rl ON (rl.id_colaborador = c.id_colaborador AND rl.ativo = '1')
@@ -79,23 +79,24 @@ if ($authorization) {
                 IF(LENGTH(c.nr_doc) = 11, INSERT( INSERT( INSERT( c.nr_doc, 10, 0, '-' ), 7, 0, '.' ), 4, 0, '.' ), null) nr_doc_format,
 			    IF(LENGTH(rg) = 9, INSERT( INSERT( INSERT( rg, 9, 0, '-' ), 6, 0, '.' ), 3, 0, '.' ), 
 			    IF(LENGTH(rg) = 8, INSERT( INSERT( rg, 6, 0, '.' ), 3, 0, '.' ), null)) rg_format,
-            rl.id_rl_colaborador_empresa,rl.id_rl_setor_funcao,rl.data_admissao,DATE_FORMAT(rl.data_admissao,'%d/%m/%Y') data_admissao_mask,rl.matricula,rl.status,
+            rl.id_rl_colaborador_empresa,rl.id_rl_setor_funcao,rl.data_admissao,DATE_FORMAT(rl.data_admissao,'%d/%m/%Y') data_admissao_mask,rl.matricula,rl.status,rl.data_demissao,
             e.id_empresa, e.nr_doc as nr_doc_empresa,  e.razao_social
             FROM colaboradores c
             JOIN rl_colaboradores_empresas rl ON (rl.id_colaborador = c.id_colaborador AND rl.ativo = '1')
             JOIN empresas e ON (rl.id_empresa = e.id_empresa)
             WHERE c.ativo = 1
             AND c.id_colaborador = :id_colaborador
+            ORDER BY rl.status DESC
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_colaborador', $id_colaborador);
         } else {
             $sql = "
-            SELECT c.*, 
+            SELECT c.*,
                 IF(LENGTH(c.nr_doc) = 11, INSERT( INSERT( INSERT( c.nr_doc, 10, 0, '-' ), 7, 0, '.' ), 4, 0, '.' ), null) nr_doc_format,
 			    IF(LENGTH(rg) = 9, INSERT( INSERT( INSERT( rg, 9, 0, '-' ), 6, 0, '.' ), 3, 0, '.' ), 
 			    IF(LENGTH(rg) = 8, INSERT( INSERT( rg, 6, 0, '.' ), 3, 0, '.' ), null)) rg_format,
-            rl.id_rl_colaborador_empresa,rl.data_admissao,DATE_FORMAT(rl.data_admissao,'%d/%m/%Y') data_admissao_mask,rl.matricula,rl.status,
+            rl.id_rl_colaborador_empresa,rl.data_admissao,DATE_FORMAT(rl.data_admissao,'%d/%m/%Y') data_admissao_mask,rl.matricula,rl.status,rl.data_demissao,
             e.id_empresa,  e.nr_doc as nr_doc_empresa,  e.razao_social
             FROM colaboradores c
             JOIN rl_colaboradores_empresas rl ON (rl.id_colaborador = c.id_colaborador AND rl.ativo = '1')

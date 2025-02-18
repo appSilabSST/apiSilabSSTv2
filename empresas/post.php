@@ -59,6 +59,14 @@ if ($authorization) {
                 // Para armazenar os handles individuais de cURL
                 $handles = [];
 
+                if ($json['id_tipo_orgao'] == 2) {
+                    $nr_inscricao = $json['nr_doc'];
+                    $id_tipo_orgao = $json['id_tipo_orgao'];
+                } else {
+                    $nr_inscricao = null;
+                    $id_tipo_orgao = null;
+                }
+
                 // Chama a API para cadastrar o local de atividade
                 $postfields = array(
                     'id_empresa' => $id_empresa,
@@ -66,8 +74,8 @@ if ($authorization) {
                     'id_tipo_ambiente' => 1,
                     'id_cnae' => $cnae['id_cnae'],
                     'grau_risco' => null,
-                    'nr_inscricao' => $json['nr_doc'],
-                    'id_tipo_orgao' => $json['id_tipo_orgao'],
+                    'nr_inscricao' => $nr_inscricao,
+                    'id_tipo_orgao' => $id_tipo_orgao,
                     'atividade_principal' => $json['atividade_principal'],
                     'logradouro' =>  $json['logradouro'],
                     'numero' => $json['numero'],

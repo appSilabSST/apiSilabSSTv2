@@ -2,22 +2,25 @@
 
 include_once('../conexao.php');
 
-$postjson = json_decode(file_get_contents('php://input'), true);
-
-$id = trim($postjson['id']);
+$id = trim($_GET['id']);
 
 // SALVAR OU EDITAR EMPRESA
-if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
+if (!empty($id)) {
+
 
     $sql = "
-    SELECT p.id_pcmso, p.nr_pcmso, p.nr_pcmso nr_controle, DATE_FORMAT(p.data_inicio, '%Y-%m') data_inicio, DATE_FORMAT(p.data_inicio, '%b/%y') data_inicio_format, DATE_FORMAT(p.data_fim, '%Y-%m') data_fim, DATE_FORMAT(p.data_fim, '%b/%y') data_fim_format, p.responsavel, p.responsavel_cpf, p.responsavel_email,p.grau_risco_empresa,p.grau_risco_local_atividade,p.id_profissional,p.consideracoes_finais,p.corpo_documento,
-    e.id_empresa, e.razao_social, IF(e.tipo_inscricao = 1, 'CNPJ', 'CPF') tipo_inscricao_format, e.nr_inscricao, e.cidade, e.uf,
+    SELECT p.id_pcmso, p.nr_pcmso, p.nr_pcmso nr_controle, DATE_FORMAT(p.data_inicio, '%Y-%m') data_inicio,
+    DATE_FORMAT(p.data_inicio, '%b/%y') data_inicio_format, DATE_FORMAT(p.data_fim, '%Y-%m') data_fim,
+    DATE_FORMAT(p.data_fim, '%b/%y') data_fim_format, p.responsavel, p.responsavel_cpf,
+    p.responsavel_email,p.grau_risco,p.id_profissional,p.consideracoes_finais,p.corpo_documento,
+    e.id_empresa, e.razao_social, IF(e.id_tipo_orgao = 2, 'CNPJ', 'CPF') tipo_inscricao_format, e.cidade,
+    e.uf,
     l.id_local_atividade, l.razao_social nome_local_atividade, l.atividade_principal,
     s.id_status_documento, s.status_documento,
     pro.nome nome_profissional, pro.orgao_classe, pro.orgao_nr, pro.orgao_uf,
     es.nome especialidade,
     DATE_FORMAT(CURDATE(), '%d de %M de %Y') data
-	FROM pcmso p
+    FROM pcmso p
     LEFT JOIN empresas e ON (p.id_empresa = e.id_empresa)
     LEFT JOIN locais_atividade l ON (p.id_local_atividade = l.id_local_atividade)
     LEFT JOIN status_documentos s ON (s.id_status_documento = p.id_status_documento)
@@ -44,12 +47,12 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
 
         // MONTAR TABELA DE CONTROLE DE REVISÕES
         $sql1 = "
-        SELECT DATE_FORMAT(data, '%b/%y') data_format, revisao, descricao, status, IF(status = 0, 'FECHADA', 'ABERTA') status_format
-        FROM revisoes
-        WHERE id_pcmso = $id
-        AND ativo = 1
-        ORDER BY data DESC
-        ";
+                SELECT DATE_FORMAT(revisoes.data_inicio, '%b/%y') data_format, revisao, descricao, status, IF(status = 0, 'FECHADA', 'ABERTA') status_format
+                FROM revisoes
+                WHERE id_pcmso = $id
+                AND ativo = 1
+                ORDER BY revisoes.data_inicio DESC
+            ";
 
         $query1 = mysqli_query($conecta, $sql1);
 
@@ -322,28 +325,28 @@ if ($postjson['requisicao'] == 'atualizar' && !empty($id)) {
 
         $corpo_documento = str_replace($search, $replace, $modelo_documento);
 
-        $sql = "
-        UPDATE pcmso SET
-        corpo_documento = '" . mysqli_real_escape_string($conecta, $corpo_documento) . "'
-        WHERE id_pcmso = " . mysqli_real_escape_string($conecta, $id) . "
-        ";
+        // $sql = "
+        // UPDATE pcmso SET
+        // corpo_documento = '" . mysqli_real_escape_string($conecta, $corpo_documento) . "'
+        // WHERE id_pcmso = " . mysqli_real_escape_string($conecta, $id) . "
+        // ";
 
-        // echo $sql; exit;
-        $query  = mysqli_query($conecta, $sql);
+        // // echo $sql; exit;
+        // $query  = mysqli_query($conecta, $sql);
 
-        if ($query) {
+        // if ($query) {
 
-            $result = json_encode(array(
-                'success' => true,
-                'result' => $corpo_documento,
-            ));
-        } else {
+        $result = json_encode(array(
+            'success' => true,
+            'corpo_modelo' => $corpo_documento,
+        ));
+        // } else {
 
-            $result = json_encode(array(
-                'success' => false,
-                'result' => 'Falha ao tentar salvar registro.'
-            ));
-        }
+        //     $result = json_encode(array(
+        //         'success' => false,
+        //         'result' => 'Falha ao tentar salvar registro.'
+        //     ));
+        // }
 
         echo $result;
     }

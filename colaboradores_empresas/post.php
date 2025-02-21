@@ -30,8 +30,8 @@ if ($authorization) {
             }
 
             $sql = "
-            INSERT INTO rl_colaboradores_empresas (id_empresa, id_rl_setor_funcao, id_colaborador, data_admissao, matricula, status) VALUES 
-            (:id_empresa, :id_rl_setor_funcao, :id_colaborador, :data_admissao, :matricula, :status)
+            INSERT INTO rl_colaboradores_empresas (id_empresa, id_rl_setor_funcao, id_colaborador, data_admissao, matricula,funcao, status) VALUES 
+            (:id_empresa, :id_rl_setor_funcao, :id_colaborador, :data_admissao, :matricula,:funcao, :status)
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_empresa', trim($json['id_empresa']));
@@ -39,14 +39,17 @@ if ($authorization) {
             $stmt->bindParam(':id_colaborador', trim($json['id_colaborador']));
             $stmt->bindParam(':data_admissao', trim($json['data_admissao']), trim($json['data_admissao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':matricula', trim($json['matricula']), trim($json['matricula']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':funcao', trim($json['funcao']), trim($json['funcao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':status', trim($json['status']));
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {
+                $id_rl_colaborador_empresa = $conn->lastInsertId();
                 http_response_code(200);
                 $result = array(
                     'status' => 'success',
-                    'result' => 'Colaborador vinculado com sucesso!'
+                    'result' => 'Colaborador vinculado com sucesso!',
+                    'id' => $id_rl_colaborador_empresa
                 );
             } else {
                 http_response_code(500);

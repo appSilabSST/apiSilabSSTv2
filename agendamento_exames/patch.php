@@ -2,14 +2,14 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($json['id']) && is_numeric($json['id'])) {
+        if (isset($json['id_rl_agendamento_exame']) && is_numeric($json['id_rl_agendamento_exame'])) {
             $sql = "
             UPDATE rl_agendamento_exames SET
             ";
             foreach ($json as $key => $value) {
-                if ($key != 'id') {
+                if ($key != 'id_rl_agendamento_exame') {
                     $sql .= "$key = :$key,";
-                } elseif ($key == 'id' && count($json) == 1) {
+                } elseif ($key == 'id_rl_agendamento_exame' && count($json) == 1) {
                     // PROCURA SE POSSUI EXAME PARA REAPROVEITAMENTO
                     $sql_ = "
                     SELECT (
@@ -57,7 +57,7 @@ if ($authorization) {
             // echo $sql;exit;
             $stmt = $conn->prepare($sql);
             foreach ($json as $key => $value) {
-                if ($key != 'id') {
+                if ($key != 'id_rl_agendamento_exame') {
                     $stmt->bindParam(":$key", trim($value), trim($value) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
                 } else {
                     $stmt->bindValue(":id_rl_agendamento_exame", $value);

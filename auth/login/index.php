@@ -40,7 +40,18 @@ if (empty($username) || empty($password)) {
         $name_fullname = explode(" ", $row->nome);
         $name_fullname = $name_fullname[0] . " " . end($name_fullname);
 
-        $token = encodeJWT($remember,$row->id_usuario_sistema, $name_fullname, $row->tipo_usuario_sistema, 'admin');
+        $sala = array(
+            'id_sala' => $row->id_sala,
+            'classe' => $row->classe
+        );
+
+        $sala = array(
+            'id_sala' => 1,
+            'classe' => 1,
+            'nome' => "Clínico"
+        );
+
+        $token = encodeJWT($remember, $row->id_usuario_sistema, $name_fullname, $row->tipo_usuario_sistema, 'admin', $sala);
         // echo $token;exit;
 
         $result = json_encode(array(
@@ -52,7 +63,6 @@ if (empty($username) || empty($password)) {
             'success' => true,
         ));
     }
-
 }
 
 http_response_code(200);

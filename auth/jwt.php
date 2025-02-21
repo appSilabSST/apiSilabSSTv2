@@ -1,6 +1,6 @@
 <?php
 
-function encodeJWT($user_remember, $user_id, $user_name, $user_function, $user_role)
+function encodeJWT($user_remember, $user_id, $user_name, $user_function, $user_role, $sala)
 {
 
     // secret key
@@ -15,7 +15,7 @@ function encodeJWT($user_remember, $user_id, $user_name, $user_function, $user_r
     );
 
     // Expire time
-    $exp = time() + 3000; 
+    $exp = time() + 3000;
 
     // Create token payload as a JSON string
     $payload = json_encode(
@@ -25,6 +25,7 @@ function encodeJWT($user_remember, $user_id, $user_name, $user_function, $user_r
             'user_name' => $user_name,
             'user_permission' => $user_function,
             'user_role' => $user_role,
+            'sala' => $sala,
             'iat' => time(),
             'exp' => $exp
         )

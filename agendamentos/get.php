@@ -7,12 +7,14 @@ if ($authorization) {
             $id_agendamento = trim($_GET["id"]);
             $sql = "
                 SELECT a.*,ta.*,
-				p.nr_pcmso,la.razao_social AS nome_local_atividade,
-				pf.nome AS nome_profissional,pf.cpf,pf.orgao_classe,pf.orgao_uf,
+				p.nr_pcmso,p.data_fim,p.data_fim,
+                la.razao_social AS nome_local,la.nr_inscricao,e2.id_tipo_orgao as id_tipo_orgao_local,
+				pf.nome AS nome_profissional,pf.orgao_nr,pf.orgao_classe,pf.orgao_uf,
                 c.id_colaborador, c.id_tipo_orgao, c.nr_doc, c.nome nome_colaborador, c.nome_social,
+                rl_ce.data_admissao,rl_ce.matricula,
                 e.id_empresa, e.razao_social, 
-                st.setor,if(a.id_setor_funcao_ausente is NULL OR a.id_setor_funcao_ausente = 0, st.id_setor, a.id_setor_funcao_ausente) as id_setor,
-                IF(rl_sf.funcao IS NULL, a.funcao, rl_sf.funcao) funcao,rl_sf.descricao,
+                IF(rl_sf.funcao IS NULL, rl_ce.funcao, rl_sf.funcao) funcao,rl_sf.descricao,
+                st.setor,st.id_setor,
                 s.status_agendamento,
                 (
                     SELECT JSON_ARRAYAGG(JSON_OBJECT(
@@ -50,10 +52,11 @@ if ($authorization) {
                 LEFT JOIN empresas e ON (rl_ce.id_empresa = e.id_empresa)
                 LEFT JOIN pcmso p ON (p.id_pcmso = a.id_pcmso)
                 LEFT JOIN locais_atividade la ON (la.id_local_atividade = p.id_local_atividade)
+                LEFT JOIN empresas e2 ON (e2.nr_doc = la.nr_inscricao)
                 LEFT JOIN profissionais pf ON (pf.id_profissional = a.id_profissional)        
                 LEFT JOIN tipos_atendimento ta ON (a.id_tipo_atendimento = ta.id_tipo_atendimento)
                 LEFT JOIN rl_setores_funcoes rl_sf ON (a.id_rl_setor_funcao = rl_sf.id_rl_setor_funcao)
-                LEFT JOIN setores st ON (st.id_setor = rl_sf.id_setor or st.id_setor = a.id_setor_funcao_ausente)
+                LEFT JOIN setores st ON (st.id_setor = a.id_setor)
                 LEFT JOIN status_agendamento s ON (a.id_status_agendamento = s.id_status_agendamento)
                 WHERE a.ativo = '1' 
                 AND a.id_agendamento = :id_agendamento
@@ -62,6 +65,46 @@ if ($authorization) {
 
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_agendamento', $id_agendamento);
+        }
+        // SELECIONAR AFASTAMENTOS DE UMA EMPRESA ESPECÍFICA
+        elseif (isset($_GET["data"]) && isset($_GET["id_sala"])) {
+            $data = trim($_GET["data"]);
+            $classe = trim($_GET["classe"]);
+            $id_sala = trim($_GET["id_sala"]);
+
+            if ($_GET["tipo"] == "externo") {
+                $where = 'and a.id_local_atendimento > 1';
+            } else {
+                $where = 'and (a.id_local_atendimento = 1 OR a.id_local_atendimento = 0)';
+            }
+
+            $sql = "
+            SELECT a.*,DATE_FORMAT(a.horario, '%H:%i') horario,
+            s.status_agendamento,ta.tipo_atendimento,
+            c.nome nome_colaborador,c.id_tipo_orgao,c.nr_doc,c.id_colaborador,c.sexo,c.data_nascimento,
+            e.razao_social, e.id_empresa,
+            IF(rl_sf.funcao IS NULL, rl_ce.funcao, rl_sf.funcao) funcao
+            FROM agendamentos a
+            JOIN rl_agendamento_exames rl_ae ON (rl_ae.id_agendamento = a.id_agendamento)
+            JOIN rl_salas_exames  rl_se ON (rl_se.id_exame = rl_ae.id_exame)
+            JOIN salas_atendimentos sl_at ON ( sl_at.id_sala_atendimento = rl_se.id_sala_atendimento)
+            JOIN rl_colaboradores_empresas rl_ce ON (a.id_rl_colaborador_empresa = rl_ce.id_rl_colaborador_empresa)
+            JOIN colaboradores c ON (rl_ce.id_colaborador = c.id_colaborador)
+         	JOIN empresas e ON (rl_ce.id_empresa = e.id_empresa or a.id_empresa_reservado = e.id_empresa)
+            LEFT JOIN rl_setores_funcoes rl_sf ON (a.id_rl_setor_funcao = rl_sf.id_rl_setor_funcao)
+            JOIN status_agendamento s ON (a.id_status_agendamento = s.id_status_agendamento)
+            JOIN tipos_atendimento ta ON (a.id_tipo_atendimento = ta.id_tipo_atendimento)
+            WHERE a.ativo = '1' 
+            AND sl_at.id_sala_atendimento = :id_sala
+            AND (a.id_status_agendamento = 2 OR a.id_status_agendamento = 2) 
+            AND a.data = :data
+            AND a.nr_agendamento IS NOT NULL
+            $where
+            ORDER BY id_status_agendamento, horario,nome_colaborador
+            ";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id_sala', $id_sala);
+            $stmt->bindParam(':data', $data);
         }
         // SELECIONAR AFASTAMENTOS DE UMA EMPRESA ESPECÍFICA
         elseif (isset($_GET["data"])) {
@@ -74,22 +117,22 @@ if ($authorization) {
             }
 
             $sql = "
-            SELECT a.id_agendamento,a.data,a.nr_agendamento,DATE_FORMAT(a.horario, '%H:%i') horario,a.justificativa_remarcacao,a.encaixe,
-            a.observacao,a.id_status_agendamento,a.status,a.id_empresa_reservado,a.id_tipo_atendimento,
-            s.status_agendamento,
-            c.nome nome_colaborador,c.id_tipo_orgao,c.nr_doc,c.id_colaborador,
+            SELECT a.*,DATE_FORMAT(a.horario, '%H:%i') horario,
+            s.status_agendamento,ta.tipo_atendimento,
+            c.nome nome_colaborador,c.id_tipo_orgao,c.nr_doc,c.id_colaborador,c.sexo,c.data_nascimento,
             e.razao_social, e.id_empresa,
-            rl_sf.id_setor, IF(rl_sf.funcao IS NULL, a.funcao, rl_sf.funcao) funcao
+            IF(rl_sf.funcao IS NULL, rl_ce.funcao, rl_sf.funcao) funcao
             FROM agendamentos a
             LEFT JOIN rl_colaboradores_empresas rl_ce ON (a.id_rl_colaborador_empresa = rl_ce.id_rl_colaborador_empresa)
             LEFT JOIN colaboradores c ON (rl_ce.id_colaborador = c.id_colaborador)
             LEFT JOIN empresas e ON (rl_ce.id_empresa = e.id_empresa or a.id_empresa_reservado = e.id_empresa)
             LEFT JOIN rl_setores_funcoes rl_sf ON (a.id_rl_setor_funcao = rl_sf.id_rl_setor_funcao)
             LEFT JOIN status_agendamento s ON (a.id_status_agendamento = s.id_status_agendamento)
+            LEFT JOIN tipos_atendimento ta ON (a.id_tipo_atendimento = ta.id_tipo_atendimento)
             WHERE a.ativo = '1' 
             AND a.data = :data
             $where
-            ORDER BY a.horario, FIELD(a.nr_agendamento, NULL, a.nr_agendamento)
+            ORDER BY FIELD(a.id_status_agendamento,1,2,3,4,5,6)
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':data', $data);

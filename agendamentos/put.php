@@ -2,59 +2,136 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
+
+        $id_agendamento = trim($json['id_agendamento']);
+
+        if (!isset($json['nr_agendamento']) || $json['nr_agendamento'] === null) {
+            $sql = "
+                SELECT 
+                IF(((SELECT IFNULL(MAX(nr_agendamento), 0) FROM agendamentos) - ((DATE_FORMAT(CURDATE(), '%y') * 100000))) >= 0,
+                    (SELECT MAX(nr_agendamento) + 1 FROM agendamentos),
+                    (DATE_FORMAT(CURDATE(), '%y') * 100000 + 1)
+                ) AS next_nr_agendamento
+            ";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $nr_agendamento = $result['next_nr_agendamento'];
+        } else {
+            $nr_agendamento = trim($json['nr_agendamento']);
+        }
+
         if (
+            isset($json['tipo']) && is_numeric($json['tipo']) && $json['tipo'] == 1 &&
             isset($json['id_agendamento']) && is_numeric($json['id_agendamento']) &&
+            isset($json['id_tipo_atendimento']) && is_numeric($json['id_tipo_atendimento']) &&
+            isset($json['encaixe']) && is_numeric($json['encaixe']) &&
+            isset($json['exames']) && count($json['exames']) > 0 &&
+            isset($json['riscos']) && count($json['riscos']) > 0
+        ) {
+            if (isset($json['rl_colaborador_empresa'])) {
+
+                $curl = curl_init();
+
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'https://silabsst.com.br/_backend/colaboradores_empresas/',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => json_encode($json['rl_colaborador_empresa']),
+                    CURLOPT_HTTPHEADER => array(
+                        "Authorization: $token",
+                        "Content-Type: application/json"
+                    ),
+                ));
+
+                $response = curl_exec($curl);
+                curl_close($curl);
+
+                $result = json_decode($response, true);
+
+                if ($result['status'] == "success") {
+
+                    $id_rl_colaborador_empresa = $result['id'];
+
+                    $sql = "
+                            UPDATE agendamentos SET
+                                id_tipo_atendimento = :id_tipo_atendimento,
+                                nr_agendamento = :nr_agendamento,
+                                id_rl_colaborador_empresa = :id_rl_colaborador_empresa,
+                                id_profissional = :id_profissional,
+                                encaixe = :encaixe,
+                                observacao = :observacao,
+                                disponivel = 0
+                            WHERE 
+                                id_agendamento = :id_agendamento
+                        ";
+
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bindParam(':id_tipo_atendimento', trim($json['id_tipo_atendimento']), PDO::PARAM_INT);
+                    $stmt->bindParam(':nr_agendamento', $nr_agendamento, PDO::PARAM_INT);
+                    $stmt->bindParam(':id_rl_colaborador_empresa', $id_rl_colaborador_empresa, PDO::PARAM_INT);
+                    $stmt->bindParam(':id_profissional', trim($json['id_profissional']), PDO::PARAM_INT);
+                    $stmt->bindParam(':encaixe', trim($json['encaixe']), PDO::PARAM_INT);
+                    $stmt->bindParam(':observacao', trim($json['observacao']), trim($json['observacao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+                    $stmt->bindParam(':id_agendamento', $id_agendamento);
+                }
+            }
+        } else if (
+            isset($json['id_agendamento']) && is_numeric($json['id_agendamento']) &&
+            isset($json['tipo']) && is_numeric($json['tipo']) && $json['tipo'] == 2 &&
+            isset($json['id_pcmso']) && is_numeric($json['id_pcmso']) &&
+            isset($json['id_setor']) && is_numeric($json['id_setor']) &&
+            isset($json['id_profissional']) && is_numeric($json['id_profissional']) &&
             isset($json['id_rl_colaborador_empresa']) && is_numeric($json['id_rl_colaborador_empresa']) &&
             isset($json['exames']) && count($json['exames']) > 0 &&
             isset($json['riscos']) && count($json['riscos']) > 0 &&
             isset($json['id_tipo_atendimento'])
         ) {
-            $id_agendamento = trim($json['id_agendamento']);
-
-            if (!isset($json['nr_agendamento']) || $json['nr_agendamento'] === null) {
-                $sql = "
-                    SELECT 
-                    IF(((SELECT IFNULL(MAX(nr_agendamento), 0) FROM agendamentos) - ((DATE_FORMAT(CURDATE(), '%y') * 100000))) >= 0,
-                        (SELECT MAX(nr_agendamento) + 1 FROM agendamentos),
-                        (DATE_FORMAT(CURDATE(), '%y') * 100000 + 1)
-                    ) AS next_nr_agendamento
-                ";
-
-                $stmt = $conn->prepare($sql); // Use $sql here
-                $stmt->execute();
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                $nr_agendamento = $result['next_nr_agendamento'];
-            } else {
-                $nr_agendamento = trim($json['nr_agendamento']);
-            }
 
             $sql = "
-            UPDATE agendamentos SET
-            id_pcmso = :id_pcmso,
-            id_tipo_atendimento = :id_tipo_atendimento,
-            nr_agendamento = :nr_agendamento,
-            id_rl_colaborador_empresa = :id_rl_colaborador_empresa,
-            id_empresa_reservado = :id_empresa_reservado,
-            id_rl_setor_funcao = :id_rl_setor_funcao,
-            funcao = :funcao,
-            id_profissional = :id_profissional,
-            encaixe = :encaixe,
-            disponivel = 0
-            WHERE id_agendamento = :id_agendamento
+                UPDATE agendamentos SET
+                id_pcmso = :id_pcmso,
+                id_tipo_atendimento = :id_tipo_atendimento,
+                id_rl_colaborador_empresa = :id_rl_colaborador_empresa,
+                id_rl_setor_funcao = :id_rl_setor_funcao,
+                id_profissional = :id_profissional,
+                id_setor = :id_setor,
+                encaixe = :encaixe,
+                nr_agendamento = :nr_agendamento,
+                observacao = :observacao,
+                disponivel = 0
+                WHERE id_agendamento = :id_agendamento
             ";
 
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_pcmso', trim($json['id_pcmso']), trim($json['id_pcmso']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
             $stmt->bindParam(':id_tipo_atendimento', trim($json['id_tipo_atendimento']), PDO::PARAM_INT);
-            $stmt->bindParam(':id_rl_setor_funcao', trim($json['id_rl_setor_funcao']), trim($json['id_rl_setor_funcao']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-            $stmt->bindParam(':funcao', trim($json['funcao']), trim($json['funcao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':id_empresa_reservado', trim($json['id_empresa_reservado']), trim($json['id_empresa_reservado']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-            $stmt->bindParam(':id_profissional', trim($json['id_profissional']), PDO::PARAM_INT);
             $stmt->bindParam(':id_rl_colaborador_empresa', trim($json['id_rl_colaborador_empresa']), PDO::PARAM_INT);
+            $stmt->bindParam(':id_rl_setor_funcao', trim($json['id_rl_setor_funcao']), trim($json['id_rl_setor_funcao']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+            $stmt->bindParam(':id_profissional', trim($json['id_profissional']), PDO::PARAM_INT);
+            $stmt->bindParam(':id_setor', trim($json['id_setor']), PDO::PARAM_INT);
             $stmt->bindParam(':encaixe', trim($json['encaixe']), PDO::PARAM_INT);
+            $stmt->bindParam(':observacao', trim($json['observacao']), trim($json['observacao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':nr_agendamento', $nr_agendamento, PDO::PARAM_INT);
             $stmt->bindParam(':id_agendamento', $id_agendamento);
-            $stmt->execute();
+        } else {
+            http_response_code(400);
+            $result = array(
+                'status' => 'fail',
+                'result' => 'Dados incompletos!'
+            );
+            exit;
+        }
+
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
 
             // Create both cURL resources for exames and riscos
             $ch1 = curl_init();
@@ -131,12 +208,6 @@ if ($authorization) {
                 'result' => 'Agendamento atualizado com sucesso!',
                 'nr_agendamento' => $nr_agendamento
             );
-        } else {
-            http_response_code(400);
-            $result = array(
-                'status' => 'fail',
-                'result' => 'Dados incompletos!'
-            );
         }
     } catch (\Throwable $th) {
         http_response_code(500);
@@ -165,6 +236,5 @@ if ($authorization) {
         )
     );
 }
-exit;
 
 exit;

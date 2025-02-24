@@ -17,9 +17,9 @@ if ($authorization) {
         } else {
             $sql = "
             SELECT e.id_exame, e.procedimento, e.valor_custo, e.valor_cobrar, e.cod_esocial , e.validade, e.padronizar,
-            f.razao_social, f.id_fornecedor,f.nr_inscricao
+            f.razao_social, f.id_fornecedor,f.nr_doc,f.id_tipo_orgao
             FROM exames e 
-            LEFT JOIN fornecedores f on f.id_fornecedor = e.id_fornecedor             
+            LEFT JOIN fornecedores f on (f.id_fornecedor = e.id_fornecedor)             
             WHERE e.ativo = 1
             ORDER BY e.procedimento
             ";

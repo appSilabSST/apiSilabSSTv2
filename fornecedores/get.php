@@ -12,6 +12,16 @@ if ($authorization) {
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_fornecedor', $id_fornecedor);
+        } else if (isset($_GET["nr_doc"]) && is_numeric($_GET["nr_doc"])) {
+            $nr_doc = trim($_GET["nr_doc"]);
+            $sql = "
+            SELECT *
+            FROM fornecedores
+            WHERE ativo = 1
+            AND nr_doc = :nr_doc
+            ";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':nr_doc', $nr_doc);
         } else {
             $sql = "
             SELECT *

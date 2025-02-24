@@ -2,7 +2,7 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($json['id']) && is_numeric($json['id'])) {
+        if (isset($json['id_rl_agendamento_exame']) && is_numeric($json['id_rl_agendamento_exame'])) {
             $sql = "
             UPDATE rl_agendamento_exames SET
             id_agendamento = :id_agendamento,

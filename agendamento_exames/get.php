@@ -7,7 +7,7 @@ if ($authorization) {
             $id_rl_agendamento_exame = trim($_GET["id"]);
 
             $sql = "
-            SELECT rl.id_agendamento, rl.id_exame, rl.data, rl.id_rl_agendamento_exame, rl.cobrar, rl.id_resultado_exame, rl.reaproveitado,
+            SELECT  rl.*,
             e.procedimento, e.cod_esocial, IF(e.cod_esocial IS NOT NULL, CONCAT(e.procedimento, ' | eSocial: ' , e.cod_esocial), e.procedimento) procedimento_format,
             (
                 SELECT JSON_OBJECT('realizado',r1.data, 'validade',IF(r2.validade > 0, DATE_ADD(r1.data, INTERVAL r2.validade MONTH), 'INDETERMINADO'))
@@ -38,7 +38,7 @@ if ($authorization) {
             $id_agendamento = trim($_GET["id_agendamento"]);
 
             $sql = "
-            SELECT rl.id_agendamento, rl.id_exame, rl.data, rl.id_rl_agendamento_exame, rl.cobrar, rl.id_resultado_exame, rl.reaproveitado,
+            SELECT rl.*,
             e.procedimento, e.cod_esocial, IF(e.cod_esocial IS NOT NULL, CONCAT(e.procedimento, ' | eSocial: ' , e.cod_esocial), e.procedimento) procedimento_format,e.valor_cobrar,
             (
                 SELECT JSON_OBJECT(

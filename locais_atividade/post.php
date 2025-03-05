@@ -5,9 +5,9 @@ if ($authorization) {
         if (isset($json['id_empresa']) && is_numeric($json['id_empresa']) && isset($json['id_tipo_ambiente']) && is_numeric($json['id_tipo_ambiente'])) {
             $sql = "
             INSERT INTO locais_atividade 
-                (id_empresa,razao_social, id_tipo_ambiente,id_cnae,grau_risco,nr_inscricao,id_tipo_orgao,atividade_principal,logradouro,numero,complemento,bairro,cidade,cep,uf) 
+                (id_empresa,razao_social, id_tipo_ambiente,codigo,grau_risco,nr_inscricao,id_tipo_orgao,atividade_principal,atividade,logradouro,numero,complemento,bairro,cidade,cep,uf) 
             VALUES 
-                (:id_empresa,:razao_social, :id_tipo_ambiente, :id_cnae,:grau_risco,:nr_inscricao,:id_tipo_orgao,:atividade_principal,:logradouro,:numero,:complemento,:bairro,:cidade,:cep,:uf)
+                (:id_empresa,:razao_social, :id_tipo_ambiente, :codigo,:grau_risco,:nr_inscricao,:id_tipo_orgao,:atividade_principal,:atividade,:logradouro,:numero,:complemento,:bairro,:cidade,:cep,:uf)
             ";
 
             $stmt = $conn->prepare($sql);
@@ -15,11 +15,12 @@ if ($authorization) {
             $stmt->bindParam(':id_empresa', trim($json['id_empresa']));
             $stmt->bindParam(':razao_social', trim($json['razao_social']));
             $stmt->bindParam(':id_tipo_ambiente', trim($json['id_tipo_ambiente']));
-            $stmt->bindParam(':id_cnae', trim($json['id_cnae']));
+            $stmt->bindParam(':codigo', trim($json['codigo']));
             $stmt->bindParam(':grau_risco', trim($json['grau_risco']));
             $stmt->bindParam(':nr_inscricao', trim($json['nr_inscricao']));
             $stmt->bindParam(':id_tipo_orgao', trim($json['id_tipo_orgao']));
             $stmt->bindParam(':atividade_principal', trim($json['atividade_principal']));
+            $stmt->bindParam(':atividade', trim($json['atividade']));
             $stmt->bindParam(':logradouro', trim($json['logradouro']), trim($json['logradouro']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':numero', trim($json['numero']), trim($json['numero']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':complemento', trim($json['complemento']), trim($json['complemento']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
@@ -27,7 +28,7 @@ if ($authorization) {
             $stmt->bindParam(':cidade', trim($json['cidade']), trim($json['cidade']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':cep', trim($json['cep']), trim($json['cep']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':uf', trim($json['uf']), trim($json['uf']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            
+
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {

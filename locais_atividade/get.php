@@ -7,11 +7,10 @@ if ($authorization) {
             $sql = "
             SELECT l.*, 
             t.tipo_ambiente,
-            c.grau_risco AS grau_risco_empresa,e.razao_social AS empresa
+            e.razao_social AS empresa
             FROM locais_atividade l
             LEFT JOIN tipos_ambiente t ON (t.id_tipo_ambiente = l.id_tipo_ambiente)
             LEFT JOIN empresas e ON (l.id_empresa = e.id_empresa)
-            LEFT JOIN cnae c ON (c.id_cnae = e.id_cnae)
             WHERE l.ativo = '1'
             AND l.id_local_atividade = :id_local_atividade
             ";
@@ -22,7 +21,7 @@ if ($authorization) {
             $sql = "
             SELECT l.*, 
             e.nome_fantasia,
-            IF(l.id_tipo_orgao = 3, l.razao_social, e2.razao_social) AS nome_local,
+            l.razao_social AS nome_local,
             ta.tipo_ambiente
             FROM locais_atividade l
             JOIN empresas e ON e.id_empresa = l.id_empresa
@@ -30,19 +29,19 @@ if ($authorization) {
             JOIN tipos_ambiente ta ON ta.id_tipo_ambiente = l.id_tipo_ambiente
             WHERE l.ativo = '1'
             AND l.id_empresa = :id_empresa
+            ORDER BY l.id_tipo_ambiente
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_empresa', $id_empresa);
         } else {
             $sql = "
-            SELECT e.*,e2.id_empresa as id_empresa_local,l.*,c.*,
+            SELECT e.*,e2.id_empresa as id_empresa_local,l.*,
             if(l.id_tipo_orgao = 0,e.id_tipo_orgao,l.id_tipo_orgao) as id_tipo_orgao,
-            IF(l.id_tipo_orgao = 3, l.razao_social, e2.razao_social) AS nome_local,
+            l.razao_social AS nome_local,
             ta.tipo_ambiente
             FROM locais_atividade l
             JOIN empresas e ON e.id_empresa = l.id_empresa
             LEFT JOIN empresas e2 ON e2.nr_doc = l.nr_inscricao
-            LEFT JOIN cnae c ON (c.id_cnae = l.id_cnae)
             JOIN tipos_ambiente ta ON ta.id_tipo_ambiente = l.id_tipo_ambiente
             WHERE l.ativo = '1'
             ";

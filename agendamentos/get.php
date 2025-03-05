@@ -100,7 +100,7 @@ if ($authorization) {
             AND a.data = :data
             AND a.nr_agendamento IS NOT NULL
             $where
-            ORDER BY id_status_agendamento, horario,nome_colaborador
+            ORDER BY horario,nome_colaborador
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_sala', $id_sala);
@@ -120,7 +120,7 @@ if ($authorization) {
             SELECT a.*,DATE_FORMAT(a.horario, '%H:%i') horario,
             s.status_agendamento,ta.tipo_atendimento,
             c.nome nome_colaborador,c.id_tipo_orgao,c.nr_doc,c.id_colaborador,c.sexo,c.data_nascimento,
-            e.razao_social, e.id_empresa,
+            e.razao_social, e.id_empresa,e.nr_doc as nr_dor_empresa,e.id_tipo_orgao as id_tipo_orgao_empresa,
             IF(rl_sf.funcao IS NULL, rl_ce.funcao, rl_sf.funcao) funcao
             FROM agendamentos a
             LEFT JOIN rl_colaboradores_empresas rl_ce ON (a.id_rl_colaborador_empresa = rl_ce.id_rl_colaborador_empresa)
@@ -132,7 +132,7 @@ if ($authorization) {
             WHERE a.ativo = '1' 
             AND a.data = :data
             $where
-            ORDER BY FIELD(a.id_status_agendamento,1,2,3,4,5,6)
+            ORDER BY horario,nome_colaborador
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':data', $data);

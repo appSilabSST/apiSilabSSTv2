@@ -39,19 +39,19 @@ if ($authorization) {
 
                 $id_empresa = $conn->lastInsertId();
 
-                $cnae = null;
+                // $cnae = null;
 
-                if (is_array($json['cnaes'])) {
-                    // pega o cnae primario da empresa
-                    $cnae = array_filter($json['cnaes'], function ($element) {
-                        return $element['classe'] == 1;
-                    });
+                // if (is_array($json['cnaes'])) {
+                //     // pega o cnae primario da empresa
+                //     $cnae = array_filter($json['cnaes'], function ($element) {
+                //         return $element['classe'] == 1;
+                //     });
 
-                    if (isset($cnae)) {
-                        // Pega o primeiro CNAE filtrado
-                        $cnae = array_values($cnae)[0];
-                    }
-                }
+                //     if (isset($cnae)) {
+                //         // Pega o primeiro CNAE filtrado
+                //         $cnae = array_values($cnae)[0];
+                //     }
+                // }
 
                 // Cria o manipulador multi-cURL
                 $mh = curl_multi_init();
@@ -64,7 +64,7 @@ if ($authorization) {
                     $id_tipo_orgao = $json['id_tipo_orgao'];
                 } else {
                     $nr_inscricao = null;
-                    $id_tipo_orgao = null;
+                    $id_tipo_orgao = 3;
                 }
 
                 // Chama a API para cadastrar o local de atividade
@@ -72,10 +72,11 @@ if ($authorization) {
                     'id_empresa' => $id_empresa,
                     'razao_social' => $json['razao_social'],
                     'id_tipo_ambiente' => 1,
-                    'id_cnae' => $cnae['id_cnae'],
-                    'grau_risco' => null,
                     'nr_inscricao' => $nr_inscricao,
                     'id_tipo_orgao' => $id_tipo_orgao,
+                    'codigo' => $json['codigo'],
+                    'atividade' => $json['atividade'],
+                    'grau_risco' => $json['grau_risco'],
                     'atividade_principal' => $json['atividade_principal'],
                     'logradouro' =>  $json['logradouro'],
                     'numero' => $json['numero'],
@@ -107,40 +108,40 @@ if ($authorization) {
                 curl_multi_add_handle($mh, $ch);
                 // Armazena o handle
                 $handles[] = $ch;
-                if (is_array($json['cnaes'])) {
-                    // Loop através dos CNAEs para adicionar os vínculos
-                    foreach ($json['cnaes'] as $cnaeItem) {
-                        if (isset($cnaeItem['id_cnae'])) {
-                            $postfields = array(
-                                'id_cnae' => $cnaeItem['id_cnae'],
-                                'classe' => $cnaeItem['classe'],
-                                'id_empresa' => $id_empresa
-                            );
+                // if (is_array($json['cnaes'])) {
+                //     // Loop através dos CNAEs para adicionar os vínculos
+                //     foreach ($json['cnaes'] as $cnaeItem) {
+                //         if (isset($cnaeItem['id_cnae'])) {
+                //             $postfields = array(
+                //                 'id_cnae' => $cnaeItem['id_cnae'],
+                //                 'classe' => $cnaeItem['classe'],
+                //                 'id_empresa' => $id_empresa
+                //             );
 
-                            // Inicializa um novo handle para cada CNAE
-                            $ch = curl_init();
-                            curl_setopt_array($ch, array(
-                                CURLOPT_URL => "https://silabsst.com.br/_backend/cnae_empresa/",
-                                CURLOPT_RETURNTRANSFER => true,
-                                CURLOPT_ENCODING => '',
-                                CURLOPT_MAXREDIRS => 10,
-                                CURLOPT_TIMEOUT => 30,  // Timeout de 30 segundos
-                                CURLOPT_FOLLOWLOCATION => true,
-                                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                                CURLOPT_CUSTOMREQUEST => 'POST',
-                                CURLOPT_POSTFIELDS => json_encode($postfields),
-                                CURLOPT_HTTPHEADER => array(
-                                    "Authorization: $token",
-                                    "Content-Type: application/json"
-                                ),
-                            ));
+                //             // Inicializa um novo handle para cada CNAE
+                //             $ch = curl_init();
+                //             curl_setopt_array($ch, array(
+                //                 CURLOPT_URL => "https://silabsst.com.br/_backend/cnae_empresa/",
+                //                 CURLOPT_RETURNTRANSFER => true,
+                //                 CURLOPT_ENCODING => '',
+                //                 CURLOPT_MAXREDIRS => 10,
+                //                 CURLOPT_TIMEOUT => 30,  // Timeout de 30 segundos
+                //                 CURLOPT_FOLLOWLOCATION => true,
+                //                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                //                 CURLOPT_CUSTOMREQUEST => 'POST',
+                //                 CURLOPT_POSTFIELDS => json_encode($postfields),
+                //                 CURLOPT_HTTPHEADER => array(
+                //                     "Authorization: $token",
+                //                     "Content-Type: application/json"
+                //                 ),
+                //             ));
 
-                            // Adiciona este handle ao multi-cURL
-                            curl_multi_add_handle($mh, $ch);
-                            $handles[] = $ch;  // Armazena o handle para posterior processamento
-                        }
-                    }
-                }
+                //             // Adiciona este handle ao multi-cURL
+                //             curl_multi_add_handle($mh, $ch);
+                //             $handles[] = $ch;  // Armazena o handle para posterior processamento
+                //         }
+                //     }
+                // }
 
                 // Executa todas as requisições em paralelo
                 $running = null;

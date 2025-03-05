@@ -10,8 +10,8 @@ function getResult($stmt)
             isset($_GET["id"]) && is_numeric($_GET["id"]) ||
             isset($_GET["nr_doc"]) && is_numeric($_GET["nr_doc"]) ||
             isset($_GET["codigo"]) && is_numeric($_GET["codigo"]) ||
-            isset($_GET["nr_inscricao"]) && is_numeric($_GET["nr_inscricao"]) 
-            // ||            isset($_GET["id_agendamento"]) && is_numeric($_GET["id_agendamento"])
+            isset($_GET["nr_inscricao"]) && is_numeric($_GET["nr_inscricao"])
+            // || isset($_GET["id_agendamento"]) && is_numeric($_GET["id_agendamento"])
         )
     ) {
         $result = $stmt->fetch(PDO::FETCH_OBJ);
@@ -64,4 +64,38 @@ function setupInsetAgendamento($date, $id)
              INSERT INTO agendamentos (data, horario, id_regra_agendamento) VALUES
                 " . substr($insert, 0, -1) . "
             ";
+}
+
+
+function move_file($file, $cnpj)
+{
+    // Verifica se um arquivo de anexo foi enviado
+    if ($file["error"] != 4) {
+        // Obtém o diretório raiz do servidor (sem o public_html)
+        $raizServidor = dirname($_SERVER['DOCUMENT_ROOT']); // Volta um nível a partir do public_html
+
+        // Define o caminho completo para o diretório .anexos
+        $anexoFolder = $raizServidor . "/.anexos/" . $cnpj . "/" . date("Y") . "/" . date("m") . "/" . date("d") . "/";
+
+        // Cria o diretório, caso não exista
+        if (!file_exists($anexoFolder)) {
+            mkdir($anexoFolder, 0755, true);
+        }
+
+        // Obtém a extensão do arquivo de forma mais segura
+        $info = pathinfo($file["name"]);
+        $extensao = $info["extension"];
+
+        // Gera um nome único para o arquivo
+        $nomeArquivo = sha1($file["tmp_name"] . time() . $cnpj) . "." . $extensao;
+
+        // Move o arquivo para o novo diretório
+        if (move_uploaded_file($file["tmp_name"], $anexoFolder . $nomeArquivo)) {
+            return  $cnpj . "/" . date("Y") . "/" . date("m") . "/" . date("d") . "/" . $nomeArquivo;
+        } else {
+            return false; // Se o arquivo não puder ser movido
+        }
+    } else {
+        return false; // Se não houver arquivo enviado
+    }
 }

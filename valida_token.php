@@ -32,23 +32,35 @@ $method = $_SERVER['REQUEST_METHOD'];
 if (json_decode(file_get_contents('php://input'), true)) {
     $json = json_decode(file_get_contents('php://input'), true);
 }
-
 // VERIFICA SE O TOKEN FOI DECLARADO
 if (!empty($token)) {
     try {
-        include('conn.php');
-        $sql = "
-        SELECT id_token 
-        FROM token 
-        WHERE token = :token 
-        AND ativo = 1
-        ";
 
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':token', $token);
-        $stmt->execute();
+        $curl = curl_init();
 
-        if ($stmt->rowCount() == 0) {
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://silabsst.com.br/_backend/token/?token=' . $token,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => array(
+                "Content-Type: application/json"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+
+        if ($response) {
+            $authorization = true;
+            $info = json_decode($response);
+            include_once("conn.php");
+        } else {
             echo json_encode(
                 array(
                     'status' => 'fail',
@@ -56,8 +68,6 @@ if (!empty($token)) {
                 )
             );
             exit;
-        } else {
-            $authorization = true;
         }
     } catch (PDOException $ex) {
         echo json_encode(

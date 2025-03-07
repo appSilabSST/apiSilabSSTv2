@@ -2,7 +2,7 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($json['id']) && is_numeric($json['id'])) {
+        if (isset($json['id_rl_colaborador_empresa']) && is_numeric($json['id_rl_colaborador_empresa'])) {
 
             // VARIÁVEIS PARA VERIFICAR DUPLICIDADE DE CADASTROS ATIVOS
             $status = false;
@@ -12,7 +12,7 @@ if ($authorization) {
             UPDATE rl_colaboradores_empresas SET
             ";
             foreach ($json as $key => $value) {
-                if ($key != 'id') {
+                if ($key != 'id_rl_colaborador_empresa') {
                     $sql .= "$key = :$key,";
                 } else {
                     $id_rl_colaborador_empresa = $value;
@@ -53,7 +53,7 @@ if ($authorization) {
 
             $stmt = $conn->prepare($sql);
             foreach ($json as $key => $value) {
-                if ($key != 'id') {
+                if ($key != 'id_rl_colaborador_empresa') {
                     $stmt->bindParam(":$key", trim($value), trim($value) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
                 } else {
                     $stmt->bindValue(":id_rl_colaborador_empresa", $value);

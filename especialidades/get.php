@@ -5,13 +5,13 @@ if ($authorization) {
         if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
             $id_especialidade = trim($_GET["id"]);
             $sql = "
-            SELECT * FROM especialidades WHERE id_especialidade = :id_especialidade
+            SELECT * FROM especialidades WHERE id_especialidade = :id_especialidade and ativo = '1'
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_especialidade', $id_especialidade);
         } else {
             $sql = "
-            SELECT * FROM especialidades
+            SELECT * FROM especialidades WHERE ativo = '1'
             ";
             $stmt = $conn->prepare($sql);
         }

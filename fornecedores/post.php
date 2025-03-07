@@ -53,7 +53,8 @@ if ($authorization) {
         if ($th->getCode() == 23000) {
             $result = array(
                 'status' => 'fail',
-                'result' => 'Fornecedor já existente!'
+                'result' => 'Fornecedor já existente!',
+                'getMessage' => $th->getMessage()
             );
         } else {
             $result = array(

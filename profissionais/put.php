@@ -3,16 +3,16 @@
 if ($authorization) {
     try {
         if (
-            isset($json['id']) && is_numeric($json['id']) &&
+            isset($json['id_profissional']) && is_numeric($json['id_profissional']) &&
             isset($json['nome']) && isset($json['cpf']) && isset($json['id_especialidade'])
             ) {
-            $id_profissional = $json['id'];
+            $id_profissional = $json['id_profissional'];
             $sql = "
             UPDATE profissionais SET
             nome = :nome, 
             cpf = :cpf, 
             id_especialidade = :id_especialidade, 
-            orgao_classe = :orgao_classe, 
+            id_tipo_orgao = :id_tipo_orgao, 
             orgao_nr = :orgao_nr, 
             orgao_uf = :orgao_uf, 
             nit = :nit
@@ -22,7 +22,7 @@ if ($authorization) {
             $stmt->bindParam(':nome', trim($json['nome']));
             $stmt->bindParam(':cpf', trim($json['cpf']));
             $stmt->bindParam(':id_especialidade', trim($json['id_especialidade']));
-            $stmt->bindParam(':orgao_classe', trim($json['orgao_classe']), trim($json['orgao_classe']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':id_tipo_orgao', trim($json['id_tipo_orgao']), trim($json['id_tipo_orgao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':orgao_nr', trim($json['orgao_nr']), trim($json['orgao_nr']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':orgao_uf', trim($json['orgao_uf']), trim($json['orgao_uf']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':nit', trim($json['nit']), trim($json['nit']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);

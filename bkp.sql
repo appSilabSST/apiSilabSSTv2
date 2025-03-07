@@ -19511,7 +19511,7 @@ CREATE TABLE IF NOT EXISTS `profissionais` (
   `nome` char(150) COLLATE utf8_unicode_ci DEFAULT NULL,
   `cpf` char(14) COLLATE utf8_unicode_ci DEFAULT NULL,
   `id_especialidade` int(11) DEFAULT NULL,
-  `orgao_classe` char(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `orgao_profissional` char(10) COLLATE utf8_unicode_ci DEFAULT NULL,
   `orgao_nr` char(10) COLLATE utf8_unicode_ci DEFAULT NULL,
   `orgao_uf` char(2) COLLATE utf8_unicode_ci DEFAULT NULL,
   `nit` char(11) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -19521,7 +19521,7 @@ CREATE TABLE IF NOT EXISTS `profissionais` (
 
 -- Copiando dados para a tabela g1aco290_silab.profissionais: ~1 rows (aproximadamente)
 DELETE FROM `profissionais`;
-INSERT INTO `profissionais` (`id_profissional`, `nome`, `cpf`, `id_especialidade`, `orgao_classe`, `orgao_nr`, `orgao_uf`, `nit`, `ativo`) VALUES
+INSERT INTO `profissionais` (`id_profissional`, `nome`, `cpf`, `id_especialidade`, `orgao_profissional`, `orgao_nr`, `orgao_uf`, `nit`, `ativo`) VALUES
 	(1, 'Pedro Monti', '123.456.789-10', 2, 'CREA', '123456', 'SP', NULL, 1),
 	(2, 'Celso Sousa', '987.654.321-00', 3, 'CRM', '654321', 'SP', NULL, 1);
 

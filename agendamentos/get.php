@@ -9,7 +9,7 @@ if ($authorization) {
                 SELECT a.*,ta.*,
 				p.nr_pcmso,p.data_fim,p.data_fim,
                 la.razao_social AS nome_local,la.nr_inscricao,e2.id_tipo_orgao as id_tipo_orgao_local,
-				pf.nome AS nome_profissional,pf.orgao_nr,pf.orgao_classe,pf.orgao_uf,
+				pf.nome AS nome_profissional,pf.orgao_nr,to_p.siglas as orgao_profissional,pf.orgao_uf,
                 c.id_colaborador, c.id_tipo_orgao, c.nr_doc, c.nome nome_colaborador, c.nome_social,
                 rl_ce.data_admissao,rl_ce.matricula,
                 e.id_empresa, e.razao_social, 
@@ -54,6 +54,7 @@ if ($authorization) {
                 LEFT JOIN locais_atividade la ON (la.id_local_atividade = p.id_local_atividade)
                 LEFT JOIN empresas e2 ON (e2.nr_doc = la.nr_inscricao)
                 LEFT JOIN profissionais pf ON (pf.id_profissional = a.id_profissional)        
+                LEFT JOIN tipos_orgao to_p ON (to_p.id_tipo_orgao = pf.id_tipo_orgao)        
                 LEFT JOIN tipos_atendimento ta ON (a.id_tipo_atendimento = ta.id_tipo_atendimento)
                 LEFT JOIN rl_setores_funcoes rl_sf ON (a.id_rl_setor_funcao = rl_sf.id_rl_setor_funcao)
                 LEFT JOIN setores st ON (st.id_setor = a.id_setor)

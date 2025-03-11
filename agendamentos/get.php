@@ -84,7 +84,8 @@ if ($authorization) {
             s.status_agendamento,ta.tipo_atendimento,
             c.nome nome_colaborador,c.id_tipo_orgao,c.nr_doc,c.id_colaborador,c.sexo,c.data_nascimento,
             e.razao_social, e.id_empresa,
-            IF(rl_sf.funcao IS NULL, rl_ce.funcao, rl_sf.funcao) funcao
+            IF(rl_sf.funcao IS NULL, rl_ce.funcao, rl_sf.funcao) funcao,
+            COUNT(rl_ae.id_rl_agendamento_exame) AS countExames
             FROM agendamentos a
             JOIN rl_agendamento_exames rl_ae ON (rl_ae.id_agendamento = a.id_agendamento)
             JOIN rl_salas_exames  rl_se ON (rl_se.id_exame = rl_ae.id_exame)

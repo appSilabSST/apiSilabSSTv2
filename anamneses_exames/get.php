@@ -13,6 +13,15 @@ if ($authorization) {
             $sql = "SELECT * FROM rl_anamneses_exames JOIN anamneses ON anamneses.id_anamnese = rl_anamneses_exames.id_anamnese JOIN exames ON exames.id_exame = rl_anamneses_exames.id_exame WHERE rl_anamneses_exames.id_anamnese = :id_anamnese";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_anamnese', $id_anamnese);
+        } else if (isset($_GET["id_exame"]) && is_numeric($_GET["id_exame"])) {
+            $id_exame = trim($_GET["id_exame"]);
+            $sql = "SELECT * 
+                    FROM rl_anamneses_exames 
+                    JOIN anamnese_perguntas ON (anamnese_perguntas.id_anamnese = rl_anamneses_exames.id_anamnese)
+                    WHERE rl_anamneses_exames.id_exame = :id_exame
+                    AND anamnese_perguntas.ativo = 1";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id_exame', $id_exame);
         } else {
             $sql = "SELECT * FROM rl_anamneses_exames JOIN anamneses ON anamneses.id_anamnese = rl_anamneses_exames.id_anamnese JOIN exames ON exames.id_exame = rl_anamneses_exames.id_exame";
             $stmt = $conn->prepare($sql);

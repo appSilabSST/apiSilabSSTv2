@@ -32,6 +32,24 @@ if ($authorization) {
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_rl_agendamento_exame', $id_rl_agendamento_exame);
+        } elseif (isset($_GET["data"])  && isset($_GET["id_agendamento"]) && is_numeric($_GET["id_agendamento"])) {
+            $id_agendamento = trim($_GET["id_agendamento"]);
+            $data = trim($_GET["data"]);
+
+            $sql = "
+            SELECT rl.*,e.*
+			FROM rl_agendamento_exames rl
+            JOIN agendamentos a ON rl.id_agendamento = a.id_agendamento
+            LEFT JOIN exames e ON e.id_exame = rl.id_exame
+            WHERE rl.ativo = '1'
+            AND rl.id_agendamento = :id_agendamento
+            AND rl.`data` = :data
+            ORDER BY e.procedimento
+            ";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id_agendamento', $id_agendamento);
+            $stmt->bindParam(':data', $data);
         }
         // SELECIONAR EXAMES DE UM AGENDAMENTO ESPECÍFICO
         elseif (isset($_GET["id_agendamento"]) && is_numeric($_GET["id_agendamento"])) {

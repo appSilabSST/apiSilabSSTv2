@@ -32,24 +32,31 @@ if ($authorization) {
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_rl_agendamento_exame', $id_rl_agendamento_exame);
-        } elseif (isset($_GET["data"])  && isset($_GET["id_agendamento"]) && is_numeric($_GET["id_agendamento"])) {
+        } elseif (
+            isset($_GET["data"]) && isset($_GET["id_agendamento"]) && is_numeric($_GET["id_agendamento"])
+            && isset($_GET["id_sala"]) && is_numeric($_GET["id_sala"])
+        ) {
             $id_agendamento = trim($_GET["id_agendamento"]);
             $data = trim($_GET["data"]);
+            $id_sala = trim($_GET["id_sala"]);
 
             $sql = "
             SELECT rl.*,e.*
 			FROM rl_agendamento_exames rl
             JOIN agendamentos a ON rl.id_agendamento = a.id_agendamento
+            JOIN rl_salas_exames rl_se ON (rl_se.id_exame = rl.id_exame)
             LEFT JOIN exames e ON e.id_exame = rl.id_exame
             WHERE rl.ativo = '1'
             AND rl.id_agendamento = :id_agendamento
             AND rl.`data` = :data
+            AND rl_se.id_sala_atendimento = :id_sala
             ORDER BY e.procedimento
             ";
 
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_agendamento', $id_agendamento);
             $stmt->bindParam(':data', $data);
+            $stmt->bindParam(':id_sala', $id_sala);
         }
         // SELECIONAR EXAMES DE UM AGENDAMENTO ESPECÍFICO
         elseif (isset($_GET["id_agendamento"]) && is_numeric($_GET["id_agendamento"])) {

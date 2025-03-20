@@ -41,10 +41,12 @@ if ($authorization) {
             $id_sala = trim($_GET["id_sala"]);
 
             $sql = "
-            SELECT rl.*,e.*
+            SELECT rl.*,e.*,
+            av.avaliacao,av.resultado
 			FROM rl_agendamento_exames rl
             JOIN agendamentos a ON rl.id_agendamento = a.id_agendamento
             JOIN rl_salas_exames rl_se ON (rl_se.id_exame = rl.id_exame)
+            LEFT JOIN avaliacao av ON (av.id_rl_agendamento_exame = rl.id_rl_agendamento_exame)
             LEFT JOIN exames e ON e.id_exame = rl.id_exame
             WHERE rl.ativo = '1'
             AND rl.id_agendamento = :id_agendamento

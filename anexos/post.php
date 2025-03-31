@@ -4,7 +4,11 @@ if ($authorization) {
     try {
         if (
             isset($_POST['titulo']) &&
-            (isset($_POST['id_afastamento']) || isset($_POST['id_agendamento'])) &&
+            (
+                isset($_POST['id_agendamento']) ||
+                isset($_POST['id_afastamento']) ||
+                isset($_POST['id_rl_agendamento_exame'])
+            ) &&
             isset($_FILES['arquivo']) && $_FILES['arquivo']['error'] === UPLOAD_ERR_OK
         ) {
 
@@ -13,7 +17,7 @@ if ($authorization) {
 
             if ($arquivo) {
 
-                $sql = "INSERT INTO anexos (titulo,arquivo,id_afastamento,id_agendamento) VALUES (:titulo,:arquivo,:id_afastamento,:id_agendamento)";
+                $sql = "INSERT INTO anexos (titulo,arquivo,id_afastamento,id_agendamento,id_rl_agendamento_exame) VALUES (:titulo,:arquivo,:id_afastamento,:id_agendamento,:id_rl_agendamento_exame)";
 
                 $stmt = $conn->prepare($sql);
 
@@ -21,6 +25,7 @@ if ($authorization) {
                 $stmt->bindParam(':arquivo', trim($arquivo));
                 $stmt->bindParam(':id_afastamento', trim($_POST['id_afastamento']), trim($_POST['id_afastamento']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
                 $stmt->bindParam(':id_agendamento', trim($_POST['id_agendamento']), trim($_POST['id_agendamento']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+                $stmt->bindParam(':id_rl_agendamento_exame', trim($_POST['id_rl_agendamento_exame']), trim($_POST['id_rl_agendamento_exame']) == null ? PDO::PARAM_NULL : PDO::PARAM_INT);
 
                 $stmt->execute();
 
@@ -28,7 +33,7 @@ if ($authorization) {
                     http_response_code(200);
                     $result = array(
                         'status' => 'success',
-                        'result' => 'Sucesso ao adicionar anexo e informações no banco!'
+                        'result' => 'Sucesso ao adicionar anexo e informações no banco!',
                     );
                 } else {
                     http_response_code(500);

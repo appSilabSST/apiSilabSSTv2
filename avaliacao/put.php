@@ -3,7 +3,7 @@
 if ($authorization) {
     try {
         if (
-            isset($json['id_rl_agendamento_exame']) && is_numeric($json['id_rl_agendamento_exame']) &&
+            isset($json['id_avaliacao']) && is_numeric($json['id_avaliacao']) &&
             isset($json['resultado']) && is_numeric($json['resultado'])
         ) {
             // Prepara os dados com condições na mesma linha
@@ -13,15 +13,22 @@ if ($authorization) {
 
             // Prepara o SQL para inserir a avaliação
             $sql = "
-            INSERT INTO avaliacao (id_rl_agendamento_exame, avaliacao, resultado, anotacao) 
-            VALUES (:id_rl_agendamento_exame, :avaliacao, :resultado, :anotacao)
+              UPDATE 
+                avaliacao 
+                SET  
+                    avaliacao = :avaliacao,
+                    resultado = :resultado, 
+                    anotacao = :anotacao,
+                    anamnese = :anamnese
+                WHERE  
+                    id_avaliacao = :id_avaliacao  
             ";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_rl_agendamento_exame', trim($json['id_rl_agendamento_exame']), PDO::PARAM_INT);
             $stmt->bindParam(':resultado', trim($json['resultado']), PDO::PARAM_INT);
-            $stmt->bindParam(':anamnese', $anamnese, PDO::PARAM_STR);
             $stmt->bindParam(':avaliacao', $avaliacao, PDO::PARAM_STR);
+            $stmt->bindParam(':anamnese', $anamnese, PDO::PARAM_STR);
             $stmt->bindParam(':anotacao', $anotacao, PDO::PARAM_STR);
+            $stmt->bindParam(':id_avaliacao', trim($json['id_avaliacao']), PDO::PARAM_INT);
             $stmt->execute();
 
             http_response_code(200);

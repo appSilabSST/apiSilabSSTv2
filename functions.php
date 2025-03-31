@@ -75,7 +75,7 @@ function move_file($file, $cnpj)
         $raizServidor = dirname($_SERVER['DOCUMENT_ROOT']); // Volta um nível a partir do public_html
 
         // Define o caminho completo para o diretório .anexos
-        $anexoFolder = $raizServidor . "/.anexos/" . $cnpj . "/" . date("Y") . "/" . date("m") . "/" . date("d") . "/";
+        echo   $anexoFolder = $raizServidor . "/.anexos/" . $cnpj . "/" . date("Y") . "/" . date("m") . "/" . date("d") . "/";
 
         // Cria o diretório, caso não exista
         if (!file_exists($anexoFolder)) {

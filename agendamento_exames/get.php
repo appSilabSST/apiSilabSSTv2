@@ -43,12 +43,12 @@ if ($authorization) {
             $sql = "
             SELECT rl.*,e.*,
             an.titulo,an.id_anexo,
-            av.avaliacao,av.resultado,av.id_avaliacao,av.anamnese
+            av.avaliacao,av.resultado,av.id_avaliacao,av.anamnese,av.anotacao
 			FROM rl_agendamento_exames rl
             JOIN agendamentos a ON rl.id_agendamento = a.id_agendamento
             JOIN rl_salas_exames rl_se ON (rl_se.id_exame = rl.id_exame)
             LEFT JOIN avaliacao av ON (av.id_rl_agendamento_exame = rl.id_rl_agendamento_exame)
-            LEFT JOIN anexos an ON (an.id_rl_agendamento_exame = an.id_rl_agendamento_exame)
+            LEFT JOIN anexos an ON (an.id_rl_agendamento_exame = rl.id_rl_agendamento_exame)
             LEFT JOIN exames e ON e.id_exame = rl.id_exame
             WHERE rl.ativo = '1'
             AND rl.id_agendamento = :id_agendamento

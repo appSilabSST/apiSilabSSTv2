@@ -138,6 +138,39 @@ if ($authorization) {
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':data', $data);
+        } elseif (isset($_GET["id_status_agendamento"]) && is_numeric($_GET["id_status_agendamento"])) {
+            $id_status_agendamento = trim($_GET["id_status_agendamento"]);
+
+            $sql = "
+            SELECT a.*,DATE_FORMAT(a.horario, '%H:%i') horario,
+            s.status_agendamento,ta.tipo_atendimento,
+            c.nome nome_colaborador,c.id_tipo_orgao,c.nr_doc,c.id_colaborador,c.sexo,c.data_nascimento,
+            e.razao_social, e.id_empresa,e.nr_doc as nr_dor_empresa,e.id_tipo_orgao as id_tipo_orgao_empresa,
+            IF(rl_sf.funcao IS NULL, rl_ce.funcao, rl_sf.funcao) funcao,
+            (
+			  	SELECT JSON_OBJECT(
+				  'realizados', JSON_ARRAYAGG(rl_ex.realizado),
+				  'resultados', JSON_ARRAYAGG(aval.resultado)
+				)
+				FROM 
+				  rl_agendamento_exames rl_ex
+				  LEFT JOIN avaliacao aval ON (aval.id_rl_agendamento_exame = rl_ex.id_rl_agendamento_exame) 
+				WHERE 
+				  rl_ex.id_agendamento = a.id_agendamento
+			) AS situacao
+            FROM agendamentos a
+            LEFT JOIN rl_colaboradores_empresas rl_ce ON (a.id_rl_colaborador_empresa = rl_ce.id_rl_colaborador_empresa)
+            LEFT JOIN colaboradores c ON (rl_ce.id_colaborador = c.id_colaborador)
+            LEFT JOIN empresas e ON (rl_ce.id_empresa = e.id_empresa or a.id_empresa_reservado = e.id_empresa)
+            LEFT JOIN rl_setores_funcoes rl_sf ON (a.id_rl_setor_funcao = rl_sf.id_rl_setor_funcao)
+            LEFT JOIN status_agendamento s ON (a.id_status_agendamento = s.id_status_agendamento)
+            LEFT JOIN tipos_atendimento ta ON (a.id_tipo_atendimento = ta.id_tipo_atendimento)
+            WHERE a.ativo = '1' 
+            and a.id_status_agendamento = :id_status_agendamento
+            ORDER BY a.data,nome_colaborador
+            ";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id_status_agendamento',  $id_status_agendamento);
         }
         // RETORNA MENSAGEM INFORMAÇÃO A OBRIGATORIEDADE EM ENVIAR UMA DATA
         else {

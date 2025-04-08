@@ -13,12 +13,13 @@ if ($authorization) {
 
             // Prepara o SQL para inserir a avaliação
             $sql = "
-            INSERT INTO avaliacao (id_rl_agendamento_exame, avaliacao, resultado, anotacao,anamnese) 
-            VALUES (:id_rl_agendamento_exame, :avaliacao, :resultado, :anotacao,:anamnese)
+            INSERT INTO avaliacao (id_rl_agendamento_exame, avaliacao, resultado, id_profissional,anotacao,anamnese) 
+            VALUES (:id_rl_agendamento_exame, :avaliacao, :resultado,:id_profissional, :anotacao,:anamnese)
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_rl_agendamento_exame', trim($json['id_rl_agendamento_exame']), PDO::PARAM_INT);
             $stmt->bindParam(':resultado', trim($json['resultado']), PDO::PARAM_INT);
+            $stmt->bindParam(':id_profissional', trim($json['id_profissional']), PDO::PARAM_INT);
             $stmt->bindParam(':anamnese', $anamnese, $anamnese == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':avaliacao', $avaliacao,  $avaliacao == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':anotacao', $anotacao,  $anotacao == null ? PDO::PARAM_NULL : PDO::PARAM_STR);

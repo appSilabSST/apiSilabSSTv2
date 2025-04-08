@@ -167,6 +167,7 @@ if ($authorization) {
             LEFT JOIN tipos_atendimento ta ON (a.id_tipo_atendimento = ta.id_tipo_atendimento)
             WHERE a.ativo = '1' 
             and a.id_status_agendamento = :id_status_agendamento
+            AND a.resultado_aso IS NULL
             ORDER BY a.data,nome_colaborador
             ";
             $stmt = $conn->prepare($sql);

@@ -19,15 +19,17 @@ if ($authorization) {
                     avaliacao = :avaliacao,
                     resultado = :resultado, 
                     anotacao = :anotacao,
-                    anamnese = :anamnese
+                    anamnese = :anamnese,
+                    id_profissional = :id_profissional
                 WHERE  
                     id_avaliacao = :id_avaliacao  
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':resultado', trim($json['resultado']), PDO::PARAM_INT);
-            $stmt->bindParam(':anamnese', $anamnese, $anamnese == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':avaliacao', $avaliacao,  $avaliacao == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':anotacao', $anotacao,  $anotacao == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':id_profissional', trim($json['id_profissional']), PDO::PARAM_INT);
+            $stmt->bindValue(':anamnese', $anamnese, $anamnese === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(':avaliacao', $avaliacao, $avaliacao === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(':anotacao', $anotacao, $anotacao === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':id_avaliacao', trim($json['id_avaliacao']), PDO::PARAM_INT);
             $stmt->execute();
 

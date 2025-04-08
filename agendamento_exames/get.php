@@ -67,7 +67,8 @@ if ($authorization) {
             $id_agendamento = trim($_GET["id_agendamento"]);
 
             $sql = "
-            SELECT rl.*,
+            SELECT av.*,an.titulo,an.id_anexo,
+            rl.*,
             e.procedimento, e.cod_esocial, IF(e.cod_esocial IS NOT NULL, CONCAT(e.procedimento, ' | eSocial: ' , e.cod_esocial), e.procedimento) procedimento_format,e.valor_cobrar,
             (
                 SELECT JSON_OBJECT(
@@ -88,6 +89,8 @@ if ($authorization) {
                 LIMIT 1
             ) data_reaproveitado
             FROM rl_agendamento_exames rl
+            LEFT JOIN avaliacao av ON (av.id_rl_agendamento_exame = rl.id_rl_agendamento_exame)
+            LEFT JOIN anexos an ON (an.id_rl_agendamento_exame = rl.id_rl_agendamento_exame)
             JOIN agendamentos a ON rl.id_agendamento = a.id_agendamento
             LEFT JOIN exames e ON e.id_exame = rl.id_exame
             WHERE rl.ativo = '1'

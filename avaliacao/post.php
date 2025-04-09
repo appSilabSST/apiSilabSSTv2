@@ -7,9 +7,9 @@ if ($authorization) {
             isset($json['resultado']) && is_numeric($json['resultado'])
         ) {
             // Prepara os dados com condições na mesma linha
-            $avaliacao = (isset($json['avaliacao']) && is_array($json['avaliacao'])) ? json_encode($json['avaliacao']) : null;
-            $anamnese = (isset($json['anamnese']) && is_array($json['anamnese'])) ? json_encode($json['anamnese']) : null;
-            $anotacao  = (isset($json['anotacao']) && trim($json['anotacao']) !== '') ? trim($json['anotacao']) : null;
+            $avaliacao = empty($json['avaliacao']) || $json['avaliacao'] === '{}' ? null : json_encode($json['avaliacao']);
+            $anamnese = empty($json['anamnese']) || $json['anamnese'] === '{}' ? null : json_encode($json['anamnese']);
+            $anotacao = isset($json['anotacao']) && $json['anotacao'] !== null ? trim($json['anotacao']) : null;
 
             // Prepara o SQL para inserir a avaliação
             $sql = "
@@ -20,9 +20,9 @@ if ($authorization) {
             $stmt->bindParam(':id_rl_agendamento_exame', trim($json['id_rl_agendamento_exame']), PDO::PARAM_INT);
             $stmt->bindParam(':resultado', trim($json['resultado']), PDO::PARAM_INT);
             $stmt->bindParam(':id_profissional', trim($json['id_profissional']), PDO::PARAM_INT);
-            $stmt->bindParam(':anamnese', $anamnese, $anamnese == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':avaliacao', $avaliacao,  $avaliacao == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':anotacao', $anotacao,  $anotacao == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(':anamnese', $anamnese, $anamnese === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(':avaliacao', $avaliacao, $avaliacao === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(':anotacao', $anotacao, $anotacao === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->execute();
 
             http_response_code(200);

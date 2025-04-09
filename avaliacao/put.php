@@ -7,9 +7,9 @@ if ($authorization) {
             isset($json['resultado']) && is_numeric($json['resultado'])
         ) {
             // Prepara os dados com condições na mesma linha
-            $avaliacao = (isset($json['avaliacao']) && is_array($json['avaliacao'])) ? json_encode($json['avaliacao']) : null;
-            $anamnese = (isset($json['anamnese']) && is_array($json['anamnese'])) ? json_encode($json['anamnese']) : null;
-            $anotacao  = (isset($json['anotacao']) && trim($json['anotacao']) !== '') ? trim($json['anotacao']) : null;
+            $avaliacao = empty($json['avaliacao']) || $json['avaliacao'] === '{}' ? null : json_encode($json['avaliacao']);
+            $anamnese = empty($json['anamnese']) || $json['anamnese'] === '{}' ? null : json_encode($json['anamnese']);
+            $anotacao = isset($json['anotacao']) && $json['anotacao'] !== null ? trim($json['anotacao']) : null;
 
             // Prepara o SQL para inserir a avaliação
             $sql = "
@@ -24,6 +24,7 @@ if ($authorization) {
                 WHERE  
                     id_avaliacao = :id_avaliacao  
             ";
+
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':resultado', trim($json['resultado']), PDO::PARAM_INT);
             $stmt->bindParam(':id_profissional', trim($json['id_profissional']), PDO::PARAM_INT);

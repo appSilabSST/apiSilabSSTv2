@@ -10,7 +10,7 @@ if ($authorization) {
 				p.nr_pcmso,p.data_fim,p.data_fim,
                 la.razao_social AS nome_local,la.nr_inscricao,e2.id_tipo_orgao as id_tipo_orgao_local,
 				pf.nome AS nome_profissional,pf.orgao_nr,to_p.siglas as orgao_profissional,pf.orgao_uf,
-                c.id_colaborador, c.id_tipo_orgao, c.nr_doc, c.nome nome_colaborador, c.nome_social,
+                c.id_colaborador, c.id_tipo_orgao, c.nr_doc, c.nome nome_colaborador, c.nome_social,c.celular,
                 rl_ce.data_admissao,rl_ce.matricula,
                 e.id_empresa, e.razao_social, 
                 IF(rl_sf.funcao IS NULL, rl_ce.funcao, rl_sf.funcao) funcao,rl_sf.descricao,
@@ -18,21 +18,27 @@ if ($authorization) {
                 s.status_agendamento,
                 (
                     SELECT JSON_ARRAYAGG(JSON_OBJECT(
-                    'id_exame', ex.id_exame,
-                    'id_rl_agendamento_exame', rl_ae.id_rl_agendamento_exame,
-                    'cod_esocial', ex.cod_esocial,
-                    'procedimento', ex.procedimento,
-                    'reaproveitado', rl_ae.reaproveitado,
-                    'data', rl_ae.data,
-                    'realizado', rl_ae.realizado,
-                    'cobrar', rl_ae.cobrar,
-                    'id_resultado_exame', rl_ae.id_resultado_exame,
-                    'valor', rl_ae.valor,
-                    'ativo', rl_ae.ativo
-                ))
-                FROM rl_agendamento_exames rl_ae
-                JOIN exames ex ON (rl_ae.id_exame = ex.id_exame)
-                WHERE rl_ae.id_agendamento = a.id_agendamento
+                        'id_exame', ex.id_exame,
+                        'id_rl_agendamento_exame', rl_ae.id_rl_agendamento_exame,
+                        'cod_esocial', ex.cod_esocial,
+                        'procedimento', ex.procedimento,
+                        'reaproveitado', rl_ae.reaproveitado,
+                        'data', rl_ae.data,
+                        'realizado', rl_ae.realizado,
+                        'cobrar', rl_ae.cobrar,
+                        'valor', rl_ae.valor,
+                        'ativo', rl_ae.ativo,
+                        'resultado', av.resultado,
+                        'anamnese', av.anamnese,
+                        'anotacao', av.anotacao,
+                        'avaliacao', av.avaliacao,
+                        'id_avaliacao', av.id_avaliacao,
+                        'id_profissional', av.id_profissional
+                    ))
+                    FROM rl_agendamento_exames rl_ae
+                    JOIN exames ex ON (rl_ae.id_exame = ex.id_exame)
+                    LEFT JOIN avaliacao av ON (av.id_rl_agendamento_exame = rl_ae.id_rl_agendamento_exame)
+                    WHERE rl_ae.id_agendamento = a.id_agendamento
                 ) exames,
                 (
                     SELECT JSON_ARRAYAGG(JSON_OBJECT(

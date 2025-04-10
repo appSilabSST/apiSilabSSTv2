@@ -12,9 +12,8 @@ if ($authorization) {
             nome = :nome, 
             cpf = :cpf, 
             id_especialidade = :id_especialidade, 
-            id_tipo_orgao = :id_tipo_orgao, 
-            orgao_nr = :orgao_nr, 
-            orgao_uf = :orgao_uf, 
+            numero = :numero, 
+            estado = :estado, 
             nit = :nit
             WHERE id_profissional = :id_profissional
             ";
@@ -22,10 +21,9 @@ if ($authorization) {
             $stmt->bindParam(':nome', trim($json['nome']));
             $stmt->bindParam(':cpf', trim($json['cpf']));
             $stmt->bindParam(':id_especialidade', trim($json['id_especialidade']));
-            $stmt->bindParam(':id_tipo_orgao', trim($json['id_tipo_orgao']), trim($json['id_tipo_orgao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':orgao_nr', trim($json['orgao_nr']), trim($json['orgao_nr']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':orgao_uf', trim($json['orgao_uf']), trim($json['orgao_uf']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':nit', trim($json['nit']), trim($json['nit']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':numero', trim($json['numero']));
+            $stmt->bindParam(':estado', trim($json['estado']));
+            $stmt->bindParam(':nit', trim($json['nit']));
             $stmt->bindParam(':id_profissional', $id_profissional);
             $stmt->execute();
 

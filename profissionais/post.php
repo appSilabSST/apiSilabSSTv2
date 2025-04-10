@@ -5,17 +5,16 @@ if ($authorization) {
         if (isset($json['nome']) && isset($json['cpf']) && isset($json['id_especialidade'])) {
 
             $sql = "
-            INSERT INTO profissionais (nome, cpf, id_especialidade, id_tipo_orgao, orgao_nr, orgao_uf, nit) VALUES
-            (:nome, :cpf, :id_especialidade, :id_tipo_orgao, :orgao_nr, :orgao_uf, :nit)
+            INSERT INTO profissionais (nome, cpf, id_especialidade, numero,estado,nit) VALUES
+            (:nome, :cpf, :id_especialidade,:numero,:estado,:nit)
             ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':nome', trim($json['nome']));
             $stmt->bindParam(':cpf', trim($json['cpf']));
             $stmt->bindParam(':id_especialidade', trim($json['id_especialidade']));
-            $stmt->bindParam(':id_tipo_orgao', trim($json['id_tipo_orgao']), trim($json['id_tipo_orgao']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':orgao_nr', trim($json['orgao_nr']), trim($json['orgao_nr']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':orgao_uf', trim($json['orgao_uf']), trim($json['orgao_uf']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':nit', trim($json['nit']), trim($json['nit']) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':numero', trim($json['numero']));
+            $stmt->bindParam(':estado', trim($json['estado']));
+            $stmt->bindParam(':nit', trim($json['nit']));
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {

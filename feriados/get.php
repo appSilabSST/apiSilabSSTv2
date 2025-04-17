@@ -22,7 +22,7 @@ if ($authorization) {
             $stmt->bindParam(':data', $data);
         } else if (isset($_GET["diaMesAno"])) {
             $daiMesAno = trim($_GET["diaMesAno"]);
-            list($ano, $mes, $dia) = explode('/', $daiMesAno);
+            list($ano, $mes, $dia) = explode('-', $daiMesAno);
             $sql = "
             SELECT *
             FROM feriados f

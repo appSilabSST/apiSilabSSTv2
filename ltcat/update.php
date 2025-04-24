@@ -16,7 +16,7 @@ if (!empty($id)) {
     e.uf,
     la.id_local_atividade, la.razao_social nome_local_atividade, la.atividade_principal,
     s.id_status_documento, s.status_documento,
-    pro.nome nome_profissional, to_p.siglas as orgao_profissional,, pro.orgao_nr, pro.orgao_uf,
+    pro.nome nome_profissional, esp.siglas  as orgao_profissional,, pro.numero, pro.estado,
     es.nome especialidade,
     DATE_FORMAT(CURDATE(), '%d de %M de %Y') data
     FROM ltcat l
@@ -24,7 +24,7 @@ if (!empty($id)) {
     LEFT JOIN locais_atividade la ON (l.id_local_atividade = la.id_local_atividade)
     LEFT JOIN status_documentos s ON (s.id_status_documento = l.id_status_documento)
     LEFT JOIN profissionais pro ON (l.id_profissional = pro.id_profissional)
-    LEFT JOIN tipos_orgao to_p ON (to_p.id_tipo_orgao = pro.id_tipo_orgao)  
+    LEFT JOIN especialidades esp ON (esp.id_especialidade = pro.id_especialidade)  
     LEFT JOIN especialidades es ON (es.id_especialidade = pro.id_especialidade)
     WHERE l.ativo = 1
     AND l.id_ltcat = $id
@@ -309,7 +309,7 @@ if (!empty($id)) {
                                 <td>
                                     <span class="text-tiny">' . $row->nome_profissional . '</span><br>
                                     <span class="text-tiny">' . $row->especialidade . '</span><br>
-                                    <span class="text-tiny">' . $row->orgao_profissional . ' ' . $row->orgao_nr . '/' . $row->orgao_uf . '</span><br>
+                                    <span class="text-tiny">' . $row->orgao_profissional . ' ' . $row->numero . '/' . $row->estado . '</span><br>
                                 </td>
                                 <td>
                                     <span class="text-tiny">(N/A) Não aplicável</span><br>
@@ -345,8 +345,8 @@ if (!empty($id)) {
             '{{nome_profissional}}',
             '{{especialidade}}',
             '{{orgao_profissional}}',
-            '{{orgao_nr}}',
-            '{{orgao_uf}}',
+            '{{numero}}',
+            '{{estado}}',
             '{{responsavel}}',
             '{{responsavel_cpf}}',
             '{{levantamento_riscos}}',
@@ -359,8 +359,8 @@ if (!empty($id)) {
             $row->nome_profissional,
             $row->especialidade,
             $row->orgao_profissional,
-            $row->orgao_nr,
-            $row->orgao_uf,
+            $row->numero,
+            $row->estado,
             $row->responsavel,
             $row->responsavel_cpf,
             $row->levantamento_riscos,

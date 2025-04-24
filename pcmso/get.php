@@ -22,7 +22,7 @@ if ($authorization) {
             e2.id_empresa as id_empresa_local,
             ta.tipo_ambiente,ta.id_tipo_ambiente,
             COUNT(r.id_revisao) as isRevisoes,
-            pro.nome,pro.cpf,to_p.siglas as orgao_profissional,pro.orgao_nr,pro.orgao_uf
+            pro.nome,pro.cpf,esp.siglas as orgao_profissional,pro.numero,pro.estado
             FROM pcmso p
             LEFT JOIN locais_atividade la ON (p.id_local_atividade = la.id_local_atividade)
             LEFT JOIN empresas e ON (e.id_empresa = p.id_empresa)
@@ -30,7 +30,7 @@ if ($authorization) {
             LEFT JOIN revisoes r ON (r.id_pcmso  = p.id_pcmso)
             LEFT JOIN tipos_ambiente ta ON (ta.id_tipo_ambiente = la.id_tipo_ambiente)
             LEFT JOIN profissionais pro ON (p.id_profissional = pro.id_profissional)
-            LEFT JOIN tipos_orgao to_p ON (to_p.id_tipo_orgao = pro.id_tipo_orgao)  
+            LEFT JOIN especialidades esp ON (esp.id_especialidade = pro.id_especialidade)  
             WHERE p.ativo = 1
             AND p.id_pcmso = :id_pcmso
             GROUP BY p.id_pcmso
@@ -46,14 +46,14 @@ if ($authorization) {
  			la.razao_social AS nome_local,la.nr_inscricao,la.id_tipo_orgao as id_tipo_orgao_local,
             e2.id_empresa as id_empresa_local,
             ta.tipo_ambiente,ta.id_tipo_ambiente,
-            pro.nome,pro.cpf,to_p.siglas as orgao_profissional,pro.orgao_nr,pro.orgao_uf
+            pro.nome,pro.cpf,esp.siglas as orgao_profissional,pro.numero,pro.estado
             FROM pcmso p
             LEFT JOIN locais_atividade la ON (p.id_local_atividade = la.id_local_atividade)
             LEFT JOIN empresas e ON (e.id_empresa = p.id_empresa)
             LEFT JOIN empresas e2 ON (e2.nr_doc = la.nr_inscricao)
             LEFT JOIN tipos_ambiente ta ON (ta.id_tipo_ambiente = la.id_tipo_ambiente)
             LEFT JOIN profissionais pro ON (p.id_profissional = pro.id_profissional)
-            LEFT JOIN tipos_orgao to_p ON (to_p.id_tipo_orgao = pro.id_tipo_orgao)  
+            LEFT JOIN especialidades esp ON (esp.id_especialidade = pro.id_especialidade)   
             WHERE p.ativo = 1
             AND p.id_empresa = :id_empresa
             ";
@@ -90,7 +90,7 @@ if ($authorization) {
             e2.id_empresa as id_empresa_local,
             ta.tipo_ambiente,ta.id_tipo_ambiente,
             COUNT(r.id_revisao) as isRevisoes,
-            pro.nome,pro.cpf,to_p.siglas as orgao_profissional,pro.orgao_nr,pro.orgao_uf
+            pro.nome,pro.cpf,esp.siglas as orgao_profissional,pro.numero,pro.estado
             FROM pcmso p
             LEFT JOIN locais_atividade la ON (p.id_local_atividade = la.id_local_atividade)
             LEFT JOIN empresas e ON (e.id_empresa = p.id_empresa)
@@ -98,7 +98,7 @@ if ($authorization) {
             LEFT JOIN revisoes r ON (r.id_pcmso  = p.id_pcmso)
             LEFT JOIN tipos_ambiente ta ON (ta.id_tipo_ambiente = la.id_tipo_ambiente)
             LEFT JOIN profissionais pro ON (p.id_profissional = pro.id_profissional)
-            LEFT JOIN tipos_orgao to_p ON (to_p.id_tipo_orgao = pro.id_tipo_orgao)  
+            LEFT JOIN especialidades esp ON (esp.id_especialidade = pro.id_especialidade)   
             WHERE p.ativo = 1
             GROUP BY p.id_pcmso
             ORDER BY p.nr_pcmso DESC 

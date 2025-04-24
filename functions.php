@@ -32,38 +32,114 @@ function isValidDate($date)
 }
 
 
-function setupInsetAgendamento($date, $id)
+// function setupInsetAgendamento($date, $id)
+// {
+//     $insert = "";
+//     $nova_data = trim($date['data_inicio']);
+//     $data_fim = isset($date['data_fim']) ? trim($date['data_fim']) : date('Y-m-d', strtotime("+ 6 month", strtotime($nova_data)));
+
+//     // Lista de feriados (datas sem expediente)
+//     $filterDiasSemExpediente = [
+//         '2025-05-01',
+//         '2025-05-08',
+//     ];
+//     // Converte para timestamps para facilitar comparação
+//     $filterTimestamps = array_map('strtotime', $filterDiasSemExpediente);
+
+//     // VERIFICA SE A DATA INÍCIO É COMPATÍVEL COM O DIA DE SEMANA SELECIONADO
+//     while ((date('w', strtotime($nova_data)) + 1) <> $date['id_dia_semana']) {
+//         $nova_data = date('Y-m-d', strtotime("+ 1 day", strtotime($nova_data)));
+//     }
+
+//     // echo $nova_data;exit;
+//     while (strtotime($nova_data) <= strtotime($data_fim)) {
+
+//         // Se for feriado / dia sem expediente, pula para +1 semana
+//         if (in_array(strtotime($nova_data), $filterTimestamps, true)) {
+//             $nova_data = date('Y-m-d', strtotime("+1 week", $nova_data));
+//             continue;
+//         }
+
+//         $novo_horario = date('H:i', strtotime(trim($date['horario_inicio'])));
+
+//         while (strtotime($novo_horario) <= strtotime(trim($date['horario_fim']))) {
+//             // CRIA HORÁRIOS DE AGENDA VIRTUALMENTE
+//             for ($i = 0; $i < $date['qtde_intervalo']; $i++) {
+//                 $insert .= "('$nova_data','$novo_horario','$id'),";
+//             }
+
+//             $novo_horario = date('H:i', strtotime("+{$date['intervalo']} minutes", strtotime($novo_horario)));
+//         }
+
+//         $nova_data = date('Y-m-d', strtotime("+ 1 week", strtotime($nova_data)));
+//     }
+
+//     return "
+//              INSERT INTO agendamentos (data, horario, id_regra_agendamento) VALUES
+//                 " . substr($insert, 0, -1) . "
+//             ";
+// }
+
+
+function setupInsetAgendamento($date, $id, $diasSemExpediente)
 {
     $insert = "";
     $nova_data = trim($date['data_inicio']);
-    $data_fim = isset($date['data_fim']) ? trim($date['data_fim']) : date('Y-m-d', strtotime("+ 6 month", strtotime($nova_data)));
+    $data_fim  = isset($date['data_fim'])  ? trim($date['data_fim']) : date('Y-m-d', strtotime("+6 month", strtotime($nova_data)));
 
-    // VERIFICA SE A DATA INÍCIO É COMPATÍVEL COM O DIA DE SEMANA SELECIONADO
-    while ((date('w', strtotime($nova_data)) + 1) <> $date['id_dia_semana']) {
-        $nova_data = date('Y-m-d', strtotime("+ 1 day", strtotime($nova_data)));
+    // Filtra somente os feriados “Sem expediente” (ativo = 1)
+    $semExpediente = array_filter($diasSemExpediente, function ($item) {
+        return  $item['ativo'] == 1;
+    });
+
+    // Extrai apenas o campo 'data' em um array simples
+    $filterDiasSemExpediente = array_map(function ($f) {
+        return $f['data'];
+    }, $semExpediente);
+
+    // Converte para timestamps para facilitar comparação
+    $filterTimestamps = array_map('strtotime', $filterDiasSemExpediente);
+
+    // Ajusta data de início para bater com o dia da semana desejado
+    while ((date('w', strtotime($nova_data)) + 1) != $date['id_dia_semana']) {
+        $nova_data = date('Y-m-d', strtotime("+1 day", strtotime($nova_data)));
     }
 
-    // echo $nova_data;exit;
+    // Laço principal: data atual até data_fim
     while (strtotime($nova_data) <= strtotime($data_fim)) {
+        $ts_nova_data = strtotime($nova_data);
 
+        // Se for feriado / dia sem expediente, pula para +1 semana
+        if (in_array($ts_nova_data, $filterTimestamps, true)) {
+            $nova_data = date('Y-m-d', strtotime("+1 week", $ts_nova_data));
+            continue;
+        }
+
+        // Gera intervalos de horário para o dia válido
         $novo_horario = date('H:i', strtotime(trim($date['horario_inicio'])));
+        $horario_fim  = strtotime(trim($date['horario_fim']));
 
-        while (strtotime($novo_horario) <= strtotime(trim($date['horario_fim']))) {
-            // CRIA HORÁRIOS DE AGENDA VIRTUALMENTE
+        while (strtotime($novo_horario) <= $horario_fim) {
+            // Repete conforme qtde_intervalo
             for ($i = 0; $i < $date['qtde_intervalo']; $i++) {
                 $insert .= "('$nova_data','$novo_horario','$id'),";
             }
-
-            $novo_horario = date('H:i', strtotime("+{$date['intervalo']} minutes", strtotime($novo_horario)));
+            // Avança o intervalo
+            $novo_horario = date(
+                'H:i',
+                strtotime("+{$date['intervalo']} minutes", strtotime($novo_horario))
+            );
         }
 
-        $nova_data = date('Y-m-d', strtotime("+ 1 week", strtotime($nova_data)));
+        // Avança uma semana
+        $nova_data = date('Y-m-d', strtotime("+1 week", $ts_nova_data));
     }
 
+    // Monta a query final
     return "
-             INSERT INTO agendamentos (data, horario, id_regra_agendamento) VALUES
-                " . substr($insert, 0, -1) . "
-            ";
+        INSERT INTO agendamentos (data, horario, id_regra_agendamento) VALUES
+        " . rtrim($insert, ',') . "
+    ";
 }
 
 

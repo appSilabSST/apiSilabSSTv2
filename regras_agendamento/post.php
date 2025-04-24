@@ -43,7 +43,34 @@ if ($authorization) {
 
                 $id_regra_agendamento = $conn->lastInsertId();
 
-                $insertAgendamento = setupInsetAgendamento($json, $id_regra_agendamento);
+                $curl = curl_init();
+
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'https://silabsst.com.br/_backend/feriados/',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'GET',
+                    CURLOPT_HTTPHEADER => array(
+                        "Authorization: $token",
+                        "Content-Type: application/json"
+                    ),
+                ));
+
+                $response = curl_exec($curl);
+
+                if (curl_errno($curl)) {
+                    throw new Exception('Erro na requisição cURL: ' . curl_error($curl));
+                }
+
+                curl_close($curl);
+
+                $response = json_decode($response, true);
+
+                $insertAgendamento = setupInsetAgendamento($json, $id_regra_agendamento, $response);
 
                 if ($insertAgendamento) {
                     // Execute o insert ou a ação de agendamento se for necessário

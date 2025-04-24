@@ -11,7 +11,7 @@ if ($authorization) {
                 e2.id_empresa as id_empresa_local,
                 ta.tipo_ambiente,ta.id_tipo_ambiente,
                 COUNT(r.id_revisao) as isRevisoes,
-                pro.nome,pro.cpf,to_p.siglas as orgao_profissional,pro.orgao_nr,pro.orgao_uf
+                pro.nome,pro.cpf,esp.siglas  as orgao_profissional,pro.numero,pro.estado
                 FROM ltcat l
                 LEFT JOIN locais_atividade la ON (l.id_local_atividade = la.id_local_atividade)
                 LEFT JOIN empresas e ON (e.id_empresa = l.id_empresa)
@@ -19,7 +19,7 @@ if ($authorization) {
                 LEFT JOIN revisoes r ON (r.id_ltcat  = l.id_ltcat)
                 LEFT JOIN tipos_ambiente ta ON (ta.id_tipo_ambiente = la.id_tipo_ambiente)
                 LEFT JOIN profissionais pro ON (l.id_profissional = pro.id_profissional)       
-                LEFT JOIN tipos_orgao to_p ON (to_p.id_tipo_orgao = pro.id_tipo_orgao)   
+                LEFT JOIN especialidades esp ON (esp.id_especialidade = pro.id_especialidade)   
                 WHERE l.ativo = 1
                 AND l.id_ltcat = :id_ltcat
                 GROUP BY l.id_ltcat
@@ -53,7 +53,7 @@ if ($authorization) {
             e2.id_empresa as id_empresa_local,
             ta.tipo_ambiente,ta.id_tipo_ambiente,
             COUNT(r.id_revisao) as isRevisoes,
-            pro.nome,pro.cpf,to_p.siglas as orgao_profissional,pro.orgao_nr,pro.orgao_uf
+            pro.nome,pro.cpf,esp.siglas as orgao_profissional,pro.numero,pro.estado
             FROM ltcat l
             LEFT JOIN locais_atividade la ON (l.id_local_atividade = la.id_local_atividade)
             LEFT JOIN empresas e ON (e.id_empresa = l.id_empresa)
@@ -61,7 +61,7 @@ if ($authorization) {
             LEFT JOIN revisoes r ON (r.id_ltcat  = l.id_ltcat)
             LEFT JOIN tipos_ambiente ta ON (ta.id_tipo_ambiente = la.id_tipo_ambiente)
             LEFT JOIN profissionais pro ON (l.id_profissional = pro.id_profissional)
-            LEFT JOIN tipos_orgao to_p ON (to_p.id_tipo_orgao = pro.id_tipo_orgao)  
+            LEFT JOIN especialidades esp ON (esp.id_especialidade = pro.id_especialidade)  
             WHERE l.ativo = 1
             GROUP BY l.id_ltcat
             ORDER BY l.nr_ltcat

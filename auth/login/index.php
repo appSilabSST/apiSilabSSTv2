@@ -19,15 +19,22 @@ if (empty($username) || empty($password)) {
 } else {
     $sql = "
     SELECT
-        id_usuario_sistema , nome ,
-        tipo_usuario_sistema
+        us.id_profissional,us.id_permissao,us.username,
+        IF(us.nome IS NULL, p.nome, us.nome) AS nome,
+        ep.id_sala_atendimento,
+        JSON_ARRAYAGG(sa.id_exame) AS ids_exames
     FROM 
-        usuarios_sistema
-    JOIN
-        tipo_usuarios_sistema ON usuarios_sistema.id_tipo_usuario_sistema = tipo_usuarios_sistema.id_tipo_usuario_sistema
+        usuarios_sistema us
+        LEFT JOIN profissionais p ON ( p.id_profissional = us.id_profissional)
+        LEFT JOIN especialidades es ON (es.id_especialidade = p.id_especialidade)
+    	LEFT JOIN escalas_profissionais  ep ON (ep.id_profissional = p.id_profissional AND ep.`data` = CURDATE())
+    	LEFT JOIN rl_salas_exames  sa ON (sa.id_sala_atendimento = ep.id_sala_atendimento)
     WHERE 
-        username LIKE '$username'
-        AND senha LIKE '$password'
+        us.username LIKE '$username'
+        AND us.senha LIKE '$password'
+        AND us.ativo = '1'
+    GROUP BY 
+	  	us.id_usuario_sistema  
     ";
 
     // echo $sql;exit;
@@ -40,18 +47,7 @@ if (empty($username) || empty($password)) {
         $name_fullname = explode(" ", $row->nome);
         $name_fullname = $name_fullname[0] . " " . end($name_fullname);
 
-        $sala = array(
-            'id_sala' => $row->id_sala,
-            'classe' => $row->classe
-        );
-
-        $sala = array(
-            'id_sala' => 1,
-            'classe' => 1,
-            'nome' => "Clínico"
-        );
-
-        $token = encodeJWT($remember, $row->id_usuario_sistema, $name_fullname, $row->tipo_usuario_sistema, 'admin', $sala);
+        $token = encodeJWT($remember, $row->id_profissional, $row->permissoes, $row->id_sala_atendimento, $row->ids_exames, $name_fullname);
         // echo $token;exit;
 
         $result = json_encode(array(

@@ -2,32 +2,40 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($json['nome']) && !empty($json['nome'])) {
+        if (
+            isset($json['id_permissao']) && is_numeric($json['id_permissao']) &&
+            isset($json['username']) && isset($json['senha'])
+        ) {
 
             $sql = "
-            INSERT INTO profissionais (nome, cpf, id_especialidade, numero,estado,nit) VALUES
-            (:nome, :cpf, :id_especialidade,:numero,:estado,:nit)
+                INSERT INTO usuarios_sistema 
+                    (id_permissao,nome, username,senha)
+                VALUES 
+                    (:id_permissao,:nome,:username,:senha) 
             ";
+
+            $senha = hash('sha256', trim($postjson['senha']));
+
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':nome', trim($json['nome']));
-            $stmt->bindParam(':cpf', trim($json['cpf']), empty($json['nome']) ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':id_especialidade', trim($json['id_especialidade']), empty($json['id_especialidade']) ? PDO::PARAM_NULL : PDO::PARAM_INT);
-            $stmt->bindParam(':numero', trim($json['numero']), empty($json['numero']) ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':estado', trim($json['estado']));
-            $stmt->bindParam(':nit', trim($json['nit']));
+
+            $stmt->bindParam(':nome', trim($json['nome']), PDO::PARAM_STR);
+            $stmt->bindParam(':id_permissao', trim($json['id_permissao']), PDO::PARAM_INT);
+            $stmt->bindParam(':username', trim($json['username']), PDO::PARAM_STR);
+            $stmt->bindParam(':senha', $senha, PDO::PARAM_STR);
+
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {
                 http_response_code(200);
                 $result = array(
                     'status' => 'success',
-                    'result' => 'Profissional cadastrado com sucesso!'
+                    'result' => 'Vinculo criado com sucesso!'
                 );
             } else {
                 http_response_code(500);
                 $result = array(
                     'status' => 'fail',
-                    'result' => 'Falha ao cadastrar profissional!'
+                    'result' => 'Falha ao criar o Vinculo!'
                 );
             }
         } else {
@@ -43,7 +51,7 @@ if ($authorization) {
         if ($th->getCode() == 23000) {
             $result = array(
                 'status' => 'fail',
-                'result' => 'CPF já existente!',
+                'result' => 'Cnae já existente!',
                 'error' => $th->getMessage()
             );
         } else {

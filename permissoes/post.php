@@ -2,32 +2,46 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($json['nome']) && !empty($json['nome'])) {
+        if (
+            isset($json['id_empresa']) && isset($json['id_empresa']) &&
+            isset($json['id_cnae']) && isset($json['id_cnae']) &&
+            isset($json['classe']) && isset($json['classe'])
+        ) {
+
+            // Caso o tipo da classe seja 1, altere todos os outros cnae da empresa classe 2
+            if ($json['classe'] == 1) {
+                $sql = "UPDATE rl_empresa_cnae SET classe = 2 WHERE id_empresa = :id_empresa";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':id_empresa', $json['id_empresa']);
+                $stmt->execute();
+            }
 
             $sql = "
-            INSERT INTO profissionais (nome, cpf, id_especialidade, numero,estado,nit) VALUES
-            (:nome, :cpf, :id_especialidade,:numero,:estado,:nit)
+                INSERT INTO rl_empresa_cnae 
+                    (id_empresa, id_cnae,classe) 
+                VALUES 
+                    (:id_empresa, :id_cnae,:classe)
             ";
+
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':nome', trim($json['nome']));
-            $stmt->bindParam(':cpf', trim($json['cpf']), empty($json['nome']) ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':id_especialidade', trim($json['id_especialidade']), empty($json['id_especialidade']) ? PDO::PARAM_NULL : PDO::PARAM_INT);
-            $stmt->bindParam(':numero', trim($json['numero']), empty($json['numero']) ? PDO::PARAM_NULL : PDO::PARAM_STR);
-            $stmt->bindParam(':estado', trim($json['estado']));
-            $stmt->bindParam(':nit', trim($json['nit']));
+
+            $stmt->bindParam(':id_empresa', trim($json['id_empresa']));
+            $stmt->bindParam(':id_cnae', trim($json['id_cnae']), PDO::PARAM_INT);
+            $stmt->bindParam(':classe', trim($json['classe']), PDO::PARAM_INT);
+
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {
                 http_response_code(200);
                 $result = array(
                     'status' => 'success',
-                    'result' => 'Profissional cadastrado com sucesso!'
+                    'result' => 'Vinculo criado com sucesso!'
                 );
             } else {
                 http_response_code(500);
                 $result = array(
                     'status' => 'fail',
-                    'result' => 'Falha ao cadastrar profissional!'
+                    'result' => 'Falha ao criar o Vinculo!'
                 );
             }
         } else {
@@ -43,7 +57,7 @@ if ($authorization) {
         if ($th->getCode() == 23000) {
             $result = array(
                 'status' => 'fail',
-                'result' => 'CPF já existente!',
+                'result' => 'Cnae já existente!',
                 'error' => $th->getMessage()
             );
         } else {

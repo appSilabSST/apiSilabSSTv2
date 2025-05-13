@@ -1,6 +1,6 @@
 <?php
 
-function encodeJWT($user_remember, $id_profissional, $permissoes, $acesso, $perfil, $id_sala_atendimento, $ids_exames, $user_name)
+function encodeJWT($user_remember, $user, $escala)
 {
 
     // secret key
@@ -19,22 +19,11 @@ function encodeJWT($user_remember, $id_profissional, $permissoes, $acesso, $perf
 
     $escala = null;
 
-    if ($id_sala_atendimento > 0) {
-        $escala = json_encode([
-            'id_sala_atendimento' => $id_sala_atendimento,
-            'exames' => $ids_exames
-        ]);
-    }
-
     // Create token payload as a JSON string
     $payload = json_encode(
         array(
             'user_remember' => $user_remember,
-            'id_profissional' => $id_profissional,
-            'user_name' => $user_name,
-            'permissoes' => $permissoes,
-            'perfil' => $perfil,
-            'acesso' => $acesso,
+            'user' => $user,
             'escala' => $escala,
             'iat' => time(),
             'exp' => $exp

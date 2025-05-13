@@ -19,7 +19,7 @@ if (empty($username) || empty($password)) {
 } else {
     $sql = "
     SELECT
-        us.id_profissional,us.id_permissao,us.username,
+        us.id_profissional,us.id_permissao,us.username,us.id_usuario_sistema,us.email,
         per.acesso,per.nome as perfil,
         IF(us.nome IS NULL, p.nome, us.nome) AS nome,
         ep.id_sala_atendimento,
@@ -49,7 +49,26 @@ if (empty($username) || empty($password)) {
         $name_fullname = explode(" ", $row->nome);
         $name_fullname = $name_fullname[0] . " " . end($name_fullname);
 
-        $token = encodeJWT($remember, $row->id_profissional, $row->id_permissao, $row->acesso, $row->perfil, $row->id_sala_atendimento, $row->ids_exames, $name_fullname);
+        $user =
+            [
+                'nome' => $name_fullname,
+                'id_profissional' => $row->id_profissional,
+                'id_usuario_sistema' => $row->id_usuario_sistema,
+                'email' => $row->email,
+                'perfil' => $row->perfil,
+                'acesso' => $row->acesso
+            ];
+
+        $escala = [];
+
+        if ($row->id_sala_atendimento > 0) {
+            $escala = [
+                'id_sala_atendimento' => $row->id_sala_atendimento,
+                'ids_exames' => $row->ids_exames
+            ];
+        };
+
+        $token = encodeJWT($remember, $user, $escala);
         // echo $token;exit;
 
         $result = json_encode(array(

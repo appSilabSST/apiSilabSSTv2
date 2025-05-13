@@ -2,26 +2,26 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($json['id_rl_empresa_cnae']) && is_numeric($json['id_rl_empresa_cnae'])) {
+        if (isset($json['id_permissao']) && is_numeric($json['id_permissao'])) {
 
             $sql = "
-            UPDATE rl_empresa_cnae SET
+            UPDATE permissoes SET
             ";
             foreach ($json as $key => $value) {
-                if ($key != 'id_rl_empresa_cnae') {
+                if ($key != 'id_permissao') {
                     $sql .= "$key = :$key,";
                 }
             }
             $sql = substr($sql, 0, -1) . "
-            WHERE id_rl_empresa_cnae = :id_rl_empresa_cnae
+            WHERE id_permissao = :id_permissao
             ";
 
             $stmt = $conn->prepare($sql);
             foreach ($json as $key => $value) {
-                if ($key != 'id_rl_empresa_cnae') {
+                if ($key != 'id_permissao') {
                     $stmt->bindParam(":$key", trim($value), trim($value) == null ? PDO::PARAM_NULL : PDO::PARAM_STR);
                 } else {
-                    $stmt->bindValue(":id_rl_empresa_cnae", $value);
+                    $stmt->bindValue(":id_permissao", $value);
                 }
             }
             $stmt->execute();

@@ -2,27 +2,20 @@
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($json['id_rl_empresa_cnae']) && is_numeric($json['id_rl_empresa_cnae'])) {
-
-            // Caso o tipo da classe seja 1, altere todos os outros cnae da empresa classe 2
-            if ($json['classe'] == 1 && $json['id_empresa'] > 0) {
-                $sql = "UPDATE rl_empresa_cnae SET classe = 2 WHERE id_empresa = :id_empresa";
-                $stmt = $conn->prepare($sql);
-                $stmt->bindParam(':id_empresa', $json['id_empresa']);
-                $stmt->execute();
-            }
+        if (isset($json['id_permissao']) && is_numeric($json['id_permissao'])) {
 
             $sql = "
-            UPDATE rl_empresa_cnae SET
-            id_cnae = :id_cnae,
-            classe = :classe
-            WHERE id_rl_empresa_cnae = :id_rl_empresa_cnae
+            UPDATE permissoes SET
+            nome = :nome,
+            acesso = :acesso
+            WHERE id_permissao = :id_permissao
             ";
 
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_cnae', trim($json['id_cnae']), PDO::PARAM_INT);
-            $stmt->bindParam(':classe', trim($json['classe']), PDO::PARAM_INT);
-            $stmt->bindParam(':id_rl_empresa_cnae', trim($json['id_rl_empresa_cnae']));
+
+            $stmt->bindParam(':nome', trim($json['nome']), PDO::PARAM_STR);
+            $stmt->bindParam(':acesso', trim($json['acesso']), PDO::PARAM_STR);
+            $stmt->bindParam(':id_permissao', trim($json['id_permissao']), PDO::PARAM_INT);
             $stmt->execute();
 
             $result = array(

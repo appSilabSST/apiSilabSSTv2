@@ -20,12 +20,14 @@ if (empty($username) || empty($password)) {
     $sql = "
     SELECT
         us.id_profissional,us.id_permissao,us.username,
+        per.acesso,per.nome as perfil,
         IF(us.nome IS NULL, p.nome, us.nome) AS nome,
         ep.id_sala_atendimento,
         JSON_ARRAYAGG(sa.id_exame) AS ids_exames
     FROM 
         usuarios_sistema us
         LEFT JOIN profissionais p ON ( p.id_profissional = us.id_profissional)
+        LEFT JOIN permissoes per ON ( per.id_permissao = us.id_permissao)
         LEFT JOIN especialidades es ON (es.id_especialidade = p.id_especialidade)
     	LEFT JOIN escalas_profissionais  ep ON (ep.id_profissional = p.id_profissional AND ep.`data` = CURDATE())
     	LEFT JOIN rl_salas_exames  sa ON (sa.id_sala_atendimento = ep.id_sala_atendimento)
@@ -47,7 +49,7 @@ if (empty($username) || empty($password)) {
         $name_fullname = explode(" ", $row->nome);
         $name_fullname = $name_fullname[0] . " " . end($name_fullname);
 
-        $token = encodeJWT($remember, $row->id_profissional, $row->permissoes, $row->id_sala_atendimento, $row->ids_exames, $name_fullname);
+        $token = encodeJWT($remember, $row->id_profissional, $row->id_permissao, $row->acesso, $row->perfil, $row->id_sala_atendimento, $row->ids_exames, $name_fullname);
         // echo $token;exit;
 
         $result = json_encode(array(

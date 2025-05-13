@@ -1,6 +1,6 @@
 <?php
 
-function encodeJWT($user_remember, $id_profissional, $permissoes, $id_sala_atendimento, $ids_exames, $user_name)
+function encodeJWT($user_remember, $id_profissional, $permissoes, $acesso, $perfil, $id_sala_atendimento, $ids_exames, $user_name)
 {
 
     // secret key
@@ -33,6 +33,8 @@ function encodeJWT($user_remember, $id_profissional, $permissoes, $id_sala_atend
             'id_profissional' => $id_profissional,
             'user_name' => $user_name,
             'permissoes' => $permissoes,
+            'perfil' => $perfil,
+            'acesso' => $acesso,
             'escala' => $escala,
             'iat' => time(),
             'exp' => $exp

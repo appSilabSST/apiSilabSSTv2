@@ -4,7 +4,7 @@ if ($authorization) {
     try {
         if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
             $id_usuario_sistema = trim($_GET["id"]);
-            $sql = "SELECT us.id_usuario_sistema, us.username, us.id_profissional,pp.nome as acesso, pp.id_permissao, p.*,
+            $sql = "SELECT us.id_usuario_sistema,us.avatar ,us.username, us.id_profissional,pp.nome as acesso, pp.id_permissao, p.*,
                            IF(us.nome IS NULL, p.nome, us.nome) AS nome
                     FROM usuarios_sistema us
                     LEFT JOIN profissionais p ON ( p.id_profissional = us.id_profissional)
@@ -16,7 +16,7 @@ if ($authorization) {
             $stmt->bindParam(':id_usuario_sistema', $id_usuario_sistema);
         } else if (isset($_GET["id_profissional"]) && is_numeric($_GET["id_profissional"])) {
             $id_profissional = trim($_GET["id_profissional"]);
-            $sql = "SELECT us.id_usuario_sistema, us.username, us.id_profissional,pp.nome as acesso, pp.id_permissao, p.*,
+            $sql = "SELECT us.id_usuario_sistema, us.avatar ,us.username, us.id_profissional,pp.nome as acesso, pp.id_permissao, p.*,
                            IF(us.nome IS NULL, p.nome, us.nome) AS nome
                     FROM usuarios_sistema us
     	            LEFT JOIN profissionais p ON ( p.id_profissional = us.id_profissional)
@@ -28,7 +28,7 @@ if ($authorization) {
             $stmt->bindParam(':id_profissional', $id_profissional);
         } else if (isset($_GET["username"]) && !empty($_GET["username"])) { // Corrigido para verificar se username não está vazio
             $username = trim($_GET["username"]);
-            $sql = "SELECT us.id_usuario_sistema, us.username, us.id_profissional,pp.nome as acesso, pp.id_permissao, p.*, 
+            $sql = "SELECT us.id_usuario_sistema,us.avatar , us.username, us.id_profissional,pp.nome as acesso, pp.id_permissao, p.*, 
                            IF(us.nome IS NULL, p.nome, us.nome) AS nome
                     FROM usuarios_sistema us
                     LEFT JOIN profissionais p ON ( p.id_profissional = us.id_profissional)
@@ -38,7 +38,7 @@ if ($authorization) {
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':username', $username);
         } else {
-            $sql = "SELECT us.id_usuario_sistema, us.username, us.id_profissional,us.ativo as ativoUsuario, pp.nome as acesso, pp.id_permissao, p.*,
+            $sql = "SELECT us.id_usuario_sistema,us.avatar , us.username, us.id_profissional,us.ativo as ativoUsuario, pp.nome as acesso, pp.id_permissao, p.*,
                            IF(us.nome IS NULL, p.nome, us.nome) AS nome
                     FROM usuarios_sistema us
                     LEFT JOIN profissionais p ON ( p.id_profissional = us.id_profissional)

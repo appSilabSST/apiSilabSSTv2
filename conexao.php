@@ -8,7 +8,7 @@ header('Access-Control-Max-Age: 86400');
 
 date_default_timezone_set('America/Sao_Paulo');
 
-define('host' , "162.241.2.151");
+define('host' , "162.241.62.112");
 define('username' , "silabs69_silab");
 define('password' , '$f)$13m~>Hq3');
 define('db_name' , "silabs69_appsilab");

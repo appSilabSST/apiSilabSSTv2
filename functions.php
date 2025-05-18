@@ -151,7 +151,7 @@ function move_file($file, $cnpj)
         $raizServidor = dirname($_SERVER['DOCUMENT_ROOT']); // Volta um nível a partir do public_html
 
         // Define o caminho completo para o diretório .anexos
-        echo   $anexoFolder = $raizServidor . "/.anexos/" . $cnpj . "/" . date("Y") . "/" . date("m") . "/" . date("d") . "/";
+        $anexoFolder = $raizServidor . "/.anexos/" . $cnpj . "/" . date("Y") . "/" . date("m") . "/" . date("d") . "/";
 
         // Cria o diretório, caso não exista
         if (!file_exists($anexoFolder)) {
@@ -173,5 +173,74 @@ function move_file($file, $cnpj)
         }
     } else {
         return false; // Se não houver arquivo enviado
+    }
+}
+
+function move_avatar($file, $cnpj)
+{
+    // Verifica se um arquivo de anexo foi enviado
+    if ($file["error"] != 4) {
+        // Obtém o diretório raiz do servidor (sem o public_html)
+        $raizServidor = dirname($_SERVER['DOCUMENT_ROOT']); // Volta um nível a partir do public_html
+
+        // Define o caminho completo para o diretório .anexos
+        $anexoFolder = $raizServidor . "/fotos/" . $cnpj . "/";
+
+        // Cria o diretório, caso não exista
+        if (!file_exists($anexoFolder)) {
+            mkdir($anexoFolder, 0755, true);
+        }
+
+        // Obtém a extensão do arquivo de forma mais segura
+        $info = pathinfo($file["name"]);
+        $extensao = $info["extension"];
+
+        // Gera um nome único para o arquivo
+        $nomeArquivo = sha1($file["tmp_name"] . time() . $cnpj) . "." . $extensao;
+
+        // Move o arquivo para o novo diretório
+        if (move_uploaded_file($file["tmp_name"], $anexoFolder . $nomeArquivo)) {
+            return  $cnpj . "/" . $nomeArquivo;
+        } else {
+            return false; // Se o arquivo não puder ser movido
+        }
+    } else {
+        return false; // Se não houver arquivo enviado
+    }
+}
+
+function delete_avatar($caminhoRelativo)
+{
+    // Obtém o diretório raiz do servidor (sem o public_html)
+    $raizServidor = dirname($_SERVER['DOCUMENT_ROOT']); // Volta um nível a partir do public_html
+
+    // Concatena o caminho completo do arquivo
+    $caminhoCompleto = $raizServidor . "/" . $caminhoRelativo;
+    // Verifica se o arquivo existe
+    if (file_exists($caminhoCompleto)) {
+        // Tenta excluir o arquivo
+        if (unlink($caminhoCompleto)) {
+            return ['excluido' => true, 'path' => $caminhoCompleto, 'result' => 'Arquivo excluído com sucesso'];  // Arquivo excluído com sucesso
+        } else {
+            return ['excluido' => false, 'path' => $caminhoCompleto, 'result' => 'Falha ao excluir'];   // Falha ao excluir
+        }
+    } else {
+        return ['excluido' => false, 'path' => $caminhoCompleto, 'result' => 'Arquivo não encontrado'];   // Arquivo não encontrado
+    }
+}
+
+
+function imagem_para_base64($caminhoImagem)
+{
+    $raizServidor = dirname($_SERVER['DOCUMENT_ROOT']);
+    $img = $raizServidor . "/fotos/" . $caminhoImagem;
+
+    // Verifica se o arquivo existe
+    if (file_exists($img)) {
+        $tipo = mime_content_type($img); // Detecta o tipo MIME, como image/jpeg
+        $dados = base64_encode(file_get_contents($img));
+        return "data:$tipo;base64,$dados";
+    } else {
+        return ''; // Arquivo não encontrado
     }
 }

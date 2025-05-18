@@ -1,24 +1,35 @@
 <?php
+
+include('../valida_token.php');
 // VALIDA SE FOI LIBERADO O ACESSO
 if ($authorization) {
     try {
-        if (isset($_POST['id_usuario_sistema'])) {
+        if (
+            isset($_POST['id_usuario_sistema']) &&
+            isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK
+        ) {
+            //Salva o arquivo no servidor
+            $avatar = move_avatar($_FILES["avatar"], $info->nr_doc);
 
-            $sql = "
-                    UPDATE usuario_sistema SET
+            $path = "fotos/" . $_POST["path"];
+
+            if ($avatar) {
+                $sql = "
+                    UPDATE usuarios_sistema SET
                     avatar = :avatar
                     WHERE id_usuario_sistema = :id_usuario_sistema
                 ";
 
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':avatar', trim($avatar));
-            $stmt->bindParam(':id_usuario_sistema', trim($json['id_usuario_sistema']));
-            $stmt->execute();
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':avatar', trim($avatar));
+                $stmt->bindParam(':id_usuario_sistema', trim($_POST['id_usuario_sistema']));
+                $stmt->execute();
 
-            $result = array(
-                'status' => 'success',
-                'result' => 'Cnae atualizado com sucesso!'
-            );
+                $result = array(
+                    'status' => 'success',
+                    'result' => delete_avatar($path)
+                );
+            }
         } else {
             http_response_code(400);
             $result = array(

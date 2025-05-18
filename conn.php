@@ -2,7 +2,7 @@
 
 date_default_timezone_set('America/Sao_Paulo');
 
-define('host_db', "162.241.2.151");
+define('host_db', "162.241.62.112");
 define('user_db', "silabs69_silab");
 define('pass_db', '$f)$13m~>Hq3');
 define('name_db', "silabs69_appsilab");

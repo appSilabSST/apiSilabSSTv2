@@ -19,7 +19,7 @@ if (empty($username) || empty($password)) {
 } else {
     $sql = "
     SELECT
-        us.id_profissional,us.id_permissao,us.username,us.id_usuario_sistema,us.email,
+        us.id_profissional,us.id_permissao,us.username,us.id_usuario_sistema,us.email,us.avatar,
         per.acesso,per.nome as perfil,
         IF(us.nome IS NULL, p.nome, us.nome) AS nome,
         ep.id_sala_atendimento,
@@ -41,6 +41,8 @@ if (empty($username) || empty($password)) {
 
     // echo $sql;exit;
 
+
+
     $query = mysqli_query($conecta, $sql);
 
     if (mysqli_num_rows($query) > 0) {
@@ -49,6 +51,18 @@ if (empty($username) || empty($password)) {
         $name_fullname = explode(" ", $row->nome);
         $name_fullname = $name_fullname[0] . " " . end($name_fullname);
 
+        $raizServidor = dirname($_SERVER['DOCUMENT_ROOT']);
+        $img = $raizServidor . "/fotos/" . $row->avatar;
+
+        // Verifica se o arquivo existe
+        if (file_exists($img)) {
+            $tipo = mime_content_type($img); // Detecta o tipo MIME, como image/jpeg
+            $dados = base64_encode(file_get_contents($img));
+            $avatarBase64 = "data:$tipo;base64,$dados";
+        } else {
+            $avatarBase64 =  ''; // Arquivo não encontrado
+        }
+
         $user =
             [
                 'nome' => $name_fullname,
@@ -56,7 +70,8 @@ if (empty($username) || empty($password)) {
                 'id_usuario_sistema' => $row->id_usuario_sistema,
                 'email' => $row->email,
                 'perfil' => $row->perfil,
-                'acesso' => $row->acesso
+                'acesso' => $row->acesso,
+                'avatar' => $avatarBase64,
             ];
 
         $escala = [];
